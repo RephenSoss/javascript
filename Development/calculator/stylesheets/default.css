@@ -1,0 +1,106 @@
+@font-face {
+  font-family: 'Allerta';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Allerta Regular'), local('Allerta-Regular'), url(http://themes.googleusercontent.com/static/fonts/allerta/v4/URdUfE0ePw9inz9dceNoVA.woff) format('woff');
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url(http://themes.googleusercontent.com/static/fonts/oxygenmono/v1/BzV4DVOwAgGelLT9EC5xyobN6UDyHWBl620a-IRfuBk.woff) format('woff');
+}
+@font-face {
+  font-family: 'Special Elite';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Special Elite'), local('SpecialElite-Regular'), url(http://themes.googleusercontent.com/static/fonts/specialelite/v3/9-wW4zu3WNoD5Fjka35Jm_n8qdNnd5eCmWXua5W-n7c.woff) format('woff');
+}
+@font-face {
+  font-family: 'VT323';
+  font-style: normal;
+  font-weight: 400;
+  src: local('VT323'), local('VT323-Regular'), url(http://themes.googleusercontent.com/static/fonts/vt323/v4/LfMzj2MWAZU6qzlnp1MNbg.woff) format('woff');
+}
+
+body {
+    position: absolute;
+    font-family: 'Oxygen Mono';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow-y: auto;
+    background-color: #ccc;
+}
+#calculator {
+    margin: 10px;
+    padding: 0;
+}
+#url{
+    z-index: 9;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+input {
+    margin-top: 10px;
+    width: 100%;
+    height: 25px;
+    border: 0;
+    border-radius: 0;
+    font-family: 'VT323';
+    font-size: 14pt;
+    color: #000;
+    background-color: #ccc;
+    border-bottom: 1px dotted #999;
+}
+    input#routeid {
+        
+    }
+    
+.route {
+    z-index: 1;
+    cursor: move;
+    position: absolute;
+    float: left;
+    top: 0;
+    left: 30px;
+    padding: 20px;
+    width: 150px;
+    overflow: hidden;
+    font-size: 14px;
+    border-radius: 5px;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #999;
+    display: none;
+}
+    .route:hover {
+        z-index: 999;
+        box-shadow: 0 0 15px -5px #000;
+    }
+    .route:active {
+        z-index: 999;
+        box-shadow: 0 50px 25px -15px #000;
+    }
+    .route > div {
+        padding: 5px;
+        border-bottom: 1px dotted #999;
+    }
+        .route > #DIFF {
+            color: #900;
+        }
+        .route > #SUM {
+            color: #090;
+        }
+    .routeActive {
+        background-color: #ccc;
+        border: 5px dotted #000;
+    }
+    .routeHover {
+        color: #000;
+        background-color: #5f5;
+    }
