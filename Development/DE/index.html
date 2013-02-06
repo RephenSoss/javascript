@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>QueryTask with query geometry from another task</title>
+    <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/esri/css/esri.css">
+     
+    <script src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/"></script>
+	
+      <script>
+		dojo.require("esri.map");
+		dojo.require("esri.tasks.gp");
+		dojo.require("esri.layers.agstiled");
+		dojo.require("esri.toolbars.draw");
+		dojo.require("dijit.form.Button");
+		dojo.require("dojo.number");
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.ContentPane");
+		
+		var map, gp, toolbar;
+
+      /*Initialize map, GP & image params*/
+		function init() {
+			map = new esri.Map("mapDiv", { 
+			  basemap: "topo", 
+			  center: [-98.506, 29.434],
+			  zoom: 6
+		});
+		
+		dojo.connect(map, "onLoad", initToolbar);
+
+		//identify proxy page to use if the toJson payload to the geoprocessing service is greater than 2000 characters.
+		//If this null or not available the gp.execute operation will not work.  Otherwise it will do a http post to the proxy.
+		//esri.config.defaults.io.proxyUrl = "/arcgisserver/apis/javascript/proxy/proxy.ashx";
+		//esri.config.defaults.io.alwaysUseProxy = false;
+		}
+
+	  
+		function initToolbar(map) {
+			gp = new esri.tasks.Geoprocessor("http://tsd-gisgpc-3/ArcGIS/rest/services/TPP/DE_Intersect/GPServer/DEIntersect_Lines");
+			gp.setOutputSpatialReference({wkid:4326}); 
+			toolbar = new esri.toolbars.Draw(map);
+			dojo.connect(toolbar, "onDrawEnd", computeIntersection);
+		}
+
+	   function computeIntersection(geometry) {
+			toolbar.deactivate();
+			map.showZoomSlider();
+			
+			var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([255,0,0]), 1);
+			var graphic = new esri.Graphic(geometry,symbol);
+			map.graphics.add(graphic);
+			
+			tb.deactivate();
+
+			var features= [];
+			features.push(graphic);
+
+			var featureSet = new esri.tasks.FeatureSet();
+			featureSet.features = features;
+			
+			var params = { "Feature_Set":featureSet };
+			gp.execute(params);
+			
+			dojo.connect(gp, "onExecuteComplete", function(results,messages) {
+			  //create symbol for selected features
+			  var symbol = new esri.symbol.SimpleMarkerSymbol();
+			  symbol.style = esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE;
+			  symbol.setSize(8);
+			  symbol.setColor(new dojo.Color([255,255,0,0.5]));
+
+			  var resultFeatures = fset.features;
+			  for (var i=0, il=resultFeatures.length; i<il; i++) {
+				var graphic = resultFeatures[i];
+				graphic.setSymbol(symbol);
+				graphic.setInfoTemplate(infoTemplate);
+				map.graphics.add(graphic);
+			  }
+
+			});
+			
+		  }
+
+		dojo.ready(init);
+    </script>
+  </head>
+
+  <body class="claro">
+    Zoom to area and click on map to select census block points within the buffered circle.<br/>
+    Buffer distance (in kilometers):&nbsp;<input type="text" id="bufferDistance" value="1" size="5"/>
+      <span>Draw:<br /></span>
+      <button data-dojo-type="dijit.form.Button" data-dojo-props="onClick:function(){toolbar.activate(esri.toolbars.Draw.POLYLINE);map.hideZoomSlider();}">Polyline</button>
+    <div id="mapDiv" style="width: 500px; height:500px;"></div>
+    <span id="messages"></span>
+  </body>
+</html>
