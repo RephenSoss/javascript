@@ -596,11 +596,7 @@
 				//var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions/MapServer/0";	
 				var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
 				
-				//var defaultSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#D80000"), 3);							
-				//var theRenderer = new esri.renderer.SimpleRenderer(defaultSymbol);
-				
-				pavementConditionLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["SIGNED_HIG","PVMNT_TYPE","DISTRESS_S","CONDITION_","RIDE_SCORE"], infoTemplate: infoTemplate});		
-				//pavementConditionLyr.setRenderer(theRenderer);				
+				pavementConditionLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["SIGNED_HIG","PVMNT_TYPE","DISTRESS_S","CONDITION_","RIDE_SCORE"], infoTemplate: infoTemplate});			
 				map.addLayer(pavementConditionLyr);
 			}
 			activeOverlay = pavementConditionLyr;	
@@ -622,13 +618,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Highway Designations:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Minute_Orders/FeatureServer/0";	
-									
-				var defaultSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#D80000"), 3);							
-				var theRenderer = new esri.renderer.SimpleRenderer(defaultSymbol);				
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Minute_Orders/FeatureServer/0";					
 
-				minuteOrderLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});
-				minuteOrderLyr.setRenderer(theRenderer);		
+				minuteOrderLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 				map.addLayer(minuteOrderLyr);
 			}	
 			activeOverlay = minuteOrderLyr;	
@@ -649,55 +641,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Speed Limit:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/1";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/1";			
 				
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "SPD_MAX");
-				
-				//add symbol for each possible value
-				symbol01 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);
-				symbol02 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);
-				symbol03 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);						
-				symbol04 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);										
-				symbol05 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);														
-				symbol06 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);																		
-				symbol07 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);																		
-				symbol08 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#98FB98"), 4);										
-				symbol09 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#87CEFA"), 6);														
-				symbol10 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#1E90FF"), 6);																		
-				symbol11 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#32CD32"), 6);
-				symbol12 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#228B22"), 6);
-				symbol13 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#F0E68C"), 6);						
-				symbol14 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FFFF00"), 6);										
-				symbol15 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FFD700"), 6);														
-				symbol16 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FFA500"), 6);																		
-				symbol17 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF7F50"), 6);																		
-				symbol18 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 6);										
-								
-				theRenderer.addValue("0", symbol01);
-				theRenderer.addValue("5", symbol02);
-				theRenderer.addValue("10", symbol03);				
-				theRenderer.addValue("15", symbol04);				
-				theRenderer.addValue("20", symbol05);				
-				theRenderer.addValue("25", symbol06);					
-				theRenderer.addValue("30", symbol07);				
-				theRenderer.addValue("35", symbol08);				
-				theRenderer.addValue("40", symbol09);				
-				theRenderer.addValue("45", symbol10);					
-				theRenderer.addValue("50", symbol11);				
-				theRenderer.addValue("55", symbol12);				
-				theRenderer.addValue("60", symbol13);					
-				theRenderer.addValue("65", symbol14);				
-				theRenderer.addValue("70", symbol15);				
-				theRenderer.addValue("75", symbol16);				
-				theRenderer.addValue("80", symbol17);					
-				theRenderer.addValue("85", symbol18);					
-				
-				speedLimitLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Speed_Limit",visible: true,outFields:["RIA_RTE_ID","SPD_MAX","FRM_DFO","TO_DFO"], infoTemplate: infoTemplate});	
-				speedLimitLyr.setRenderer(theRenderer);		
+				speedLimitLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Speed_Limit",visible: true,outFields:["RIA_RTE_ID","SPD_MAX","FRM_DFO","TO_DFO"], infoTemplate: infoTemplate});		
 				map.addLayer(speedLimitLyr);
 			}	
 			activeOverlay = speedLimitLyr;	
@@ -726,12 +672,8 @@
 				
 				var infoTemplate = new esri.InfoTemplate("Proposition One:",tableText);	
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/3";	
-	
-				var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF6633"), 4);
-				var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
 
-				pOneLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Proposition_One",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-				pOneLyr.setRenderer(theRenderer);		
+				pOneLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Proposition_One",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});		
 				map.addLayer(pOneLyr);
 			}	
 			activeOverlay = pOneLyr;	
@@ -761,12 +703,8 @@
 				
 				var infoTemplate = new esri.InfoTemplate("Feasibility Study:",tableText);	
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/0";	
-	
-				var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#0000FF"), 3);
-				var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);	
 
-				feasStudyLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Feasibility_Studies",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-				feasStudyLyr.setRenderer(theRenderer);		
+				feasStudyLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Feasibility_Studies",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});
 				map.addLayer(feasStudyLyr);
 			}	
 			activeOverlay = feasStudyLyr;	
@@ -796,12 +734,8 @@
 				
 				var infoTemplate = new esri.InfoTemplate("Project - Future Candidate:",tableText);	
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/2";	
-				
-				var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 3);				
-				var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);	
 
 				unfundedLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Unfunded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-				unfundedLyr.setRenderer(theRenderer);
 				unfundedLyr.setDefinitionExpression("TPP_WORK_PROGRAM <> 'CANDPA' AND RIGHT(CONTROL_SECT_JOB,3) Not Like '9%'");
 				map.addLayer(unfundedLyr);
 			}	
@@ -832,12 +766,8 @@
 				
 				var infoTemplate = new esri.InfoTemplate("Project - 10 Year Program:",tableText);	
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/1";	
-				
-				var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#008000"), 3);
-				var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);	
 
 				fundedLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Funded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-				fundedLyr.setRenderer(theRenderer);		
 				map.addLayer(fundedLyr);
 			}	
 			activeOverlay = fundedLyr;	
@@ -860,20 +790,7 @@
 				var infoTemplate = new esri.InfoTemplate("Future Traffic:",tableText);	
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";	
 				
-				var sizeInfo = {
-				     field:"ADT_CUR",
-				     minSize:2,
-				     maxSize:15,
-				     minDataValue:1,
-				     maxDataValue:350000
-			     };
-				
-				var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);								
-				var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
-				theRenderer.setSizeInfo(sizeInfo);
-				
 				futureTrafficLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});	
-				futureTrafficLyr.setRenderer(theRenderer);					
 				map.addLayer(futureTrafficLyr);
 			}	
 			
@@ -896,25 +813,10 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Railroad:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/14";	
-								
-				var defaultSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#202020"), 3);								
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "RR_NM");
-				
-				//add symbol for each possible value
-				symbol1 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 3);
-				symbol2 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#0080FF"), 3);
-				symbol3 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF9933"), 3);						
-				symbol4 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#9933FF"), 3);				
-								
-				theRenderer.addValue("66", symbol1);
-				theRenderer.addValue("15", symbol2);
-				theRenderer.addValue("79", symbol3);				
-				theRenderer.addValue("63", symbol4);					
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/14";					
 
 				railRoadLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
-				railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");
-				railRoadLyr.setRenderer(theRenderer);		
+				railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
 				map.addLayer(railRoadLyr);
 			}	
 			activeOverlay = railRoadLyr;	
@@ -934,38 +836,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Non Attainment:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/8";	
-				
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/8";			
 
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "STATUS");
-				
-				//add symbol for each possible value
-				var symbolOne = new esri.symbol.SimpleFillSymbol();
-				symbolOne.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#3399FF"),2));				
-				symbolOne.setColor(new esri.Color([102,178,255,0.3]));	
-				
-				var symbolTwo = new esri.symbol.SimpleFillSymbol();
-				symbolTwo.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#FF9933"),2));				
-				symbolTwo.setColor(new esri.Color([255,178,102,0.3]));	
-
-				var symbolThree = new esri.symbol.SimpleFillSymbol();
-				symbolThree.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#980000"),2));				
-				symbolThree.setColor(new esri.Color([255,0,0,0.5]));	
-				
-				var symbolFour = new esri.symbol.SimpleFillSymbol();
-				symbolFour.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#980000"),2));				
-				symbolFour.setColor(new esri.Color([255,0,0,0.5]));				
-
-				theRenderer.addValue("Early Action Compact Area", symbolOne);
-				theRenderer.addValue("Near Nonattainment ", symbolTwo);
-				theRenderer.addValue("Nonattain_Ozone 8 Hour", symbolThree);				
-				theRenderer.addValue("Nonattainment For CO", symbolFour);				
-
-				nonAttainLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});	
-				nonAttainLyr.setRenderer(theRenderer);		
+				nonAttainLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});			
 				map.addLayer(nonAttainLyr);
 			}	
 			activeOverlay = nonAttainLyr;
@@ -984,26 +857,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Texas Trunk:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";	
-
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "CMNT");
-				
-				//add symbol for each possible value		
-				symbolOne = new esri.symbol.SimpleLineSymbol("Solid",new esri.Color("#0033CC"), 4);
-				symbolTwo = new esri.symbol.SimpleLineSymbol("Solid", new esri.Color("#D00000"), 4);
-				symbolThree = new esri.symbol.SimpleLineSymbol("Solid", new esri.Color("#080808"), 4);						
-								
-				
-				theRenderer.addValue("INTERSTATE HIGHWAYS", symbolOne);
-				theRenderer.addValue("PHASE 1 CORRIDORS", symbolTwo);
-				theRenderer.addValue("OTHER TRUNK HIGHWAYS", symbolThree);
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
       				
-				txTrunkLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});	
-				txTrunkLyr.setRenderer(theRenderer);		
+				txTrunkLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});			
 				map.addLayer(txTrunkLyr);
 			}	
 			activeOverlay = txTrunkLyr;
@@ -1023,16 +879,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Maintenance Office:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Maintenance_Office/FeatureServer/0";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Maintenance_Office/FeatureServer/0";
 
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([199,21,133]),2));				
-				symbol.setColor(new esri.Color([221,160,221,0.1]));				
-				
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);	
-
-				maintOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});	
-				maintOfficeLyr.setRenderer(theRenderer);		
+				maintOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});		
 				map.addLayer(maintOfficeLyr);
 			}	
 			activeOverlay = maintOfficeLyr;			
@@ -1053,33 +902,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Functional Classification:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 				
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "FC_DESC");
-				
-				//add symbol for each possible value
-				symbolOne = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#0033CC"), 4);
-				symbolTwo = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#080808"), 4);
-				symbolThree = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#D00000"), 4);						
-				symbolFour = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#009933"), 4);
-				symbolFive = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#CC0099"), 4);
-				symbolSix = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FFFF00"), 4);
-				symbolSeven = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#CCCCCC"), 4);
-				
-				theRenderer.addValue("Interstate", symbolOne);
-				theRenderer.addValue("Principal Arterial-Other Freeways and Expressways", symbolTwo);
-				theRenderer.addValue("Principal Arterial - Other", symbolThree);				
-				theRenderer.addValue("Minor Arterial", symbolFour);
-				theRenderer.addValue("Major Collector", symbolFive);
-				theRenderer.addValue("Minor Collector", symbolSix);
-				theRenderer.addValue("Local", symbolSeven);				
-				
-				FCLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC"], infoTemplate: infoTemplate});	
-				FCLyr.setRenderer(theRenderer);		
+				FCLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC"], infoTemplate: infoTemplate});		
 				map.addLayer(FCLyr);
 			}	
 			activeOverlay = FCLyr;		
@@ -1098,25 +923,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Freight Network:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/1";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/1";		
 				
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "FR_TYPE");
-				
-				//add symbol for each possible value
-				symbolOne = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#0033CC"), 3);
-				symbolTwo = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#707070"), 3);
-				//symbolThree = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#D00000"), 4);						
-				
-				theRenderer.addValue("Primary", symbolOne);
-				theRenderer.addValue("Secondary", symbolTwo);
-				//theRenderer.addValue("Alternate Route", symbolThree);				
-				
-				FreightLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});	
-				FreightLyr.setRenderer(theRenderer);		
+				FreightLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
 				map.addLayer(FreightLyr);
 			}	
 			activeOverlay = FreightLyr;		
@@ -1134,49 +943,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Vertical Clearance:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/0";	
-				
-				//var defaultSymbol
-				var symbol = new esri.symbol.SimpleMarkerSymbol();
-				symbol.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbol.setSize(8);
-				symbol.setColor(new esri.Color("#B0B0B0"));
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolOne = new esri.symbol.SimpleMarkerSymbol();
-				symbolOne.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolOne.setSize(8);
-				symbolOne.setColor(new esri.Color("#FF9900"));
-				symbolOne.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolTwo = new esri.symbol.SimpleMarkerSymbol();
-				symbolTwo.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolTwo.setSize(8);
-				symbolTwo.setColor(new esri.Color("#FF0066"));
-				symbolTwo.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolThree = new esri.symbol.SimpleMarkerSymbol();
-				symbolThree.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolThree.setSize(8);
-				symbolThree.setColor(new esri.Color("#FFFF00"));
-				symbolThree.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));
-				
-				var symbolFour = new esri.symbol.SimpleMarkerSymbol();
-				symbolFour.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolFour.setSize(8);
-				symbolFour.setColor(new esri.Color("#3399FF"));
-				symbolFour.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));					
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(symbol,"STATUS");
-				
-				theRenderer.addValue("Very poor condition", symbolOne);
-				theRenderer.addValue("Vertical clearance less than 14 feet", symbolTwo);
-				theRenderer.addValue("Vertical clearance between 14 and 16 feet", symbolThree);				
-				theRenderer.addValue("Vertical clearance between 16 and 18 feet", symbolFour);				
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/0";		
 				
 				VerticalLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Vertical Clearance",visible: true,outFields:["STATUS"], infoTemplate: infoTemplate});	
-				VerticalLyr.setRenderer(theRenderer);		
 				map.addLayer(VerticalLyr);
 			}	
 			activeOverlay = VerticalLyr;		
@@ -1195,84 +964,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Permanent Count Station:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Permanent_Stations/FeatureServer/0";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Permanent_Stations/FeatureServer/0";				
 				
-				//var defaultSymbol
-				var symbol = new esri.symbol.SimpleMarkerSymbol();
-				symbol.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbol.setSize(8);
-				symbol.setColor(new esri.Color("#D0D0D0"));
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolOne = new esri.symbol.SimpleMarkerSymbol();
-				symbolOne.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolOne.setSize(8);
-				symbolOne.setColor(new esri.Color("#FFFF00"));
-				symbolOne.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolTwo = new esri.symbol.SimpleMarkerSymbol();
-				symbolTwo.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolTwo.setSize(8);
-				symbolTwo.setColor(new esri.Color("#FFFF00"));
-				symbolTwo.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolThree = new esri.symbol.SimpleMarkerSymbol();
-				symbolThree.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolThree.setSize(8);
-				symbolThree.setColor(new esri.Color("#3366CC"));
-				symbolThree.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));
-				
-				var symbolFour = new esri.symbol.SimpleMarkerSymbol();
-				symbolFour.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolFour.setSize(8);
-				symbolFour.setColor(new esri.Color("#3366CC"));
-				symbolFour.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));
-				
-				var symbolFive = new esri.symbol.SimpleMarkerSymbol();
-				symbolFive.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolFive.setSize(8);
-				symbolFive.setColor(new esri.Color("#FFFFFF"));
-				symbolFive.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolSix = new esri.symbol.SimpleMarkerSymbol();
-				symbolSix.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolSix.setSize(8);
-				symbolSix.setColor(new esri.Color("#FF9933"));
-				symbolSix.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));	
-				
-				var symbolSeven = new esri.symbol.SimpleMarkerSymbol();
-				symbolSeven.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolSeven.setSize(8);
-				symbolSeven.setColor(new esri.Color("#D0D0D0"));
-				symbolSeven.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));
-				
-				var symbolEight = new esri.symbol.SimpleMarkerSymbol();
-				symbolEight.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolEight.setSize(8);
-				symbolEight.setColor(new esri.Color("#A0A0A0"));
-				symbolEight.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));				
-				
-				var symbolNine = new esri.symbol.SimpleMarkerSymbol();
-				symbolNine.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbolNine.setSize(8);
-				symbolNine.setColor(new esri.Color("#B80000"));
-				symbolNine.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#404040"),1));				
-
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(symbol,"STATION_TYPE");
-				
-				theRenderer.addValue("ATR", symbolOne);
-				theRenderer.addValue("ATR-C", symbolTwo);
-				theRenderer.addValue("AVC", symbolThree);				
-				theRenderer.addValue("AVC/CVC", symbolFour);				
-				theRenderer.addValue("BC", symbolFive);
-				theRenderer.addValue("MVC", symbolSix);
-				theRenderer.addValue("TIC", symbolSeven);				
-				theRenderer.addValue("TOLL", symbolEight);				
-				theRenderer.addValue("WIM", symbolNine);				
-				
-				permStationLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Permanent Stations",visible: true,outFields:["T_FLAG","STATION_TYPE"], infoTemplate: infoTemplate});	
-				permStationLyr.setRenderer(theRenderer);		
+				permStationLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Permanent Stations",visible: true,outFields:["T_FLAG","STATION_TYPE"], infoTemplate: infoTemplate});		
 				map.addLayer(permStationLyr);
 			}	
 			activeOverlay = permStationLyr;		
@@ -1299,16 +993,9 @@
 				tableText += "</table><br>This count includes frontage roads when present.";		
 				
 				var infoTemplate = new esri.InfoTemplate("Traffic Count Station:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_AADT/FeatureServer/0";	
-				var symbol = new esri.symbol.SimpleMarkerSymbol();
-				symbol.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbol.setSize(6);
-				symbol.setColor(new esri.Color("#FF0066"));
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#A00000"),1));
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);				
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_AADT/FeatureServer/0";			
 
-				aadtLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});	
-				aadtLyr.setRenderer(theRenderer);				
+				aadtLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
 				map.addLayer(aadtLyr);
 				
 				//Labeling
@@ -1341,16 +1028,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Reference Markers:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Reference_Markers/FeatureServer/0";	
-				var symbol = new esri.symbol.SimpleMarkerSymbol();
-				symbol.style = esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
-				symbol.setSize(6);
-				symbol.setColor(new esri.Color("#CC9900"));
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color("#CC6633"),1));
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);				
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Reference_Markers/FeatureServer/0";					
 
 				MarkerLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Reference Marker",visible: true,outFields:["RID","MRKR_NBR","MRKR_SFX","MEAS","SOURCE"], infoTemplate: infoTemplate});	
-				MarkerLyr.setRenderer(theRenderer);		
 				map.addLayer(MarkerLyr);
 				
 				//Labeling
@@ -1379,16 +1059,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("State House District:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/0";	
-				
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([105,105,105]),3));				
-				symbol.setColor(new esri.Color([211,211,211,0.3]));	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/0";
 
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);	
-
-				StateHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});	
-				StateHouseLyr.setRenderer(theRenderer);		
+				StateHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 				map.addLayer(StateHouseLyr);
 			}	
 			activeOverlay = StateHouseLyr;	
@@ -1407,16 +1080,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("State Senate District:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/1";	
-				
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([65,105,225]),2));				
-				symbol.setColor(new esri.Color([135,206,235,0.1]));		
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/1";				
 
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);					
-
-				StateSenateLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});	
-				StateSenateLyr.setRenderer(theRenderer);		
+				StateSenateLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 				map.addLayer(StateSenateLyr);
 			}	
 			activeOverlay = StateSenateLyr;
@@ -1435,16 +1101,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("US House District:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/2";	
-				
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([233,150,122]),2));				
-				symbol.setColor(new esri.Color([255,160,122,0.1]));		
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/2";				
 
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);					
-
-				USHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});	
-				USHouseLyr.setRenderer(theRenderer);		
+				USHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 				map.addLayer(USHouseLyr);
 			}	
 			activeOverlay = USHouseLyr;	
@@ -1465,33 +1124,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("NHS:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/12";	
-				
-				//var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				//defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/12";				
 
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "NHS_TYPE");
-				
-				//add symbol for each possible value
-				symbolOne = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#404040"), 4);
-				symbolTwo = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#CC3366"), 4);
-				symbolThree = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#404040"), 4);						
-				symbolFour = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#404040"), 4);										
-				symbolFive = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#404040"), 4);														
-				symbolSix = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#CD853F"), 4);																		
-				symbolSeven = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#32CD32"), 4);																		
-				
-				theRenderer.addValue("Interstate", symbolOne);
-				theRenderer.addValue("MAP-21 Principal Arterial", symbolTwo);
-				theRenderer.addValue("Original NHS", symbolThree);				
-				theRenderer.addValue("STRAHNET", symbolFour);				
-				theRenderer.addValue("STRAHNET Connector", symbolFive);				
-				theRenderer.addValue("NHS Intermodal Connector", symbolSix);					
-				theRenderer.addValue("Proposed Roadway on NHS", symbolSeven);					
-
-				NHSLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","SYS_TYPE","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});	
-				NHSLyr.setRenderer(theRenderer);		
+				NHSLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","SYS_TYPE","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});		
 				map.addLayer(NHSLyr);
 			}	
 			activeOverlay = NHSLyr;		
@@ -1509,16 +1144,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("Area Office:",tableText);	
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Area_Office/FeatureServer/0";	
-			
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([255,0,0]),2));				
-				symbol.setColor(new esri.Color([255,153,153,0.1]));			
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Area_Office/FeatureServer/0";
 
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);	
-
-				areaOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM"], infoTemplate: infoTemplate});	
-				areaOfficeLyr.setRenderer(theRenderer);		
+				areaOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM"], infoTemplate: infoTemplate});		
 				map.addLayer(areaOfficeLyr);
 			}	
 			activeOverlay = areaOfficeLyr;	
@@ -1539,14 +1167,7 @@
 				var infoTemplate = new esri.InfoTemplate("COG:",tableText);		
 				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/9";	
 				
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([210,105,30]),3));				
-				symbol.setColor(new esri.Color([244,164,96,0.1]));		
-
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);	
-				
-				COGLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"COG",visible: true,outFields:["COG_NM","COG_ABRVN"], infoTemplate: infoTemplate});	
-				COGLyr.setRenderer(theRenderer);		
+				COGLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"COG",visible: true,outFields:["COG_NM","COG_ABRVN"], infoTemplate: infoTemplate});		
 				map.addLayer(COGLyr);
 			}	
 			activeOverlay = COGLyr;
@@ -1566,16 +1187,9 @@
 				tableText += "</table>";		
 				
 				var infoTemplate = new esri.InfoTemplate("MPO:",tableText);		
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/2";	
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/2";						
 				
-				var symbol = new esri.symbol.SimpleFillSymbol();
-				symbol.setOutline(new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,esri.Color([255,140,0]),2));				
-				symbol.setColor(new esri.Color([255,165,0,0.1]));	
-
-				var theRenderer = new esri.renderer.SimpleRenderer(symbol);					
-				
-				MPOLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});	
-				MPOLyr.setRenderer(theRenderer);		
+				MPOLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});		
 				map.addLayer(MPOLyr);
 			}			
 			activeOverlay = MPOLyr;
@@ -1599,38 +1213,9 @@
 				
 				//create a renderer, info template, symbology and project link for the layer 
 				var infoTemplate = new esri.InfoTemplate("Control Section:",tableText);
-				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Control_Section/FeatureServer/0";	
-				
-				var defaultSymbol = new esri.symbol.SimpleFillSymbol().setStyle(esri.symbol.SimpleFillSymbol.STYLE_NULL);
-				defaultSymbol.outline.setStyle(esri.symbol.SimpleLineSymbol.STYLE_NULL);
+				var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Control_Section/FeatureServer/0";
 
-				//create renderer
-				var theRenderer = new esri.renderer.UniqueValueRenderer(defaultSymbol, "CTRL_SECT_CLR_NBR");
-				
-				//add symbol for each possible value
-				symbol01 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 4);
-				symbol02 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#0000FF"), 4);
-				symbol03 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#008000"), 4);						
-				symbol04 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FFFF00"), 4);										
-				symbol05 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#B0B0B0"), 4);														
-				symbol06 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#00FFFF"), 4);																		
-				symbol07 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF00FF"), 4);																		
-				symbol08 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#D2B48C"), 4);										
-				symbol09 = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#00FF00"), 4);															
-				
-				theRenderer.addValue("1", symbol01);
-				theRenderer.addValue("2", symbol02);
-				theRenderer.addValue("3", symbol03);				
-				theRenderer.addValue("4", symbol04);				
-				theRenderer.addValue("5", symbol05);				
-				theRenderer.addValue("6", symbol06);					
-				theRenderer.addValue("7", symbol07);				
-				theRenderer.addValue("8", symbol08);				
-				theRenderer.addValue("9", symbol09);										
-				
-				//Add the layer - outFields: ["*"] if you want to use all fields
 				controlSectionLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_NBR","RTE_NM","BEGIN_MPT_MS","END_MPT_MS","CTRL_SECT_CLR_NBR"], infoTemplate: infoTemplate});	
-				controlSectionLyr.setRenderer(theRenderer);		
 				map.addLayer(controlSectionLyr);
 				
 				//Labeling
