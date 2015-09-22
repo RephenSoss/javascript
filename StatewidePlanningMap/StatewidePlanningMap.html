@@ -201,13 +201,18 @@
 		"esri/layers/LabelLayer",
 		"esri/Color",
 		"esri/InfoTemplate",
-		"esri/layers/ArcGISTiledMapServiceLayer", 
+		"esri/layers/ArcGISTiledMapServiceLayer",
+
+		"esri/geometry/Polyline",
+		"esri/geometry/Point",
+		"esri/symbols/Font",
 
 		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on,
 			Query, QueryTask, arcgisUtils, Legend, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
-			SimpleFillSymbol, TextSymbol, SimpleRenderer, LabelLayer, Color, InfoTemplate, Tiled) {
+			SimpleFillSymbol, TextSymbol, SimpleRenderer, LabelLayer, Color, InfoTemplate, Tiled,
+			Polyline, Point, Font) {
 			
 		parser.parse();
 		
@@ -219,8 +224,8 @@
 		tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
 		map.addLayer(tiled);
 		
-		var theExtent = new esri.geometry.Extent(-107,25.27,-93,37.27, new esri.SpatialReference({ wkid: 4269 }));
-		map.setExtent(esri.geometry.geographicToWebMercator(theExtent));			
+		var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
+		map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
 		
 		//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers but never show them.
 		addInventoryData();
@@ -241,7 +246,7 @@
 		  attachTo: "bottom-left"
         });	
 
-		theLegend = new esri.dijit.Legend({map:map},"legendDiv");	
+		theLegend = new Legend({map:map},"legendDiv");	
 		
 	
 		//Function to force IE8 to work, eventually this will not be needed.
@@ -260,19 +265,19 @@
 		
 		function addSearchLayers() {
 			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/2";		
-			citySearchLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"City_Search",visible: false,outFields:["CITY_NM","xCoord","yCoord"]});		
+			citySearchLyr = new FeatureLayer(projectsUrl, {id:"City_Search",visible: false,outFields:["CITY_NM","xCoord","yCoord"]});		
 			
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/1";		
-			countySearchLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"County_Search",visible: false,outFields:["CNTY_NM","xCoord","yCoord"]});		
+			countySearchLyr = new FeatureLayer(projectsUrl, {id:"County_Search",visible: false,outFields:["CNTY_NM","xCoord","yCoord"]});		
 
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/3";		
-			csSearchLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"ControlSection_Search",visible: false,outFields:["CTRL_SECT_NBR","xCoord","yCoord"]});	
+			csSearchLyr = new FeatureLayer(projectsUrl, {id:"ControlSection_Search",visible: false,outFields:["CTRL_SECT_NBR","xCoord","yCoord"]});	
 
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/0";		
-			districtSearchLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"District_Search",visible: false,outFields:["DIST_NM","xCoord","yCoord"]});	
+			districtSearchLyr = new FeatureLayer(projectsUrl, {id:"District_Search",visible: false,outFields:["DIST_NM","xCoord","yCoord"]});	
 			
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/4";		
-			highwaySearchLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});	
+			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});	
 		}
 		
 		function createLegend() {
@@ -294,26 +299,26 @@
 
 		function calculateDistance() {
 		   if (xPointArray.length>1) {	   
-			   polyline = new esri.geometry.Polyline();
+			   polyline = new Polyline();
 			   polyline.addPath(xPointArray);
 			   
 			   if (measureUnits=="Miles") {
-				   theDistMeasured = esri.geometry.geodesicLengths([polyline], esri.Units.MILES);
+				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.MILES);
 				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " miles.";	
 				}
 
 			   if (measureUnits=="Kilometers") {
-				   theDistMeasured = esri.geometry.geodesicLengths([polyline], esri.Units.KILOMETERS);
+				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.KILOMETERS);
 				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " kilometers.";	
 				}		   
 
 			   if (measureUnits=="Feet") {
-				   theDistMeasured = esri.geometry.geodesicLengths([polyline], esri.Units.FEET);
+				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.FEET);
 				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " feet.";	
 				}		   
 
 			   if (measureUnits=="Meters") {
-				   theDistMeasured = esri.geometry.geodesicLengths([polyline], esri.Units.METERS);
+				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.METERS);
 				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " meters.";	
 				}
 			}	 
@@ -340,33 +345,39 @@
 		}
 
 		function createToolbar() {
-		  toolbar = new esri.toolbars.Draw(map);
+		  toolbar = new Draw(map);
 		  toolbar.on("draw-end", addToMap);
 		}	  
 		
 		function activateTool(theTool) {
-		  var tool = theTool;
-		  toolbar.activate(esri.toolbars.Draw[tool]);
-		  map.hideZoomSlider();
+			var tool;
+			if (theTool == "POLYLINE") {
+				tool = Draw.POLYLINE;
+			}
+		 	toolbar.activate(tool);
+		  	map.hideZoomSlider();
 		}
 
 		function deActivateTool(theTool) {
-		  var tool = theTool;
-		  toolbar.deactivate(esri.toolbars.Draw[tool]);
-		  map.showZoomSlider();
+		  	var tool;
+			if (theTool == "POLYLINE") {
+				tool = Draw.POLYLINE;
+			}
+		  	toolbar.deactivate(tool);
+		  	map.showZoomSlider();
 		}	
 		  
 		function addToMap(evt) {
 			var lineColorCode = "#D80000";
-			var lineColor = new esri.Color(lineColorCode);	
-			var theLine = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, lineColor, 3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);		
-			var defaultSymbol = new esri.symbol.SimpleFillSymbol("solid", theLine, null);												
-			var graphic = new esri.Graphic(evt.geometry,defaultSymbol);		
-			map.graphics.add(graphic);		
+			var lineColor = new Color(lineColorCode);	
+			var theLine = new CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, lineColor, 3, CartographicLineSymbol.CAP_ROUND, CartographicLineSymbol.JOIN_MITER, 5);		
+			var defaultSymbol = new SimpleFillSymbol("solid", theLine, null);												
+			var graphic = new Graphic(evt.geometry,defaultSymbol);		
+			map.graphics.add(graphic);
 		}	  
 		  
 		function showCoordinates(evt) {
-		  var mp = new esri.geometry.webMercatorToGeographic(evt.mapPoint);
+		  var mp = new webMercatorUtils.webMercatorToGeographic(evt.mapPoint);
 		  globalX = mp.x.toFixed(6);
 		  globalY = mp.y.toFixed(6);
 		  document.getElementById("info").innerHTML = "Level: " + map.getZoom() + ", " + mp.x.toFixed(6) + ", " + mp.y.toFixed(6);
@@ -382,11 +393,11 @@
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
 			if (newMap=="Statewide_Planning_Map") {
-				var tiled = new esri.layers.ArcGISTiledMapServiceLayer("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
+				var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
 				map.addLayer(tiled);	  
 			}
 			else {
-				var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
+				var basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
 				map.addLayer(basemap);
 			}			
 
@@ -463,8 +474,8 @@
 		}	
 		
 		function panTo(theX,theY) {
-		  	var thePt = new esri.geometry.Point(theX,theY, new esri.SpatialReference({ wkid: 4269 }));
-		  	map.centerAt(esri.geometry.geographicToWebMercator(thePt));
+		  	var thePt = new Point(theX,theY, new SpatialReference({ wkid: 4269 }));
+		  	map.centerAt(webMercatorUtils.geographicToWebMercator(thePt));
 		  	//onLoad();   
 		}
 		
@@ -474,8 +485,8 @@
 			var theX = paramsList[0];
 			var theY = paramsList[1];
 			var theZ = paramsList[2];
-		  	var thePt = new esri.geometry.Point(theX,theY, new esri.SpatialReference({ wkid: 4269 }));
-		  	map.centerAndZoom(esri.geometry.geographicToWebMercator(thePt),theZ);
+		  	var thePt = new Point(theX,theY, new SpatialReference({ wkid: 4269 }));
+		  	map.centerAndZoom(webMercatorUtils.geographicToWebMercator(thePt),theZ);
 		  	//onLoad();   
 		}	
 		
@@ -631,7 +642,6 @@
 			hideAllOverlays();
 			
 			var theLayer = event.target.id;
-			console.log(theLayer);
 			document.getElementById(theLayer).style.color='red';
 			if (theLayer=="CLEAR") {
 				activeOverlay="";
@@ -651,11 +661,11 @@
 					tableText += "<tr><td>Ride Score</td><td>${RIDE_SCORE}</td></tr>";					
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Pavement Conditions:",tableText);	
+					var infoTemplate = new InfoTemplate("Pavement Conditions:",tableText);	
 					//var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions/MapServer/0";	
 					var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
 					
-					pavementConditionLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["SIGNED_HIG","PVMNT_TYPE","DISTRESS_S","CONDITION_","RIDE_SCORE"], infoTemplate: infoTemplate});			
+					pavementConditionLyr = new FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["SIGNED_HIG","PVMNT_TYPE","DISTRESS_S","CONDITION_","RIDE_SCORE"], infoTemplate: infoTemplate});			
 					map.addLayer(pavementConditionLyr);
 				}
 				activeOverlay = pavementConditionLyr;	
@@ -676,10 +686,10 @@
 					tableText += "<tr><td>AASHTO Application</td><td>${AASHTO_APPLN}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Highway Designations:",tableText);	
+					var infoTemplate = new InfoTemplate("Highway Designations:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Minute_Orders/FeatureServer/0";					
 
-					minuteOrderLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
+					minuteOrderLyr = new FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 					map.addLayer(minuteOrderLyr);
 				}	
 				activeOverlay = minuteOrderLyr;	
@@ -699,10 +709,10 @@
 					tableText += "<tr><td>To DFO</td><td>${TO_DFO}</td></tr>";											
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Speed Limit:",tableText);	
+					var infoTemplate = new InfoTemplate("Speed Limit:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/1";			
 					
-					speedLimitLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Speed_Limit",visible: true,outFields:["RIA_RTE_ID","SPD_MAX","FRM_DFO","TO_DFO"], infoTemplate: infoTemplate});		
+					speedLimitLyr = new FeatureLayer(projectsUrl, {id:"Speed_Limit",visible: true,outFields:["RIA_RTE_ID","SPD_MAX","FRM_DFO","TO_DFO"], infoTemplate: infoTemplate});		
 					map.addLayer(speedLimitLyr);
 				}	
 				activeOverlay = speedLimitLyr;	
@@ -729,10 +739,10 @@
 					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";	
 					
-					var infoTemplate = new esri.InfoTemplate("Proposition One:",tableText);	
+					var infoTemplate = new InfoTemplate("Proposition One:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/3";	
 
-					pOneLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Proposition_One",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});		
+					pOneLyr = new FeatureLayer(projectsUrl, {id:"Proposition_One",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});		
 					map.addLayer(pOneLyr);
 				}	
 				activeOverlay = pOneLyr;	
@@ -760,10 +770,10 @@
 					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Feasibility Study:",tableText);	
+					var infoTemplate = new InfoTemplate("Feasibility Study:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/0";	
 
-					feasStudyLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Feasibility_Studies",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});
+					feasStudyLyr = new FeatureLayer(projectsUrl, {id:"Feasibility_Studies",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});
 					map.addLayer(feasStudyLyr);
 				}	
 				activeOverlay = feasStudyLyr;	
@@ -791,10 +801,10 @@
 					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Project - Future Candidate:",tableText);	
+					var infoTemplate = new InfoTemplate("Project - Future Candidate:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/2";	
 
-					unfundedLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Unfunded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
+					unfundedLyr = new FeatureLayer(projectsUrl, {id:"Unfunded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
 					unfundedLyr.setDefinitionExpression("TPP_WORK_PROGRAM <> 'CANDPA' AND RIGHT(CONTROL_SECT_JOB,3) Not Like '9%'");
 					map.addLayer(unfundedLyr);
 				}	
@@ -823,10 +833,10 @@
 					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Project - 10 Year Program:",tableText);	
+					var infoTemplate = new InfoTemplate("Project - 10 Year Program:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/1";	
 
-					fundedLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Funded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
+					fundedLyr = new FeatureLayer(projectsUrl, {id:"Funded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
 					map.addLayer(fundedLyr);
 				}	
 				activeOverlay = fundedLyr;	
@@ -846,10 +856,10 @@
 					tableText += "<tr><td>24 Hour Truck Percentage</td><td>${TRK_AADT}</td></tr>";											
 					tableText += "</table><br>Future Traffic and Percent Truck data is for main lanes only.";		
 					
-					var infoTemplate = new esri.InfoTemplate("Future Traffic:",tableText);	
+					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";	
 					
-					futureTrafficLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});	
+					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});	
 					map.addLayer(futureTrafficLyr);
 				}	
 				
@@ -871,10 +881,10 @@
 					tableText += "<tr><td>Number</td><td>${RR_NBR}</td></tr>";					
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Railroad:",tableText);	
+					var infoTemplate = new InfoTemplate("Railroad:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/14";					
 
-					railRoadLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
+					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
 					map.addLayer(railRoadLyr);
 				}	
@@ -894,10 +904,10 @@
 					tableText += "<tr><td>Status</td><td>${STATUS}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Non Attainment:",tableText);	
+					var infoTemplate = new InfoTemplate("Non Attainment:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/8";			
 
-					nonAttainLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});			
+					nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});			
 					map.addLayer(nonAttainLyr);
 				}	
 				activeOverlay = nonAttainLyr;
@@ -915,10 +925,10 @@
 					tableText += "<tr><td>Trunk Type</td><td>${CMNT}</td></tr>";			
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Texas Trunk:",tableText);	
+					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
 	      				
-					txTrunkLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});			
+					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});			
 					map.addLayer(txTrunkLyr);
 				}	
 				activeOverlay = txTrunkLyr;
@@ -937,10 +947,10 @@
 					tableText += "<tr><td>Published</td><td>${CREATE_DT}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Maintenance Office:",tableText);	
+					var infoTemplate = new InfoTemplate("Maintenance Office:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Maintenance_Office/FeatureServer/0";
 
-					maintOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});		
+					maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});		
 					map.addLayer(maintOfficeLyr);
 				}	
 				activeOverlay = maintOfficeLyr;			
@@ -960,10 +970,10 @@
 					tableText += "<tr><td>FC Description</td><td>${FC_DESC}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Functional Classification:",tableText);	
+					var infoTemplate = new InfoTemplate("Functional Classification:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 					
-					FCLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC"], infoTemplate: infoTemplate});		
+					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC"], infoTemplate: infoTemplate});		
 					map.addLayer(FCLyr);
 				}	
 				activeOverlay = FCLyr;		
@@ -981,10 +991,10 @@
 					tableText += "<tr><td>Network Type</td><td>${FR_TYPE}</td></tr>";
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Freight Network:",tableText);	
+					var infoTemplate = new InfoTemplate("Freight Network:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/1";		
 					
-					FreightLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
+					FreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
 					map.addLayer(FreightLyr);
 				}	
 				activeOverlay = FreightLyr;		
@@ -1001,10 +1011,10 @@
 					tableText += "<tr><td>Status</td><td>${STATUS}</td></tr>";
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Vertical Clearance:",tableText);	
+					var infoTemplate = new InfoTemplate("Vertical Clearance:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/0";		
 					
-					VerticalLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Vertical Clearance",visible: true,outFields:["STATUS"], infoTemplate: infoTemplate});	
+					VerticalLyr = new FeatureLayer(projectsUrl, {id:"Vertical Clearance",visible: true,outFields:["STATUS"], infoTemplate: infoTemplate});	
 					map.addLayer(VerticalLyr);
 				}	
 				activeOverlay = VerticalLyr;		
@@ -1022,10 +1032,10 @@
 					tableText += "<tr><td>Station Type</td><td>${STATION_TYPE}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Permanent Count Station:",tableText);	
+					var infoTemplate = new InfoTemplate("Permanent Count Station:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Permanent_Stations/FeatureServer/0";				
 					
-					permStationLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Permanent Stations",visible: true,outFields:["T_FLAG","STATION_TYPE"], infoTemplate: infoTemplate});		
+					permStationLyr = new FeatureLayer(projectsUrl, {id:"Permanent Stations",visible: true,outFields:["T_FLAG","STATION_TYPE"], infoTemplate: infoTemplate});		
 					map.addLayer(permStationLyr);
 				}	
 				activeOverlay = permStationLyr;		
@@ -1051,19 +1061,19 @@
 					tableText += "<tr><td>AADT 2007</td><td>${F2007_TRAF}</td></tr>";				
 					tableText += "</table><br>This count includes frontage roads when present.";		
 					
-					var infoTemplate = new esri.InfoTemplate("Traffic Count Station:",tableText);	
+					var infoTemplate = new InfoTemplate("Traffic Count Station:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_AADT/FeatureServer/0";			
 
-					aadtLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
+					aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
 					map.addLayer(aadtLyr);
 					
 					//Labeling
-					var label_symbol =  new esri.symbol.TextSymbol();
-					label_symbol.setColor(new esri.Color("#F00000"));
-					label_symbol.setFont(new esri.symbol.Font("10pt").setWeight(esri.symbol.Font.WEIGHT_BOLD));
+					var label_symbol =  new TextSymbol();
+					label_symbol.setColor(new Color("#F00000"));
+					label_symbol.setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD));
 
-					var label_renderer = new esri.renderer.SimpleRenderer(label_symbol);
-					labelLayerAADT = new esri.layers.LabelLayer({id:"AADT_Labels"});
+					var label_renderer = new SimpleRenderer(label_symbol);
+					labelLayerAADT = new LabelLayer({id:"AADT_Labels"});
 					labelLayerAADT.addFeatureLayer(aadtLyr, label_renderer, "{F2013_TRAF}");
 					map.addLayer(labelLayerAADT);
 				}	
@@ -1086,19 +1096,19 @@
 					tableText += "<tr><td>Source</td><td>${SOURCE}</td></tr>";					
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Reference Markers:",tableText);	
+					var infoTemplate = new InfoTemplate("Reference Markers:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Reference_Markers/FeatureServer/0";					
 
-					MarkerLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Reference Marker",visible: true,outFields:["RID","MRKR_NBR","MRKR_SFX","MEAS","SOURCE"], infoTemplate: infoTemplate});	
+					MarkerLyr = new FeatureLayer(projectsUrl, {id:"Reference Marker",visible: true,outFields:["RID","MRKR_NBR","MRKR_SFX","MEAS","SOURCE"], infoTemplate: infoTemplate});	
 					map.addLayer(MarkerLyr);
 					
 					//Labeling
-					var label_symbol =  new esri.symbol.TextSymbol();
-					label_symbol.setColor(new esri.Color("#CC9900"));
-					label_symbol.setFont(new esri.symbol.Font("9pt").setWeight(esri.symbol.Font.WEIGHT_BOLD));
+					var label_symbol =  new TextSymbol();
+					label_symbol.setColor(new Color("#CC9900"));
+					label_symbol.setFont(new Font("9pt").setWeight(Font.WEIGHT_BOLD));
 
-					var label_renderer = new esri.renderer.SimpleRenderer(label_symbol);
-					labelLayerMarker = new esri.layers.LabelLayer({id:"Marker_Labels"});
+					var label_renderer = new SimpleRenderer(label_symbol);
+					labelLayerMarker = new LabelLayer({id:"Marker_Labels"});
 					labelLayerMarker.addFeatureLayer(MarkerLyr, label_renderer, "{MRKR_NBR}");
 					map.addLayer(labelLayerMarker);				
 				}	
@@ -1117,10 +1127,10 @@
 					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("State House District:",tableText);	
+					var infoTemplate = new InfoTemplate("State House District:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/0";
 
-					StateHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					StateHouseLyr = new FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 					map.addLayer(StateHouseLyr);
 				}	
 				activeOverlay = StateHouseLyr;	
@@ -1138,10 +1148,10 @@
 					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("State Senate District:",tableText);	
+					var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/1";				
 
-					StateSenateLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					StateSenateLyr = new FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 					map.addLayer(StateSenateLyr);
 				}	
 				activeOverlay = StateSenateLyr;
@@ -1159,10 +1169,10 @@
 					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("US House District:",tableText);	
+					var infoTemplate = new InfoTemplate("US House District:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/2";				
 
-					USHouseLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					USHouseLyr = new FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
 					map.addLayer(USHouseLyr);
 				}	
 				activeOverlay = USHouseLyr;	
@@ -1182,10 +1192,10 @@
 					tableText += "<tr><td>NHS Type</td><td>${NHS_TYPE}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("NHS:",tableText);	
+					var infoTemplate = new InfoTemplate("NHS:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/12";				
 
-					NHSLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","SYS_TYPE","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});		
+					NHSLyr = new FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","SYS_TYPE","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});		
 					map.addLayer(NHSLyr);
 				}	
 				activeOverlay = NHSLyr;		
@@ -1202,10 +1212,10 @@
 					tableText += "<tr><td>Office Name</td><td>${OFFICE_NM}</td></tr>";
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("Area Office:",tableText);	
+					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Area_Office/FeatureServer/0";
 
-					areaOfficeLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM"], infoTemplate: infoTemplate});		
+					areaOfficeLyr = new FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM"], infoTemplate: infoTemplate});		
 					map.addLayer(areaOfficeLyr);
 				}	
 				activeOverlay = areaOfficeLyr;	
@@ -1223,10 +1233,10 @@
 					tableText += "<tr><td>COG Abbreviation</td><td>${COG_ABRVN}</td></tr>";
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("COG:",tableText);		
+					var infoTemplate = new InfoTemplate("COG:",tableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/9";	
 					
-					COGLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"COG",visible: true,outFields:["COG_NM","COG_ABRVN"], infoTemplate: infoTemplate});		
+					COGLyr = new FeatureLayer(projectsUrl, {id:"COG",visible: true,outFields:["COG_NM","COG_ABRVN"], infoTemplate: infoTemplate});		
 					map.addLayer(COGLyr);
 				}	
 				activeOverlay = COGLyr;
@@ -1245,10 +1255,10 @@
 					tableText += "<tr><td>MPO Number</td><td>${MPO_NBR}</td></tr>";				
 					tableText += "</table>";		
 					
-					var infoTemplate = new esri.InfoTemplate("MPO:",tableText);		
+					var infoTemplate = new InfoTemplate("MPO:",tableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/2";						
 					
-					MPOLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});		
+					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});		
 					map.addLayer(MPOLyr);
 				}			
 				activeOverlay = MPOLyr;
@@ -1270,20 +1280,19 @@
 					tableText += "<tr><td>Color Class</td><td>${CTRL_SECT_CLR_NBR}</td></tr>";					
 					tableText += "</table>";		
 					
-					//create a renderer, info template, symbology and project link for the layer 
-					var infoTemplate = new esri.InfoTemplate("Control Section:",tableText);
+					var infoTemplate = new InfoTemplate("Control Section:",tableText);
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Control_Section/FeatureServer/0";
 
-					controlSectionLyr = new esri.layers.FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_NBR","RTE_NM","BEGIN_MPT_MS","END_MPT_MS","CTRL_SECT_CLR_NBR"], infoTemplate: infoTemplate});	
+					controlSectionLyr = new FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_NBR","RTE_NM","BEGIN_MPT_MS","END_MPT_MS","CTRL_SECT_CLR_NBR"], infoTemplate: infoTemplate});	
 					map.addLayer(controlSectionLyr);
 					
 					//Labeling
-					var label_symbol =  new esri.symbol.TextSymbol();
-					label_symbol.setColor(new esri.Color("#000000"));
-					label_symbol.setFont(new esri.symbol.Font("10pt").setWeight(esri.symbol.Font.WEIGHT_BOLD));
+					var label_symbol =  new TextSymbol();
+					label_symbol.setColor(new Color("#000000"));
+					label_symbol.setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD));
 
-					var label_renderer = new esri.renderer.SimpleRenderer(label_symbol);
-					labelLayerCS = new esri.layers.LabelLayer({id:"CS_Labels"});
+					var label_renderer = new SimpleRenderer(label_symbol);
+					labelLayerCS = new LabelLayer({id:"CS_Labels"});
 					labelLayerCS.addFeatureLayer(controlSectionLyr, label_renderer, "{CTRL_SECT_NBR}");
 					map.addLayer(labelLayerCS);				
 				}		
@@ -1309,15 +1318,15 @@
 			tableText += "<tr><td>Median Width</td><td>${MED_WID}</td></tr>";
 			tableText += "</table>";	
 
-			var infoTemplate = new esri.InfoTemplate("Roadway Inventory:",tableText);		
+			var infoTemplate = new InfoTemplate("Roadway Inventory:",tableText);		
 			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";
 				
 			//var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 5);	
-			var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);				
-			var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
+			var theSymbol = new CartographicLineSymbol(CartographicLineSymbol.STYLE_SOLID, new Color("#FF0000"), 5, CartographicLineSymbol.CAP_ROUND, CartographicLineSymbol.JOIN_MITER, 5);				
+			var theRenderer = new SimpleRenderer(theSymbol);
 
 			//Add the layer - outFields: ["*"] if you want to use all fields
-			projectsRI = new esri.layers.FeatureLayer(projectsUrl, {id:"RoadwayInventory",visible: false,outFields:["HWY","ADT_CUR","ADT_DESGN","NUM_LANES","SPD_MAX","TRK_AADT","ROW_W_USL","SUR_W","RB_WID","MED_WID","HSYS"], infoTemplate: infoTemplate});	
+			projectsRI = new FeatureLayer(projectsUrl, {id:"RoadwayInventory",visible: false,outFields:["HWY","ADT_CUR","ADT_DESGN","NUM_LANES","SPD_MAX","TRK_AADT","ROW_W_USL","SUR_W","RB_WID","MED_WID","HSYS"], infoTemplate: infoTemplate});	
 			projectsRI.setRenderer(theRenderer);
 			projectsRI.setAutoGeneralize(false);	
 			map.addLayer(projectsRI);		
@@ -1382,10 +1391,10 @@
 			projectsRI.setDefinitionExpression(theQuery);
 			noResults("queryResults","Running Query.....");
 			
-			projectsRI.selectFeatures(theQuery,esri.layers.FeatureLayer.SELECTION_NEW,function(featureSet){
+			projectsRI.selectFeatures(theQuery,FeatureLayer.SELECTION_NEW,function(featureSet){
 				if (featureSet.length>0) {
 				    if (featureSet.length<50) {
-						map.setExtent(esri.graphicsExtent(featureSet));					
+						map.setExtent(graphicsUtils.graphicsExtent(featureSet));					
 						noResults("queryResults",featureSet.length + " records returned.  Click mapped segments to view details.");
 					}
 					else {
@@ -1424,35 +1433,35 @@
 		
 			if (userInput.length>inputLenTest) {		
 				if (theSearchLayer=="Texas_City") {			
-					var query = new esri.tasks.Query();
+					var query = new Query();
 					query.returnGeometry = false;
 					query.where = "[CITY_NM] LIKE '" + userInput + "%'";				
 					citySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});					
 				}
 				
 				if (theSearchLayer=="TxDOT_Control_Section") {	
-					var query = new esri.tasks.Query();
+					var query = new Query();
 					query.returnGeometry = false;
 					query.where = "[CTRL_SECT_NBR] LIKE '" + userInput + "%'";				
 					csSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
 				}
 				
 				if (theSearchLayer=="Texas_County") {		
-					var query = new esri.tasks.Query();
+					var query = new Query();
 					query.returnGeometry = false;
 					query.where = "[CNTY_NM] LIKE '" + userInput + "%'";				
 					countySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
 				}
 				
 				if (theSearchLayer=="TxDOT_District") {	
-					var query = new esri.tasks.Query();
+					var query = new Query();
 					query.returnGeometry = false;
 					query.where = "[DIST_NM] LIKE '" + userInput + "%'";				
 					districtSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
 				}			
 
 				if (theSearchLayer=="OnSystem_Highway") {
-					var query = new esri.tasks.Query();
+					var query = new Query();
 					query.returnGeometry = false;
 					query.where = "[RTE_NM] LIKE '" + userInput + "%'";				
 					highwaySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
@@ -1462,7 +1471,7 @@
 		
 		function getAttributeData(theIDs) {		
 			var querySuccessful = false;	
-	        var query = new esri.tasks.Query();
+	        var query = new Query();
 	        query.objectIds = theIDs.slice();
 	        query.outFields = ["*"];
 
