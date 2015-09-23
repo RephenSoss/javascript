@@ -55,8 +55,13 @@
       background-color: #F0F0F0;
 	 }
 	 td{
-	 cursor: pointer;
 	 border-radius: 2px;
+	 }
+	 .Searcher{
+	 	cursor: pointer;
+	 }
+	 .MeasureUnits{
+	 	cursor: pointer;
 	 }
 	 #mapTab{
 	  display: block;
@@ -82,26 +87,31 @@
 	   display: none;
 	 }	  
 	 .tocTables{
-	  cursor: pointer;
+	  cursor: default;
 	  font-size: 13px;
 	  width: 98%;
 	 }
 	select {
 	 display: block;
      width: 98%;
+     cursor: pointer;
+    }
+    button {
+    	cursor: pointer;
+    }
+    .Overlay, .Basemaps, .SearchResult, .clickable{
+    	cursor: pointer;
     }
 	#searchResults{
 	 overflow: auto;
 	 height: 200px;
 	 color: blue;
-	 cursor: pointer;
 	 font-size: 15px;
 	}
 	#queryResults{
 	 overflow: auto;
 	 height: 200px;
 	 color: blue;
-	 cursor: pointer;
 	 font-size: 15px;
 	}	
 	.PRJFields {
@@ -1744,13 +1754,13 @@
 		<table class="tocTables">
 		 <tr><th>Select layer to search</th></tr>
 		 <tr><td>
-		 <input type="radio" name="option" class="Searcher" id="Texas_City">City<br>
-		 <input type="radio" name="option" class="Searcher" id="TxDOT_Control_Section">Control Section &nbsp;&nbsp; Ex. 002301<br>		 
-		 <input type="radio" name="option" class="Searcher" id="Texas_County">County<br>
-		 <input type="radio" name="option" class="Searcher" id="TxDOT_District">District<br>
-		 <input type="radio" name="option" class="Searcher" id="OnSystem_Highway">On System Highway<br>
+		 <label class='clickable'><input type="radio" name="option" class="Searcher" id="Texas_City">City</label><br>
+		 <label class='clickable'><input type="radio" name="option" class="Searcher" id="TxDOT_Control_Section">Control Section &nbsp;&nbsp; Ex. 002301</label><br>		 
+		 <label class='clickable'><input type="radio" name="option" class="Searcher" id="Texas_County">County</label><br>
+		 <label class='clickable'><input type="radio" name="option" class="Searcher" id="TxDOT_District">District</label><br>
+		 <label class='clickable'><input type="radio" name="option" class="Searcher" id="OnSystem_Highway">On System Highway<br>
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ex. IH0035, US0083, SH0079<br>
-		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ex. SL0001, FM2439<br>
+		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ex. SL0001, FM2439</label><br>
 		 </td></tr>
 		 <tr><td>Type name.. then click to zoom.</td></tr>
 		 <tr><td><input id="txtSearch" type="text" onfocus="this.value=''" value="Search here..."/></td></tr>
@@ -1761,13 +1771,13 @@
 		<table class="tocTables">
          <tr><th>Units</th></tr>		
 		 <tr><td colspan="2">
-		 <input type="radio" class="MeasureUnits" name="unitsList" value="Meters" title="Meters"> Meters
+		 <label class='clickable'><input type="radio" class="MeasureUnits" name="unitsList" value="Meters" title="Meters"> Meters</label>
 		 <br>
-		 <input type="radio" class="MeasureUnits" name="unitsList" value="Kilometers" title="Kilometers"> Kilometers
+		 <label class='clickable'><input type="radio" class="MeasureUnits" name="unitsList" value="Kilometers" title="Kilometers"> Kilometers</label>
 		 <br>
-		 <input type="radio" class="MeasureUnits" name="unitsList" value="Feet" title="Feet"> Feet
+		 <label class='clickable'><input type="radio" class="MeasureUnits" name="unitsList" value="Feet" title="Feet"> Feet</label>
 		 <br>
-		 <input id="radMile" type="radio" class="MeasureUnits" name="unitsList" value="Miles" checked="checked" title="Miles"> Miles
+		 <label class='clickable'><input id="radMile" type="radio" class="MeasureUnits" name="unitsList" value="Miles" checked="checked" title="Miles"> Miles</label>
 		 </td></tr>
 		 <tr><td width="100" colspan="2" align="left" id="measuredDistance">0.0</td></tr>
 		 <tr><td><button title="Clear Graphics" id="clearMeasure">Clear</button></td></tr>
