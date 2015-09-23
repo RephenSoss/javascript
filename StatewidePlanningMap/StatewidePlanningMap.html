@@ -163,7 +163,10 @@
 	var pavementConditionLyr;
 	var VerticalLyr;
 	var permStationLyr;	
-	var activeOverlay;	
+	var activeOverlay;
+	var currentMeasure=0;
+	var activeTab = 'tcMap';
+	var deLength=0;
 	
 	require(["esri/map",
 	    "esri/renderers/Renderer",
@@ -239,6 +242,7 @@
 		
 		map.on("load", createToolbar);
 		map.on("click", logCoords);	
+		map.on("mouse-move", newCoords);
 		
         var scalebar = new Scalebar({
           map: map,
@@ -297,6 +301,43 @@
 		  }
 		}
 
+		function newCoords() {
+		  if (document.getElementById("measureTab").style.display=="block"||document.getElementById("sketchTab").style.display=="block") {
+			if (xPointArray.length>=1) {	   
+			   polyline = new Polyline();
+			   polyline.addPath([xPointArray[xPointArray.length - 1],[Number(globalX),Number(globalY)]]);
+			   
+			   if (measureUnits=="Miles") {
+				   var thisMeasured = geodesicUtils.geodesicLengths([polyline], Units.MILES);
+				   var piece = Math.round(thisMeasured*1000)/1000
+				   var potential = currentMeasure + piece;
+				   document.getElementById("measuredDistance").innerHTML = Math.round(potential*1000)/1000 + " miles.";
+				}
+
+			   if (measureUnits=="Kilometers") {
+				   var thisMeasured = geodesicUtils.geodesicLengths([polyline], Units.KILOMETERS);
+				   var piece = Math.round(thisMeasured*1000)/1000
+				   var potential = currentMeasure + piece;
+				   document.getElementById("measuredDistance").innerHTML = Math.round(potential*1000)/1000 + " kilometers.";	
+				}		   
+
+			   if (measureUnits=="Feet") {
+				   var thisMeasured = geodesicUtils.geodesicLengths([polyline], Units.FEET);
+				   var piece = Math.round(thisMeasured*1000)/1000
+				   var potential = currentMeasure + piece;
+				   document.getElementById("measuredDistance").innerHTML = Math.round(potential*1000)/1000 + " feet.";	
+				}		   
+
+			   if (measureUnits=="Meters") {
+				   var thisMeasured = geodesicUtils.geodesicLengths([polyline], Units.METERS);
+				   var piece = Math.round(thisMeasured*1000)/1000
+				   var potential = currentMeasure + piece;
+				   document.getElementById("measuredDistance").innerHTML = Math.round(potential*1000)/1000 + " meters.";	
+				}
+			}
+		  }
+		}
+
 		function calculateDistance() {
 		   if (xPointArray.length>1) {	   
 			   polyline = new Polyline();
@@ -304,22 +345,26 @@
 			   
 			   if (measureUnits=="Miles") {
 				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.MILES);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " miles.";	
+				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " miles.";
+				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
 				}
 
 			   if (measureUnits=="Kilometers") {
 				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.KILOMETERS);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " kilometers.";	
+				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " kilometers.";
+				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
 				}		   
 
 			   if (measureUnits=="Feet") {
 				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.FEET);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " feet.";	
+				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " feet.";
+				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
 				}		   
 
 			   if (measureUnits=="Meters") {
 				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.METERS);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " meters.";	
+				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " meters.";
+				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
 				}
 			}	 
 		}
@@ -330,10 +375,7 @@
 			document.getElementById("measuredDistance").innerHTML = "0.00";
 		    xPointArray.length=0;
 			theDistMeasured=0;
-		}
-
-		function resetMeasurements() {
-		   xPointArray.length=0;
+			currentMeasure=0;
 		}
 		
 		dojo.query(".MeasureUnits").forEach(function (result){
@@ -374,6 +416,14 @@
 			var defaultSymbol = new SimpleFillSymbol("solid", theLine, null);												
 			var graphic = new Graphic(evt.geometry,defaultSymbol);		
 			map.graphics.add(graphic);
+
+			if (activeTab=="sketchTab"){
+				deLength = parseFloat(deLength) + parseFloat(theDistMeasured);
+			}
+
+			theDistMeasured=0;
+			xPointArray.length=0;	
+			currentMeasure=0;
 		}	  
 		  
 		function showCoordinates(evt) {
@@ -410,7 +460,6 @@
 				on(result, "click", changeTab);
 		});
 		function changeTab(event) {
-			var activeTab;
 			var ID = event.target.id;
 			if (ID == 'tcMap') {
 				activeTab = 'mapTab';
@@ -461,7 +510,9 @@
 			if (activeTab=="measureTab"||activeTab=="sketchTab") {
 			  measureUnits="Miles";
 			  theDistMeasured=0;
-			  xPointArray.length=0;		  
+			  xPointArray.length=0;	
+			  currentMeasure=0;
+			  deLength=0;
 	          activateTool("POLYLINE");		  
 			}
 			else {
@@ -1550,7 +1601,7 @@
 		
 		on(dom.byId("btnCalcCost"), "click", deCalculateCost);
 		function deCalculateCost() {
-			if (theDistMeasured>0) {
+			if (deLength>0) {
 			   //Nothing
 			}
 			else {
@@ -1564,7 +1615,7 @@
 		    var deDivided = document.getElementById("selPrjDividedType").value;
 		    var deFrontageRoads = document.getElementById("selPrjFrontageRoads").value;
 		    var deLanes = document.getElementById("txtPrjLanes").value;	 
-		    var deProjectLength = Math.round(theDistMeasured*1000)/1000;	 
+		    var deProjectLength = Math.round(deLength*1000)/1000;	 
 			 
 			if (deLanes<1) {
 				alert("Number of Lanes must be greater than 0.");
@@ -1622,6 +1673,8 @@
 			document.getElementById("deCostResult").innerHTML = "";
 			theDistMeasured=0;
 			xPointArray.length=0;
+			currentMeasure=0;
+			deLength=0;
 		}
 	});
 	
