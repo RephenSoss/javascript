@@ -120,6 +120,30 @@
 	.queryFields {
 		width: 127px;
 	}
+	#googleLink {
+    position: absolute;
+    top: 14px;
+    right: 15px;
+    font-family: Arial, sans-serif;
+    font-size: 0.8em;
+    color:blue;
+	text-decoration: underline;
+    background-color:white;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 0 0.25em 0 0;
+    box-shadow: 0 5px 10px -5px #000;
+    width:95px;
+	}
+	#googleLink:hover {
+    	background-color: #6699CC;
+    	border-color: #000;
+	}
+	#googleLink > a:hover {
+    	color: #fff;
+    	text-decoration: none;
+	}
   </style>
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
@@ -1686,6 +1710,19 @@
 			currentMeasure=0;
 			deLength=0;
 		}
+
+		on(dom.byId("googleLink"), "click", openGoogleMaps);
+        on(dom.byId("googleLink"), "mouseover", googlePointer);
+        function openGoogleMaps() {
+        	var ctr = map.extent.getCenter();
+            var lat = ctr.getLatitude();
+            var lon = ctr.getLongitude();
+            var level = map.getLevel();
+            window.open("https://www.google.com/maps/@"+lat+","+lon+","+level+"z");
+        }
+        function googlePointer(){
+            document.getElementById("googleLink").style.cursor='pointer';
+		}
 	});
 	
   </script>
@@ -1885,6 +1922,8 @@
   </div>
  <div id="mapDiv">
      <span id="info"></span>
+ </div>
+ <div id="googleLink" >Google Maps
  </div>   
 </body>
 </html>
