@@ -148,7 +148,6 @@
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
     //Map and measure variables
-	//Chris is in the ballgame
 	var map;
 	var projectsRI;
 	var toolbar;
@@ -243,13 +242,14 @@
 		"esri/geometry/Polyline",
 		"esri/geometry/Point",
 		"esri/symbols/Font",
+		"esri/dijit/PopupTemplate",
 
 		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on,
 			Query, QueryTask, arcgisUtils, Legend, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
 			SimpleFillSymbol, TextSymbol, SimpleRenderer, LabelLayer, Color, InfoTemplate, Tiled,
-			Polyline, Point, Font) {
+			Polyline, Point, Font, PopupTemplate) {
 			
 		parser.parse();
 		
@@ -765,7 +765,7 @@
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Highway Name</td><td>${RTE_NM}</td></tr>";
 					tableText += "<tr><td>Control Section</td><td>${CTRL_SECT}</td></tr>";			
-					tableText += "<tr><td>Minute Order Number</td><td>${MO_NBR}</td></tr>";						
+					tableText += "<tr><td>Minute Order Number</td><td><a href='http://publiccm.txdot.gov/minord/mosearch/Pages/Minute-Order-Search-Results.aspx#k=${MO_NBR}' target='_blank'>${MO_NBR}</a></td></tr>";						
 					tableText += "<tr><td>Approval Date</td><td>${APRV_DT}</td></tr>";									
 					tableText += "<tr><td>Description</td><td>${DSPN_DSCR}</td></tr>";	
 					tableText += "<tr><td>AASHTO Application</td><td>${AASHTO_APPLN}</td></tr>";				
@@ -959,19 +959,20 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Railroad Name</td><td>${RR_NM}</td></tr>";
-					tableText += "<tr><td>Railroad Abbreviation</td><td>${RR_ABRVN}</td></tr>";			
-					tableText += "<tr><td>Status</td><td>${RR_STAT}</td></tr>";
-					tableText += "<tr><td>Type</td><td>${RR_TYPE}</td></tr>";						
-					tableText += "<tr><td>Number</td><td>${RR_NBR}</td></tr>";					
+					tableText += "<tr><td>Railroad Name</td><td>{RR_NM}</td></tr>";
+					tableText += "<tr><td>Railroad Abbreviation</td><td>{RR_ABRVN}</td></tr>";			
+					tableText += "<tr><td>Status</td><td>{RR_STAT}</td></tr>";
+					tableText += "<tr><td>Type</td><td>{RR_TYPE}</td></tr>";						
+					tableText += "<tr><td>Number</td><td>{RR_NBR}</td></tr>";					
 					tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Railroad:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/14";					
+					var infoTemplate = new PopupTemplate({description : tableText});
+					infoTemplate.setTitle("Railroads:");
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/FeatureServer/0";					
 
 					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
-					map.addLayer(railRoadLyr);
+					map.addLayer(railRoadLyr);					
 				}	
 				activeOverlay = railRoadLyr;	
 				theLegend.layerInfos=[{layer:railRoadLyr, title:"Mainline Railroads"}];
@@ -1295,15 +1296,16 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Office Name</td><td>${OFFICE_NM}</td></tr>";
+					tableText += "<tr><td>District Name</td><td>${DIST_NM}</td></tr>";
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Area_Office/FeatureServer/0";
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/FeatureServer/0";
 
-					areaOfficeLyr = new FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM"], infoTemplate: infoTemplate});		
+					areaOfficeLyr = new FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM", "DIST_NM"], infoTemplate: infoTemplate});		
 					map.addLayer(areaOfficeLyr);
 				}	
-				activeOverlay = areaOfficeLyr;	
+				activeOverlay = areaOfficeLyr;	h
 				theLegend.layerInfos=[{layer:areaOfficeLyr, title:"TxDOT Area Offices"}];			
 			}		
 			
