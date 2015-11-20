@@ -280,7 +280,8 @@
 		window.onresize = handleIEProblem;
 		handleIEProblem();
 				
-		map = new Map("mapDiv", {minZoom:6, maxZoom:15});
+		map = new Map("mapDiv", {minZoom:6, maxZoom:15, logo: false});
+		map.infoWindow.set("titleInBody", false);
 
 		tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
 		map.addLayer(tiled);
@@ -992,8 +993,8 @@
 					
 					var infoTemplate = new PopupTemplate({description : tableText});
 					infoTemplate.setTitle("Railroads:");
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/FeatureServer/0";					
-
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/FeatureServer/0";
+					
 					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
 					map.addLayer(railRoadLyr);					
@@ -1326,10 +1327,15 @@
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
 					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/FeatureServer/0";
 
-					areaOfficeLyr = new FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM", "DIST_NM"], infoTemplate: infoTemplate});		
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([238,59,59,1]), 2), new Color([238,59,59,0.05]));	
+					var theRenderer = new SimpleRenderer(theSymbol);
+
+					areaOfficeLyr = new FeatureLayer(projectsUrl, {id:"Area_Offices",visible: true,outFields:["OFFICE_NM", "DIST_NM"], infoTemplate: infoTemplate});
+					areaOfficeLyr.setRenderer(theRenderer);		
 					map.addLayer(areaOfficeLyr);
+
 				}	
-				activeOverlay = areaOfficeLyr;	h
+				activeOverlay = areaOfficeLyr;
 				theLegend.layerInfos=[{layer:areaOfficeLyr, title:"TxDOT Area Offices"}];			
 			}		
 			
