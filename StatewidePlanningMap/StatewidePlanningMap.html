@@ -120,30 +120,54 @@
 	.queryFields {
 		width: 127px;
 	}
-	#googleLink {
-    position: absolute;
-    top: 14px;
+	nav {
+	position: absolute;
+    top: 10px;
     right: 15px;
-    font-family: Arial, sans-serif;
-    font-size: 0.8em;
-    color:blue;
-	text-decoration: underline;
-    background-color:white;
-    padding: 5px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 0 0.25em 0 0;
-    box-shadow: 0 5px 10px -5px #000;
-    width:95px;
+	text-align: center;
 	}
-	#googleLink:hover {
-    	background-color: #6699CC;
-    	border-color: #000;
+	nav ul ul {
+		display: none;
 	}
-	#googleLink > a:hover {
-    	color: #fff;
-    	text-decoration: none;
+		nav ul li:hover > ul {
+			display: block;
+		}
+	nav ul {
+		background: #6699CC; 
+		box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+		padding: 0 0px;
+		border-radius: 5px;  
+		list-style: none;
+		position: relative;
+		display: inline-table;
 	}
+		nav ul:after {
+			content: ""; clear: both; display: block;
+		}
+		nav ul li {
+			float: left;
+		}
+			nav ul li a {
+				display: block; padding: 6px 10px;
+				color: #fff; text-decoration: none;
+			}
+		nav ul ul {
+			background: #5f6975; border-radius: 0px; padding: 0;
+			position: absolute; top: 100%;
+		}
+			nav ul ul li {
+				float: none; 
+				border-top: 1px solid #6b727c;
+				border-bottom: 1px solid #575f6a; position: relative;
+				font-size: 0.8em;
+			}
+				nav ul ul li a {
+					padding: 2px 10px;
+					color: #fff;
+				}	
+					nav ul ul li a:hover {
+						background: #4b545f;
+					}
   </style>
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
@@ -1714,7 +1738,6 @@
 		}
 
 		on(dom.byId("googleLink"), "click", openGoogleMaps);
-        on(dom.byId("googleLink"), "mouseover", googlePointer);
         function openGoogleMaps() {
         	var ctr = map.extent.getCenter();
             var lat = ctr.getLatitude();
@@ -1722,9 +1745,14 @@
             var level = map.getLevel();
             window.open("https://www.google.com/maps/@"+lat+","+lon+","+level+"z");
         }
-        function googlePointer(){
-            document.getElementById("googleLink").style.cursor='pointer';
-		}
+        on(dom.byId("bingLink"), "click", openBingMaps);
+        function openBingMaps() {
+        	var ctr = map.extent.getCenter();
+            var lat = ctr.getLatitude();
+            var lon = ctr.getLongitude();
+            var level = map.getLevel();
+            window.open("http://www.bing.com/mapspreview?cp="+lat+"~"+lon+"&lvl="+level+"&style=r");
+        }
 	});
 	
   </script>
@@ -1925,7 +1953,15 @@
  <div id="mapDiv">
      <span id="info"></span>
  </div>
- <div id="googleLink" >Google Maps
- </div>   
+ <nav>  
+    <ul>
+      <li><a href="#">Jump To...</a>
+      		<ul>
+      			<li id = "googleLink"><a href="#">Google Maps</a></li>
+      			<li id = "bingLink"><a href="#">Bing Maps</a></li>
+      		</ul>
+      </li>
+	</ul>
+  </nav>  
 </body>
 </html>
