@@ -340,16 +340,20 @@
 			districtSearchLyr = new FeatureLayer(projectsUrl, {id:"District_Search",visible: false,outFields:["DIST_NM","xCoord","yCoord"]});	
 			
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/4";		
-			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});	
+			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});
+			map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr]);				
 		}
 		
 		function createLegend() {
 			if (activeOverlay) {
+				var div = document.getElementById("legendDiv");
+				div.innerHTML = '';
 				theLegend.refresh();
+
 			}
 			else {
-				theLegend.layerInfos=[{layer:tiled, title:"Statewide Planning Map"}];
-				theLegend.refresh();			
+				var div = document.getElementById("legendDiv");
+				div.innerHTML = 'Select an overlay to see its legend.';
 			}
 		}
 		
@@ -797,7 +801,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Highway Designations:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Minute_Orders/FeatureServer/0";					
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Highway_Designations/MapServer/0";					
 
 					minuteOrderLyr = new FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 					map.addLayer(minuteOrderLyr);
@@ -993,7 +997,7 @@
 					
 					var infoTemplate = new PopupTemplate({description : tableText});
 					infoTemplate.setTitle("Railroads:");
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/FeatureServer/0";
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/MapServer/0";
 					
 					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
@@ -1325,8 +1329,9 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/FeatureServer/0";
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/MapServer/0";
 
+					// Create renderer to deal with transparency problem
 					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([238,59,59,1]), 2), new Color([238,59,59,0.05]));	
 					var theRenderer = new SimpleRenderer(theSymbol);
 
@@ -1373,9 +1378,14 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("MPO:",tableText);		
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/2";						
+					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Metropolitan_Planning_Organization/MapServer/0";
+
+					// Create renderer to deal with transparency problem
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([255,140,0,1]), 2), new Color([255,140,0,0.07]));	
+					var theRenderer = new SimpleRenderer(theSymbol);						
 					
-					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});		
+					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});
+					MPOLyr.setRenderer(theRenderer);		
 					map.addLayer(MPOLyr);
 				}			
 				activeOverlay = MPOLyr;
@@ -1650,20 +1660,70 @@
 				finalSet.push(featureAttributes[attr]);
 	          }
 			  if (theSearchLayer=="OnSystem_Highway") {
-				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "'>" + finalSet[0] + "-" + finalSet[3] + " CO.</span>";			
+				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "," + finalSet[4] + "'>" + finalSet[0] + "-" + finalSet[3] + " CO.</span>";			
 			  }
 			  else {
-				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "'>" + finalSet[0] + "</span>";
+				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "," + finalSet[3] + "'>" + finalSet[0] + "</span>";
 			  }
 			  finalSet = [];
 	        }
 			
 			document.getElementById("searchResults").innerHTML = resultText;
+
 			dojo.query(".SearchResult").forEach(function (result){
 				on(result, "click", zoomTo);
+				on(result, "click", clearHighlighter);
+				on(result, "click", highlighter);
 			});
 			
 		}
+
+		function highlighter (result) {
+			var params = result.target.id;
+			var paramsList = params.split(',');
+			var theOID = paramsList[3];
+			var whereClause = "OBJECTID =" + theOID;
+			if (theSearchLayer=="Texas_City") {
+				citySearchLyr.setDefinitionExpression(whereClause);
+					citySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_Control_Section") {
+				csSearchLyr.setDefinitionExpression(whereClause);
+					csSearchLyr.show();
+			}
+			if (theSearchLayer=="Texas_County") {
+				countySearchLyr.setDefinitionExpression(whereClause);
+					countySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_District") {
+				districtSearchLyr.setDefinitionExpression(whereClause);
+					districtSearchLyr.show();
+			}
+			if (theSearchLayer=="OnSystem_Highway") {
+				highwaySearchLyr.setDefinitionExpression(whereClause);
+					highwaySearchLyr.show();
+			}
+		}
+
+		on(dom.byId("txtSearch"), "click", clearHighlighter);
+		on(dom.byId("btnClearHighlighter"), "click", clearHighlighter);
+		function clearHighlighter () {
+			citySearchLyr.setDefinitionExpression("");
+			csSearchLyr.setDefinitionExpression("");
+			countySearchLyr.setDefinitionExpression("");
+			districtSearchLyr.setDefinitionExpression("");
+			highwaySearchLyr.setDefinitionExpression("");
+			citySearchLyr.hide();
+			csSearchLyr.hide();
+			countySearchLyr.hide();
+			districtSearchLyr.hide();
+			highwaySearchLyr.hide();
+		}
+
+		on(dom.byId("searchResults"), "click", showClearButton);
+		function showClearButton (){
+			document.getElementById("btnClearHighlighter").style.display="block";
+		}		
 		
 		on(dom.byId("btnCalcCost"), "click", deCalculateCost);
 		function deCalculateCost() {
@@ -1838,6 +1898,7 @@
 		 <tr><td>Type name.. then click to zoom.</td></tr>
 		 <tr><td><input id="txtSearch" type="text" onfocus="this.value=''" value="Search here..."/></td></tr>
 		 <tr><td><div id="searchResults"></div></td></tr>
+		 <tr><td><button id="btnClearHighlighter" title="Clear Highlighter" style="display:none;">Clear</button></td></tr>		 
         </table>
 	  </div>
 	  <div id="measureTab">
