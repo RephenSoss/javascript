@@ -6,6 +6,36 @@
   <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/claro/claro.css">
   <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
   <style>
+	 #maskDiv{
+	 	height: 100%;
+	 	width: 100%;
+	 	top: 0;
+  		left: 0;
+	 	background-color: rgba(0,0,0,.5);
+	 	position: fixed;
+	 	display: none;
+	 	z-index: 100;
+	 }
+	 #surveyDiv{
+	 	height: 300;
+	 	width: 400;
+	 	top: 45%;
+  		left: 50%;
+  		margin-top: -150;
+  		margin-left: -200;
+	 	background-color: rgba(245,245,245,1);
+	 	color: #444444;
+	 	font-size: 1.5em;
+	 	text-align: center;
+	 	vertical-align: center;
+	  	border: 2px solid;
+	  	border-radius: 5px;
+	  	border-color: #F8F8F8;	
+	  	padding: 10px;
+	 	position: absolute;
+	 	display: none;
+	 	z-index: 101;	 	
+	 }
 	 #toc{
 	  border: 2px solid;
 	  border-radius: 5px;
@@ -99,6 +129,12 @@
     button {
     	cursor: pointer;
     }
+    #btnSurvey{
+	  position: absolute;
+	  bottom: 10px;
+	  left: 35px;
+	  z-index: 50;
+    }
     .Overlay, .Basemaps, .SearchResult, .clickable{
     	cursor: pointer;
     }
@@ -168,6 +204,10 @@
 					nav ul ul li a:hover {
 						background: #4b545f;
 					}
+	.esriAttribution {
+		display: none;
+	}
+
   </style>
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
@@ -801,7 +841,8 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Highway Designations:",tableText);	
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Highway_Designations/MapServer/0";					
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Highway_Designations/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Highway_Designations_AGO/FeatureServer/0"					
 
 					minuteOrderLyr = new FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 					map.addLayer(minuteOrderLyr);
@@ -971,9 +1012,22 @@
 					tableText += "</table><br>Future Traffic and Percent Truck data is for main lanes only.";		
 					
 					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
+
+					var sizeInfo = {
+					     field:"ADT_CUR",
+					     minSize:2,
+					     maxSize:15,
+					     minDataValue:1,
+					     maxDataValue:350000
+				     };
 					
-					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});	
+					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);								
+					var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
+					theRenderer.setSizeInfo(sizeInfo);							
+					
+					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});
+					futureTrafficLyr.setRenderer(theRenderer);							
 					map.addLayer(futureTrafficLyr);
 				}	
 				
@@ -997,7 +1051,9 @@
 					
 					var infoTemplate = new PopupTemplate({description : tableText});
 					infoTemplate.setTitle("Railroads:");
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/MapServer/0";
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Railroads_AGO/FeatureServer/0";
+
 					
 					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
@@ -1221,11 +1277,14 @@
 					var label_symbol =  new TextSymbol();
 					label_symbol.setColor(new Color("#CC9900"));
 					label_symbol.setFont(new Font("9pt").setWeight(Font.WEIGHT_BOLD));
+					// label_symbol.setHaloColor(new Color([255, 0, 0]));
+					// label_symbol.setHaloSize(1);
+
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerMarker = new LabelLayer({id:"Marker_Labels"});
 					labelLayerMarker.addFeatureLayer(MarkerLyr, label_renderer, "{MRKR_NBR}");
-					map.addLayer(labelLayerMarker);				
+					map.addLayer(labelLayerMarker);		
 				}	
 				activeOverlay = MarkerLyr;	
 				theLegend.layerInfos=[{layer:MarkerLyr, title:"Reference Markers"}]; 
@@ -1329,7 +1388,8 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/MapServer/0";
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Area_Offices_AGO/FeatureServer/0";
 
 					// Create renderer to deal with transparency problem
 					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([238,59,59,1]), 2), new Color([238,59,59,0.05]));	
@@ -1378,7 +1438,8 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("MPO:",tableText);		
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Metropolitan_Planning_Organization/MapServer/0";
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Metropolitan_Planning_Organization/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Metropolitan_Planning_Organizations_AGO/FeatureServer/0";
 
 					// Create renderer to deal with transparency problem
 					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([255,140,0,1]), 2), new Color([255,140,0,0.07]));	
@@ -1819,11 +1880,50 @@
             var level = map.getLevel();
             window.open("http://www.bing.com/mapspreview?cp="+lat+"~"+lon+"&lvl="+level+"&style=r");
         }
-	});
+        on(dom.byId("takeSurvey"), "click", surveyLink);
+        on(dom.byId("btnSurvey"), "click", surveyLink);
+        on(dom.byId("noThanks"), "click", noThanks);
+        function surveyLink(){
+        	window.open("https://www.surveymonkey.com/r/txdot_spm_feedback");
+        	noThanks();
+        }
+        function noThanks(){
+        	document.getElementById("maskDiv").style.display="none";
+        	document.getElementById("surveyDiv").style.display="none";
+        	if (document.getElementById("doNotShow").checked == true){
+        		localStorage.setItem("SPM_survey", "noThanks");
+        	}
+    	}
+    	function checkLocalStorage(){
+    		if (localStorage.getItem("SPM_survey")===null){
+    			document.getElementById("maskDiv").style.display="block";
+        		document.getElementById("surveyDiv").style.display="block";
+    		}
+    	}
+    	window.onload=checkLocalStorage;
+    		});
 	
   </script>
 </head>
 <body class="claro">
+<div id="maskDiv"></div>
+<div id="surveyDiv">
+	<br>
+	<p1><strong>We Want Your Feedback</strong></p1>
+	<br>
+	<br>
+	<p2 style="font-size: .7em; line-height: 220%;">We value your opinion!</p2>
+	<br>	
+	<p2 style="font-size: .7em; line-height: 50%;">Help us improve your experience by taking <br /> our short survey.</p2>
+	<br>
+	<br>
+	<button id="noThanks" style="padding: 5px 10px; position: relative; right: 7px;"> No Thanks </button><button id="takeSurvey" style="padding: 5px 10px; position: relative; left: 7px;"><strong> Take the Survey </strong></button>
+	<br>
+	<br>
+	<form style="font-size: .7em; position: absolute; bottom: 5px; width: 100%;">
+		<input id="doNotShow" type="checkbox" name="opt-out"> Do not show this message again<br>
+	</form>
+</div>
   <div id="toc">
       <div id="tabControl">
 		  <table id="tcTabs">
@@ -2013,13 +2113,17 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
+				<br><br>Version 4.1.1 info
 				</td><tr>				
 			</table>
-		</div>		
+		</div>	
   </div>
  <div id="mapDiv">
      <span id="info"></span>
  </div>
+<div>
+	<button type="button" id="btnSurvey" style=>Take the Survey</button>
+</div>	
  <nav>  
     <ul>
       <li><a href="#">Jump To...</a>
@@ -2029,6 +2133,6 @@
       		</ul>
       </li>
 	</ul>
-  </nav>  
+  </nav>
 </body>
 </html>
