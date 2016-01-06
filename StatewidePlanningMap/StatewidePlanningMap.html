@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
   <title>Statewide Planning Map</title>
@@ -6,6 +7,36 @@
   <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/claro/claro.css">
   <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
   <style>
+	 #maskDiv{
+	 	height: 100%;
+	 	width: 100%;
+	 	top: 0;
+  		left: 0;
+	 	background-color: rgba(0,0,0,.5);
+	 	position: fixed;
+	 	display: none;
+	 	z-index: 100;
+	 }
+	 #surveyDiv{
+	 	height: 300px;
+	 	width: 400px;
+	 	top: 45%;
+  		left: 50%;
+  		margin-top: -150px;
+  		margin-left: -200px;
+	 	background-color: rgba(245,245,245,1);
+	 	color: #444444;
+	 	font-size: 1.5em;
+	 	text-align: center;
+	 	vertical-align: center;
+	  	border: 2px solid;
+	  	border-radius: 5px;
+	  	border-color: #F8F8F8;	
+	  	padding: 10px;
+	 	position: absolute;
+	 	display: none;
+	 	z-index: 101;	 	
+	 }
 	 #toc{
 	  border: 2px solid;
 	  border-radius: 5px;
@@ -14,6 +45,8 @@
 	  position: absolute;
 	  left: 2px;
 	  top: 2px; 
+	  bottom: 40px;
+	  overflow: auto;
 	 }
 	 #mapDiv{
 	  border: 2px solid;
@@ -99,12 +132,19 @@
     button {
     	cursor: pointer;
     }
+    #btnSurvey{
+	  position: absolute;
+	  bottom: 10px;
+	  left: 35px;
+	  z-index: 50;
+    }
     .Overlay, .Basemaps, .SearchResult, .clickable{
     	cursor: pointer;
     }
 	#searchResults{
+	 position: relative;
 	 overflow: auto;
-	 height: 200px;
+	 min-height: initial;	
 	 color: blue;
 	 font-size: 15px;
 	}
@@ -122,8 +162,8 @@
 	}
 	nav {
 	position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 20px;
+    right: 20px;
 	text-align: center;
 	}
 	nav ul ul {
@@ -134,40 +174,86 @@
 		}
 	nav ul {
 		background: #6699CC; 
-		box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+		/*box-shadow: 0px 0px 10px rgba(0,0,0,0.5);*/
 		padding: 0 0px;
 		border-radius: 5px;  
 		list-style: none;
 		position: relative;
 		display: inline-table;
+		margin: inherit;
 	}
 		nav ul:after {
-			content: ""; clear: both; display: block;
+			content: "";
+			clear: both;
+			display: block;
+
 		}
 		nav ul li {
-			float: left;
+			float: left; 
 		}
 			nav ul li a {
-				display: block; padding: 6px 10px;
-				color: #fff; text-decoration: none;
+				display: block;
+				padding: 6px 10px;
+				color: #fff;
+				text-decoration: none; 
 			}
 		nav ul ul {
-			background: #5f6975; border-radius: 0px; padding: 0;
-			position: absolute; top: 100%;
+			background: #5f6975;
+			border-radius: 0px 0px 5px 5px;
+			padding: 0;
+			position: absolute;
+			top: 88%;
 		}
 			nav ul ul li {
-				float: none; 
+				float: none;
+				border-radius: 0px 0px 5px 5px;
 				border-top: 1px solid #6b727c;
-				border-bottom: 1px solid #575f6a; position: relative;
+				border-bottom: 1px solid #575f6a;
+				position: relative;
 				font-size: 0.8em;
 			}
 				nav ul ul li a {
 					padding: 2px 10px;
 					color: #fff;
+					border-radius: 5px;
 				}	
 					nav ul ul li a:hover {
 						background: #4b545f;
+						border-radius: 5px;
 					}
+	#credits {
+		position: absolute;
+		right: 15px;
+		bottom: 10px;
+		font-size: .8em;
+	 	z-index: 51;
+	    color: #666666;
+    	background: rgba(255,255,255,0.7);
+	}
+	.esriAttributionList {
+		display: none;
+	}
+	#btnClearHighlighter {
+		position: absolute;
+		top: 90px;
+		left: 20px;
+		z-index: 30;
+		width: 32px;
+		height: 32px;
+	    border: 1px solid #57585A;
+        background-color: rgb(255, 255, 184);
+	    color: #4C4C4C;
+		border-radius: 5px; 
+		text-align: center;   
+		font-size: 20px;
+		font-family: verdana,helvetica;
+		line-height: 25px;
+	    direction: ltr;
+        outline: none;
+    	padding-bottom: 5px;
+    	background: radial-gradient(white, lightyellow, yellow);
+	}
+	
   </style>
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
@@ -182,6 +268,7 @@
 	var theDistMeasured=0;	
 	var theLegend;
 	var tiled;
+	var polyline;
 	
 	//Search variables
 	var citySearchLyr;
@@ -289,7 +376,7 @@
 		var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
 		map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
 		
-		//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers but never show them.
+		//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
 		addInventoryData();
 		addSearchLayers();
 
@@ -301,6 +388,8 @@
 		
 		map.on("load", createToolbar);
 		map.on("click", logCoords);	
+		// Clear graphic line on Measure Tab if when a new line is started
+		map.on("click", clearMeasuredLineGraphic);
 		map.on("mouse-move", newCoords);
 		
         var scalebar = new Scalebar({
@@ -340,16 +429,20 @@
 			districtSearchLyr = new FeatureLayer(projectsUrl, {id:"District_Search",visible: false,outFields:["DIST_NM","xCoord","yCoord"]});	
 			
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Search/FeatureServer/4";		
-			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});	
+			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});
+			map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr]);				
 		}
 		
 		function createLegend() {
 			if (activeOverlay) {
+				var div = document.getElementById("legendDiv");
+				div.innerHTML = '';
 				theLegend.refresh();
+
 			}
 			else {
-				theLegend.layerInfos=[{layer:tiled, title:"Statewide Planning Map"}];
-				theLegend.refresh();			
+				var div = document.getElementById("legendDiv");
+				div.innerHTML = 'Select an overlay from the Maps tab to see its legend.';
 			}
 		}
 		
@@ -358,6 +451,18 @@
 			xPointArray.push([Number(globalX),Number(globalY)]);
 			calculateDistance();
 		  }
+		}
+
+		// Clear graphic line on Measure Tab when a new line is started
+		function clearMeasuredLineGraphic (){
+			if (document.getElementById("measureTab").style.display=="block"){
+				if (document.getElementById("mapDiv_graphics_layer").style.display=="block"){
+					map.graphics.clear();
+					if (xPointArray.length<2) {
+						document.getElementById("measuredDistance").innerHTML = "0.00";
+					}
+				}
+			}
 		}
 
 		function newCoords() {
@@ -397,34 +502,37 @@
 		  }
 		}
 
+		function unitsHandler(){
+		   if (measureUnits=="Miles") {
+			   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.MILES);
+			   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " miles.";
+			   currentMeasure = Math.round(theDistMeasured*1000)/1000;
+			}
+
+		   if (measureUnits=="Kilometers") {
+			   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.KILOMETERS);
+			   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " kilometers.";
+			   currentMeasure = Math.round(theDistMeasured*1000)/1000;
+			}		   
+
+		   if (measureUnits=="Feet") {
+			   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.FEET);
+			   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " feet.";
+			   currentMeasure = Math.round(theDistMeasured*1000)/1000;
+			}		   
+
+		   if (measureUnits=="Meters") {
+			   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.METERS);
+			   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " meters.";
+			   currentMeasure = Math.round(theDistMeasured*1000)/1000;
+			}
+		}
+
 		function calculateDistance() {
-		   if (xPointArray.length>1) {	   
+		   if (xPointArray.length>1) {
 			   polyline = new Polyline();
 			   polyline.addPath(xPointArray);
-			   
-			   if (measureUnits=="Miles") {
-				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.MILES);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " miles.";
-				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
-				}
-
-			   if (measureUnits=="Kilometers") {
-				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.KILOMETERS);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " kilometers.";
-				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
-				}		   
-
-			   if (measureUnits=="Feet") {
-				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.FEET);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " feet.";
-				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
-				}		   
-
-			   if (measureUnits=="Meters") {
-				   theDistMeasured = geodesicUtils.geodesicLengths([polyline], Units.METERS);
-				   document.getElementById("measuredDistance").innerHTML = Math.round(theDistMeasured*1000)/1000 + " meters.";
-				   currentMeasure = Math.round(theDistMeasured*1000)/1000;
-				}
+			   unitsHandler();
 			}	 
 		}
 		
@@ -435,14 +543,16 @@
 		    xPointArray.length=0;
 			theDistMeasured=0;
 			currentMeasure=0;
+			polyline = {};
 		}
 		
 		dojo.query(".MeasureUnits").forEach(function (result){
 				on(result, "click", changeUnits);
 		});
+		
 		function changeUnits(event) {
-		   measureUnits=event.target.value;
-		   calculateDistance();
+				measureUnits=event.target.value;
+				unitsHandler();
 		}
 
 		function createToolbar() {
@@ -543,7 +653,9 @@
 			}
 
 			map.graphics.clear();
-			
+			map.infoWindow.hide();
+			clearMeasure();
+
 		    if (activeTab!="queryTab") {
 				projectsRI.hide();
 			}
@@ -572,7 +684,9 @@
 			  xPointArray.length=0;	
 			  currentMeasure=0;
 			  deLength=0;
-	          activateTool("POLYLINE");		  
+			  polyline = {};
+	          activateTool("POLYLINE");	
+
 			}
 			else {
 			  deActivateTool("POLYLINE");
@@ -750,6 +864,7 @@
 			var tableText="";
 	        clearStyle("tocData");
 			hideAllOverlays();
+			map.infoWindow.hide();
 			
 			var theLayer = event.target.id;
 			document.getElementById(theLayer).style.color='red';
@@ -797,13 +912,14 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Highway Designations:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Minute_Orders/FeatureServer/0";					
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Highway_Designations/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Highway_Designations_AGO/FeatureServer/0"					
 
 					minuteOrderLyr = new FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 					map.addLayer(minuteOrderLyr);
 				}	
 				activeOverlay = minuteOrderLyr;	
-				theLegend.layerInfos=[{layer:minuteOrderLyr, title:"Minute Order Designations"}]; 
+				theLegend.layerInfos=[{layer:minuteOrderLyr, title:"Highway Designations"}]; 
 			}						
 			
 			if (theLayer=="Speed_Limit") {	
@@ -967,9 +1083,22 @@
 					tableText += "</table><br>Future Traffic and Percent Truck data is for main lanes only.";		
 					
 					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
+
+					var sizeInfo = {
+					     field:"ADT_CUR",
+					     minSize:2,
+					     maxSize:15,
+					     minDataValue:1,
+					     maxDataValue:350000
+				     };
 					
-					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});	
+					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);								
+					var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
+					theRenderer.setSizeInfo(sizeInfo);							
+					
+					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});
+					futureTrafficLyr.setRenderer(theRenderer);							
 					map.addLayer(futureTrafficLyr);
 				}	
 				
@@ -993,7 +1122,9 @@
 					
 					var infoTemplate = new PopupTemplate({description : tableText});
 					infoTemplate.setTitle("Railroads:");
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/FeatureServer/0";
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Railroads_AGO/FeatureServer/0";
+
 					
 					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
 					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
@@ -1022,7 +1153,7 @@
 					map.addLayer(nonAttainLyr);
 				}	
 				activeOverlay = nonAttainLyr;
-				theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non Attainment or Near Non Attainment Areas"}];			
+				theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non-Attainment or Near Non Attainment Areas"}];			
 			}		
 			
 			if (theLayer=="Texas_Trunk") {	
@@ -1065,7 +1196,7 @@
 					map.addLayer(maintOfficeLyr);
 				}	
 				activeOverlay = maintOfficeLyr;			
-				theLegend.layerInfos=[{layer:maintOfficeLyr, title:"TxDOT Maintenance Sections"}];			
+				theLegend.layerInfos=[{layer:maintOfficeLyr, title:"TxDOT Maintenance Offices"}];			
 			}				
 			
 			if (theLayer=="Functional_Classification") {	
@@ -1217,11 +1348,14 @@
 					var label_symbol =  new TextSymbol();
 					label_symbol.setColor(new Color("#CC9900"));
 					label_symbol.setFont(new Font("9pt").setWeight(Font.WEIGHT_BOLD));
+					// label_symbol.setHaloColor(new Color([255, 0, 0]));
+					// label_symbol.setHaloSize(1);
+
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerMarker = new LabelLayer({id:"Marker_Labels"});
 					labelLayerMarker.addFeatureLayer(MarkerLyr, label_renderer, "{MRKR_NBR}");
-					map.addLayer(labelLayerMarker);				
+					map.addLayer(labelLayerMarker);		
 				}	
 				activeOverlay = MarkerLyr;	
 				theLegend.layerInfos=[{layer:MarkerLyr, title:"Reference Markers"}]; 
@@ -1235,7 +1369,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State House District:",tableText);	
@@ -1256,7 +1390,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
@@ -1277,7 +1411,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("US House District:",tableText);	
@@ -1325,8 +1459,10 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
-					var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/FeatureServer/0";
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Area_Offices_AGO/FeatureServer/0";
 
+					// Create renderer to deal with transparency problem
 					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([238,59,59,1]), 2), new Color([238,59,59,0.05]));	
 					var theRenderer = new SimpleRenderer(theSymbol);
 
@@ -1373,9 +1509,15 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("MPO:",tableText);		
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/2";						
+					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Metropolitan_Planning_Organization/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Metropolitan_Planning_Organizations_AGO/FeatureServer/0";
+
+					// Create renderer to deal with transparency problem
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([255,140,0,1]), 2), new Color([255,140,0,0.07]));	
+					var theRenderer = new SimpleRenderer(theSymbol);						
 					
-					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});		
+					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});
+					MPOLyr.setRenderer(theRenderer);		
 					map.addLayer(MPOLyr);
 				}			
 				activeOverlay = MPOLyr;
@@ -1414,7 +1556,7 @@
 					map.addLayer(labelLayerCS);				
 				}		
 				activeOverlay = controlSectionLyr;	
-				theLegend.layerInfos=[{layer:controlSectionLyr, title:"Control Section Segments"}]; 
+				theLegend.layerInfos=[{layer:controlSectionLyr, title:"Control Section Segment colors only serve to distinguish one segment from the next."}]; 
 			}
 			
 			scaleDependentQueries();
@@ -1631,7 +1773,7 @@
 			  //Nothing
 			}
 			else {
-			  noResults("searchResults","Nothing found by that name.<br>Please try again.");
+			  noResults("searchResults","Searching...");
 			}
 		}	
 		
@@ -1650,20 +1792,71 @@
 				finalSet.push(featureAttributes[attr]);
 	          }
 			  if (theSearchLayer=="OnSystem_Highway") {
-				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "'>" + finalSet[0] + "-" + finalSet[3] + " CO.</span>";			
+				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "," + finalSet[4] + "'>" + finalSet[0] + "-" + finalSet[3] + " CO.</span>";			
 			  }
 			  else {
-				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "'>" + finalSet[0] + "</span>";
+				resultText += "<span class='SearchResult' id='" + finalSet[1] + "," + finalSet[2] + "," + theZoom + "," + finalSet[3] + "'>" + finalSet[0] + "</span>";
 			  }
 			  finalSet = [];
 	        }
 			
 			document.getElementById("searchResults").innerHTML = resultText;
+
 			dojo.query(".SearchResult").forEach(function (result){
 				on(result, "click", zoomTo);
+				on(result, "click", clearHighlighter);
+				on(result, "click", highlighter);
 			});
 			
 		}
+
+		function highlighter (result) {
+			var params = result.target.id;
+			var paramsList = params.split(',');
+			var theOID = paramsList[3];
+			var whereClause = "OBJECTID =" + theOID;
+			if (theSearchLayer=="Texas_City") {
+				citySearchLyr.setDefinitionExpression(whereClause);
+					citySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_Control_Section") {
+				csSearchLyr.setDefinitionExpression(whereClause);
+					csSearchLyr.show();
+			}
+			if (theSearchLayer=="Texas_County") {
+				countySearchLyr.setDefinitionExpression(whereClause);
+					countySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_District") {
+				districtSearchLyr.setDefinitionExpression(whereClause);
+					districtSearchLyr.show();
+			}
+			if (theSearchLayer=="OnSystem_Highway") {
+				highwaySearchLyr.setDefinitionExpression(whereClause);
+					highwaySearchLyr.show();
+			}
+		}
+
+		on(dom.byId("txtSearch"), "click", clearHighlighter);
+		on(dom.byId("btnClearHighlighter"), "click", clearHighlighter);
+		function clearHighlighter () {
+			citySearchLyr.setDefinitionExpression("");
+			csSearchLyr.setDefinitionExpression("");
+			countySearchLyr.setDefinitionExpression("");
+			districtSearchLyr.setDefinitionExpression("");
+			highwaySearchLyr.setDefinitionExpression("");
+			citySearchLyr.hide();
+			csSearchLyr.hide();
+			countySearchLyr.hide();
+			districtSearchLyr.hide();
+			highwaySearchLyr.hide();
+			document.getElementById("btnClearHighlighter").style.display="none";
+		}
+
+		on(dom.byId("searchResults"), "click", showClearButton);
+		function showClearButton (){
+			document.getElementById("btnClearHighlighter").style.display="block";
+		}		
 		
 		on(dom.byId("btnCalcCost"), "click", deCalculateCost);
 		function deCalculateCost() {
@@ -1759,11 +1952,52 @@
             var level = map.getLevel();
             window.open("http://www.bing.com/mapspreview?cp="+lat+"~"+lon+"&lvl="+level+"&style=r");
         }
-	});
+        on(dom.byId("takeSurvey"), "click", surveyLink);
+        on(dom.byId("btnSurvey"), "click", surveyLink);
+        on(dom.byId("noThanks"), "click", noThanks);
+        function surveyLink(){
+        	window.open("https://www.surveymonkey.com/r/txdot_spm_feedback");
+        	noThanks();
+        }
+        function noThanks(){
+        	document.getElementById("maskDiv").style.display="none";
+        	document.getElementById("surveyDiv").style.display="none";
+        	if (document.getElementById("doNotShow").checked == true){
+        		localStorage.setItem("SPM_survey", "noThanks");
+        	}
+    	}
+    	function checkLocalStorage(){
+    		if (localStorage.getItem("SPM_survey")===null){
+    			document.getElementById("maskDiv").style.display="block";
+        		document.getElementById("surveyDiv").style.display="block";
+    		}
+    	}
+    	window.onload=checkLocalStorage;
+    		});
 	
   </script>
 </head>
 <body class="claro">
+<div id="maskDiv"></div>
+<div id="surveyDiv">
+	<br>
+	<p1><strong>We Want Your Feedback</strong></p1>
+	<br>
+	<br>
+	<p2 style="font-size: .7em; line-height: 150%;">We value your opinion!</p2>	
+	<br>
+	<p2 style="font-size: .7em; line-height: 150%;">Help us improve your experience by taking</p2>
+	<br>
+	<p2 style="font-size: .7em; line-height: 150%;">our short survey.</p2>	
+	<br>
+	<br>
+	<button id="noThanks" style="padding: 5px 10px; position: relative; right: 7px;"> No Thanks </button><button id="takeSurvey" style="padding: 5px 10px; position: relative; left: 7px;"><strong> Take the Survey </strong></button>
+	<br>
+	<br>
+	<form style="font-size: .7em; position: absolute; bottom: 15px; width: 93%;">
+		<input id="doNotShow" type="checkbox" name="opt-out" > Do not show this message again<br>
+	</form>
+</div>
   <div id="toc">
       <div id="tabControl">
 		  <table id="tcTabs">
@@ -1880,7 +2114,7 @@
 				  <option value="opGreaterThan">Greater Than</option>
 			  </select> 
 			</td></tr>
-			<tr><td>Value:</td><td><input Class="queryFields" id="attrValue" type="text"></td></tr>
+			<tr><td>Value:</td><td><input Class="queryFields" id="attrValue" type="number" ></td></tr>
 			<tr><td>&nbsp;</td><td align="right"><button id="cmdRunQuery" type="button" value="Run Query">Run Query</button></td>
 			<tr><td colspan=2>Route tips:<br>Format=IH0035,SL0001 etc.<br>Enter * for all routes<br>Enter IH for all Interstates<br>Enter US for all US Highways<br>Enter SH for all State Highways<br><br><div id="queryResults"></div></td></tr>
 		</table>	  
@@ -1952,13 +2186,21 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
+				<br><br>Version 4.1.1 info
 				</td><tr>				
 			</table>
-		</div>		
+		</div>	
   </div>
  <div id="mapDiv">
      <span id="info"></span>
+	 <button id="btnClearHighlighter" title="Clear Highlight" style="display:none">
+	 	<span>x</span>
+	 </button>
  </div>
+ <div id="credits">TxDOT, TPP-GIS</div>
+<div>
+	<button type="button" id="btnSurvey" style=>Take the Survey</button>
+</div>	
  <nav>  
     <ul>
       <li><a href="#">Jump To...</a>
@@ -1968,6 +2210,6 @@
       		</ul>
       </li>
 	</ul>
-  </nav>  
+  </nav>
 </body>
 </html>
