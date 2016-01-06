@@ -18,21 +18,12 @@
 	 	z-index: 100;
 	 }
 	 #surveyDiv{
-<<<<<<< HEAD
-	 	height: 300;
-	 	width: 400;
-	 	top: 45%;
-  		left: 50%;
-  		margin-top: -150;
-  		margin-left: -200;
-=======
 	 	height: 300px;
 	 	width: 400px;
 	 	top: 45%;
   		left: 50%;
   		margin-top: -150px;
   		margin-left: -200px;
->>>>>>> dev_bardash
 	 	background-color: rgba(245,245,245,1);
 	 	color: #444444;
 	 	font-size: 1.5em;
@@ -230,12 +221,7 @@
 						background: #4b545f;
 						border-radius: 5px;
 					}
-<<<<<<< HEAD
-	.esriAttribution {
-		display: none;
-	}
 
-=======
 	#credits {
 		position: absolute;
 		right: 15px;
@@ -268,8 +254,7 @@
     	padding-bottom: 5px;
     	background: radial-gradient(white, lightyellow, yellow);
 	}
-	
->>>>>>> dev_bardash
+
   </style>
   <script src="http://js.arcgis.com/3.12/"></script>
   <script>
@@ -458,11 +443,7 @@
 			}
 			else {
 				var div = document.getElementById("legendDiv");
-<<<<<<< HEAD
-				div.innerHTML = 'Select an overlay to see its legend.';
-=======
 				div.innerHTML = 'Select an overlay from the Maps tab to see its legend.';
->>>>>>> dev_bardash
 			}
 		}
 		
@@ -1112,6 +1093,7 @@
 					     minDataValue:1,
 					     maxDataValue:350000
 				     };
+
 					
 					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);								
 					var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
@@ -1870,10 +1852,7 @@
 			countySearchLyr.hide();
 			districtSearchLyr.hide();
 			highwaySearchLyr.hide();
-<<<<<<< HEAD
-=======
 			document.getElementById("btnClearHighlighter").style.display="none";
->>>>>>> dev_bardash
 		}
 
 		on(dom.byId("searchResults"), "click", showClearButton);
@@ -2007,29 +1986,18 @@
 	<p1><strong>We Want Your Feedback</strong></p1>
 	<br>
 	<br>
-<<<<<<< HEAD
-	<p2 style="font-size: .7em; line-height: 220%;">We value your opinion!</p2>
-	<br>	
-	<p2 style="font-size: .7em; line-height: 50%;">Help us improve your experience by taking <br /> our short survey.</p2>
-=======
 	<p2 style="font-size: .7em; line-height: 150%;">We value your opinion!</p2>	
 	<br>
 	<p2 style="font-size: .7em; line-height: 150%;">Help us improve your experience by taking</p2>
 	<br>
 	<p2 style="font-size: .7em; line-height: 150%;">our short survey.</p2>	
->>>>>>> dev_bardash
 	<br>
 	<br>
 	<button id="noThanks" style="padding: 5px 10px; position: relative; right: 7px;"> No Thanks </button><button id="takeSurvey" style="padding: 5px 10px; position: relative; left: 7px;"><strong> Take the Survey </strong></button>
 	<br>
 	<br>
-<<<<<<< HEAD
-	<form style="font-size: .7em; position: absolute; bottom: 5px; width: 100%;">
-		<input id="doNotShow" type="checkbox" name="opt-out"> Do not show this message again<br>
-=======
 	<form style="font-size: .7em; position: absolute; bottom: 15px; width: 93%;">
 		<input id="doNotShow" type="checkbox" name="opt-out" > Do not show this message again<br>
->>>>>>> dev_bardash
 	</form>
 </div>
   <div id="toc">
@@ -2106,7 +2074,6 @@
 		 <tr><td>Type name.. then click to zoom.</td></tr>
 		 <tr><td><input id="txtSearch" type="text" onfocus="this.value=''" value="Search here..."/></td></tr>
 		 <tr><td><div id="searchResults"></div></td></tr>
-		 <tr><td><button id="btnClearHighlighter" title="Clear Highlighter" style="display:none;">Clear</button></td></tr>		 
         </table>
 	  </div>
 	  <div id="measureTab">
@@ -2232,10 +2199,7 @@
 	 	<span>x</span>
 	 </button>
  </div>
-<<<<<<< HEAD
-=======
  <div id="credits">TxDOT, TPP-GIS</div>
->>>>>>> dev_bardash
 <div>
 	<button type="button" id="btnSurvey" style=>Take the Survey</button>
 </div>	
