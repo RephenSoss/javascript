@@ -37,6 +37,40 @@
 	 	display: none;
 	 	z-index: 101;	 	
 	 }
+	 #releaseNotesDiv{
+	 	height: 510px;
+	 	width: 400px;
+	 	top: 45%;
+  		left: 50%;
+  		margin-top: -150px;
+  		margin-left: -200px;
+	 	background-color: rgba(245,245,245,1);
+	 	color: #444444;
+	 	font-size: .8em;
+	 	text-align: center;
+	  	border-radius: 5px;
+	  	padding: 10px;
+	 	position: absolute;
+	 	display: none;
+	 	z-index: 101;	 	
+	 }	 
+	 #releaseNotesDiv h1 {
+	    background-color: #6699CC;
+	    color: #FFFFFF;
+	    cursor: default;
+	    font-size: 1.5em;
+	    border-radius: 5px;
+	    padding: 5px;
+	    text-align: center;
+	    margin-top: auto;	 	
+	 }
+	 #releaseNotesDiv li {
+	    color: #444444;
+	    cursor: default;
+	    font-size: 1.1em;
+	    padding: 5px;
+	    text-align: left;	 	
+	 }
 	 #toc{
 	  border: 2px solid;
 	  border-radius: 5px;
@@ -131,6 +165,17 @@
     }
     button {
     	cursor: pointer;
+    }
+	#btnReleaseNotes{
+		background: none;
+		cursor: pointer;
+		font-size: 13px;
+	    font-family: inherit;
+		color: #3333ff;
+		border: none;
+		margin: 0px;
+		padding: 0px;
+	  	z-index: 50;
     }
     #btnSurvey{
 	  position: absolute;
@@ -399,8 +444,7 @@
 		  attachTo: "bottom-left"
         });	
 
-		theLegend = new Legend({map:map},"legendDiv");	
-		
+		theLegend = new Legend({map:map},"legendDiv");		
 	
 		//Function to force IE8 to work, eventually this will not be needed.
 		function handleIEProblem() {
@@ -1975,8 +2019,17 @@
     		}
     	}
     	window.onload=checkLocalStorage;
-    		});
-	
+
+ 		on(dom.byId("btnReleaseNotes"), "click", showReleaseNotes);
+        function showReleaseNotes(){
+        	document.getElementById("maskDiv").style.display="block";
+        	document.getElementById("releaseNotesDiv").style.display="block";
+    	}
+		});
+		function closeReleaseNotes(){
+			document.getElementById("maskDiv").style.display="none";
+        	document.getElementById("releaseNotesDiv").style.display="none";
+		}
   </script>
 </head>
 <body class="claro">
@@ -1999,6 +2052,29 @@
 	<form style="font-size: .7em; position: absolute; bottom: 15px; width: 93%;">
 		<input id="doNotShow" type="checkbox" name="opt-out" > Do not show this message again<br>
 	</form>
+</div>
+<div id="releaseNotesDiv">
+	<h1><strong>RELEASE NOTES</strong></h1>
+	<p3>Version 4.1.1 info</p3>
+	<br>
+	<br>
+	<ul>
+	  <li>Features returned in Search tab are now highlighted</li>
+	  <li>Added Jump-to-Google/Bing button</li>
+	  <li>Added Survey/Feedback button</li>
+	  <li>Added Release Notes and version control to About tab</li>
+	  <li>Cleared legend when no overlay is selected</li>
+	  <li>Fixed legend for Railroad overlay</li>
+	  <li>Updated MPO overlay</li>
+	  <li>Updated Area Office overlay</li>
+	  <li>Updated and re-symbolized Highway Designations overlay</li>
+	  <li>Added link in Highway Designation popup window to Minute Order website</li>
+	  <li>Fixed bug in Measure tab</li>
+	  <li>Various bug fixes and user experience improvements</li>
+	</ul>  
+	<br>
+	<br>
+	<button id="btnClose" style="padding: 5px 10px; position: relative; bottom: 15px;" onclick="closeReleaseNotes()"> Close </button>
 </div>
   <div id="toc">
       <div id="tabControl">
@@ -2188,7 +2264,7 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
-				<br><br>Version 4.1.1 info
+				<br><br><button type="button" id="btnReleaseNotes">Version 4.1.1 info</button>
 				</td><tr>				
 			</table>
 		</div>	
