@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+<!-- This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/ -->
 <html>
 <head>
   <title>Statewide Planning Map</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/claro/claro.css">
@@ -1234,7 +1236,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Maintenance Office:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Maintenance_Office/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Maintenance_Sections_AGO/FeatureServer/0";
 
 					maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});		
 					map.addLayer(maintOfficeLyr);
@@ -1996,27 +1998,27 @@
             var level = map.getLevel();
             window.open("http://www.bing.com/mapspreview?cp="+lat+"~"+lon+"&lvl="+level+"&style=r");
         }
-        on(dom.byId("takeSurvey"), "click", surveyLink);
+        // on(dom.byId("takeSurvey"), "click", surveyLink);
         on(dom.byId("btnSurvey"), "click", surveyLink);
-        on(dom.byId("noThanks"), "click", noThanks);
+        // on(dom.byId("noThanks"), "click", noThanks);
         function surveyLink(){
         	window.open("https://www.surveymonkey.com/r/txdot_spm_feedback");
-        	noThanks();
+        	// noThanks();
         }
-        function noThanks(){
-        	document.getElementById("maskDiv").style.display="none";
-        	document.getElementById("surveyDiv").style.display="none";
-        	if (document.getElementById("doNotShow").checked == true){
-        		localStorage.setItem("SPM_survey", "noThanks");
-        	}
-    	}
-    	function checkLocalStorage(){
-    		if (localStorage.getItem("SPM_survey")===null){
-    			document.getElementById("maskDiv").style.display="block";
-        		document.getElementById("surveyDiv").style.display="block";
-    		}
-    	}
-    	window.onload=checkLocalStorage;
+     //    function noThanks(){
+     //    	document.getElementById("maskDiv").style.display="none";
+     //    	document.getElementById("surveyDiv").style.display="none";
+     //    	if (document.getElementById("doNotShow").checked == true){
+     //    		localStorage.setItem("SPM_survey", "noThanks");
+     //    	}
+    	// }
+    	// function checkLocalStorage(){
+    	// 	if (localStorage.getItem("SPM_survey")===null){
+    	// 		document.getElementById("maskDiv").style.display="block";
+     //    		document.getElementById("surveyDiv").style.display="block";
+    	// 	}
+    	// }
+    	// window.onload=checkLocalStorage;
 
  		on(dom.byId("btnReleaseNotes"), "click", showReleaseNotes);
         function showReleaseNotes(){
@@ -2032,7 +2034,7 @@
 </head>
 <body class="claro">
 <div id="maskDiv"></div>
-<div id="surveyDiv">
+<!-- <div id="surveyDiv">
 	<br>
 	<p1><strong>We Want Your Feedback</strong></p1>
 	<br>
@@ -2050,7 +2052,7 @@
 	<form style="font-size: .7em; position: absolute; bottom: 15px; width: 93%;">
 		<input id="doNotShow" type="checkbox" name="opt-out" > Do not show this message again<br>
 	</form>
-</div>
+</div> -->
 <div id="releaseNotesDiv">
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3>Version 4.1.1 info</p3>
