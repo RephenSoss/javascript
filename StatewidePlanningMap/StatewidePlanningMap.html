@@ -332,6 +332,7 @@
 	var areaOfficeLyr;
 	var COGLyr;
 	var FCLyr;
+	var UZAlyr;
 	var FreightLyr;
 	var NHSLyr;	
 	var maintOfficeLyr;	
@@ -396,6 +397,7 @@
 		"esri/symbols/SimpleFillSymbol",
 		"esri/symbols/TextSymbol",
 		"esri/renderers/SimpleRenderer",
+		"esri/renderers/ClassBreaksRenderer",
 		"esri/layers/LabelLayer",
 		"esri/layers/LabelClass",
 		"esri/Color",
@@ -412,7 +414,7 @@
 			Query, QueryTask, arcgisUtils, Legend, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
-			SimpleFillSymbol, TextSymbol, SimpleRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,
+			SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,
 			Polyline, Point, Font, PopupTemplate, number) {
 			
 		parser.parse();
@@ -912,9 +914,11 @@
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
+			if (FCLyr) {UZALyr.hide();}
 			if (FreightLyr) {FreightLyr.hide();}		
 			if (maintOfficeLyr) {maintOfficeLyr.hide();}		
-			if (txTrunkLyr) {txTrunkLyr.hide();}		
+			if (txTrunkLyr) {txTrunkLyr.hide();}
+			if (txTrunkLyr) {UZALyr.hide();}		
 			if (MPOLyr) {MPOLyr.hide();}		
 			if (NHSLyr) {NHSLyr.hide();}
 			if (nonAttainLyr) {nonAttainLyr.hide();}		
@@ -1168,18 +1172,18 @@
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Future_Traffic_AGO/FeatureServer/0";
 					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
 
-					var sizeInfo = {
-					     field:"ADT_CUR",
-					     minSize:2,
-					     maxSize:15,
-					     minDataValue:1,
-					     maxDataValue:350000
-				     };
 
-					
-					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), 5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER, 5);								
-					var theRenderer = new esri.renderer.SimpleRenderer(theSymbol);
-					theRenderer.setSizeInfo(sizeInfo);							
+					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5);								
+					var theRenderer = new ClassBreaksRenderer(theSymbol,"ADT_CUR");
+
+					theRenderer.addBreak({minValue:1,maxValue:49999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),1.5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"<= 40,000"});
+					theRenderer.addBreak({minValue:50000,maxValue:99999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),3.45, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"50,000 - 99,999"});
+					theRenderer.addBreak({minValue:100000,maxValue:149999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),5.4, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"100,000 - 149,999"});
+					theRenderer.addBreak({minValue:150000,maxValue:199999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),7.35, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"150,000 - 199,999"});
+					theRenderer.addBreak({minValue:200000,maxValue:249999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),9.3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"200,000 - 249,999"});
+					theRenderer.addBreak({minValue:250000,maxValue:300000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),11.25, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:">= 250,000"});
+
+		
 					
 					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});
 					futureTrafficLyr.setRenderer(theRenderer);							
@@ -1243,6 +1247,7 @@
 			if (theLayer=="Texas_Trunk") {	
 				if (txTrunkLyr) {
 					txTrunkLyr.show();
+					UZALyr.show();
 				}
 				else {
 					tableText = "";
@@ -1251,14 +1256,24 @@
 					tableText += "<tr><td>Trunk Type</td><td>${CMNT}</td></tr>";			
 					tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);	
+					UZATableText = "";
+					UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+					UZATableText += "<tr><td>Name</td><td>${NAMELSAD10}</td></tr>";
+					UZATableText += "<tr><td>Urban Area Type</td><td>${UrbanAreaType}</td></tr>";
+					UZATableText += "<tr><td>Urban Area Number</td><td>${UrbanAreaNumber}</td></tr>";
+					UZATableText += "<tr><td>Pop Code</td><td>${POP_CODE}</td></tr>";			
+					UZATableText += "</table>";
+
+					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
 	      				
-					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});			
-					map.addLayer(txTrunkLyr);
+					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
+					map.addLayers([UZALyr,txTrunkLyr]);
 				}	
 				activeOverlay = txTrunkLyr;
-				theLegend.layerInfos=[{layer:txTrunkLyr, title:"Texas Trunk System"}];
+				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"},{layer:txTrunkLyr, title:"Texas Trunk System"}];
 			}			
 			
 			if (theLayer=="Maintenance_Offices") {	
@@ -1286,6 +1301,7 @@
 			if (theLayer=="Functional_Classification") {	
 				if (FCLyr) {
 					FCLyr.show();
+					UZALyr.show();
 				}
 				else {
 					tableText = "";
@@ -1293,17 +1309,28 @@
 					tableText += "<tr><td>Highway</td><td>${RTE_NM}</td></tr>";
 					tableText += "<tr><td>Proposed</td><td>${PROPOSED}</td></tr>";
 					tableText += "<tr><td>FC Code</td><td>${FC}</td></tr>";
-					tableText += "<tr><td>FC Description</td><td>${FC_DESC}</td></tr>";				
-					tableText += "</table>";		
+					tableText += "<tr><td>FC Description</td><td>${FC_DESC}</td></tr>";
+					tableText += "<tr><td>Rural/Urban Code</td><td>${RU}</td></tr>";				
+					tableText += "</table>";
+
+					UZATableText = "";
+					UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+					UZATableText += "<tr><td>Name</td><td>${NAMELSAD10}</td></tr>";
+					UZATableText += "<tr><td>Urban Area Type</td><td>${UrbanAreaType}</td></tr>";
+					UZATableText += "<tr><td>Urban Area Number</td><td>${UrbanAreaNumber}</td></tr>";
+					UZATableText += "<tr><td>Pop Code</td><td>${POP_CODE}</td></tr>";			
+					UZATableText += "</table>";								
 					
-					var infoTemplate = new InfoTemplate("Functional Classification:",tableText);	
+					var infoTemplate = new InfoTemplate("Functional Classification:",tableText);
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 					
-					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC"], infoTemplate: infoTemplate});		
-					map.addLayer(FCLyr);
+					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC", "RU"], infoTemplate: infoTemplate});	
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
+					map.addLayers([UZALyr, FCLyr]);
 				}	
 				activeOverlay = FCLyr;		
-				theLegend.layerInfos=[{layer:FCLyr, title:"Functional Classification"}];			
+				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"}, {layer:FCLyr, title:"Functional Classification"}];			
 			}		
 			
 			if (theLayer=="Freight_Network") {	
@@ -1433,7 +1460,7 @@
 					
 					//Labeling
 					var label_symbol =  new TextSymbol();
-					label_symbol.setColor(new Color("#CC9900"));
+					label_symbol.setColor(new Color("#CC6633"));
 					label_symbol.setFont(new Font("9pt").setWeight(Font.WEIGHT_BOLD));
 					label_symbol.setHaloColor(new Color([255, 255, 255]));
 					label_symbol.setHaloSize(2);
@@ -2262,7 +2289,7 @@
 		  <tr><td class="Overlay" id='COG'>COG</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Control_Section'>Control Section</td></tr>
 		  <tr><td class="Overlay" id='Freight_Network'>Freight Network</td></tr>		  
-		  <tr class="alt"><td class="Overlay" id='Functional_Classification'>Functional Classification</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Functional_Classification'>Functional Classification & UZA</td></tr>
 		  <tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>		  
 	 	  <tr><td class="Overlay" id='Maintenance_Offices'>Maintenance Office</td></tr>	  
@@ -2279,7 +2306,7 @@
 		  <tr class="alt"><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
 		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
 		  <tr class="alt"><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
-		  <tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System</td></tr>
+		  <tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & UZA</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
 		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
 		  <tr class="alt"><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>			  
