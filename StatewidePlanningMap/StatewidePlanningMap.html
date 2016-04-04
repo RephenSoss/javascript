@@ -1171,17 +1171,15 @@
 					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Future_Traffic_AGO/FeatureServer/0";
 					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
+							
+					var theRenderer = new ClassBreaksRenderer(null,"ADT_CUR");
 
-
-					var theSymbol = new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"), esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5);								
-					var theRenderer = new ClassBreaksRenderer(theSymbol,"ADT_CUR");
-
-					theRenderer.addBreak({minValue:1,maxValue:49999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),1.5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"<= 40,000"});
-					theRenderer.addBreak({minValue:50000,maxValue:99999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),3.45, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"50,000 - 99,999"});
-					theRenderer.addBreak({minValue:100000,maxValue:149999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),5.4, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"100,000 - 149,999"});
-					theRenderer.addBreak({minValue:150000,maxValue:199999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),7.35, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"150,000 - 199,999"});
-					theRenderer.addBreak({minValue:200000,maxValue:249999,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),9.3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"200,000 - 249,999"});
-					theRenderer.addBreak({minValue:250000,maxValue:300000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),11.25, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:">= 250,000"});
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),1.5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"<= 40,000"});
+					theRenderer.addBreak({minValue:50000,maxValue:100000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),3.45, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"50,000 - 99,999"});
+					theRenderer.addBreak({minValue:100000,maxValue:150000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),5.4, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"100,000 - 149,999"});
+					theRenderer.addBreak({minValue:150000,maxValue:200000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),7.35, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"150,000 - 199,999"});
+					theRenderer.addBreak({minValue:200000,maxValue:250000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),9.3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"200,000 - 249,999"});
+					theRenderer.addBreak({minValue:250000,maxValue:Infinity,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),11.25, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:">= 250,000"});
 
 		
 					
