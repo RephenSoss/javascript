@@ -1172,14 +1172,16 @@
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Future_Traffic_AGO/FeatureServer/0";
 					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
 							
-					var theRenderer = new ClassBreaksRenderer(null,"ADT_CUR");
+					var theRenderer = new ClassBreaksRenderer(null,function(feature){
+						return feature.attributes.ADT_CUR;
+					});
 
-					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),1.5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"<= 40,000"});
-					theRenderer.addBreak({minValue:50000,maxValue:100000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),3.45, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"50,000 - 99,999"});
-					theRenderer.addBreak({minValue:100000,maxValue:150000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),5.4, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"100,000 - 149,999"});
-					theRenderer.addBreak({minValue:150000,maxValue:200000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),7.35, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"150,000 - 199,999"});
-					theRenderer.addBreak({minValue:200000,maxValue:250000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),9.3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"200,000 - 249,999"});
-					theRenderer.addBreak({minValue:250000,maxValue:Infinity,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),11.25, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:">= 250,000"});
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),1.5, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"<= 40,000",field:"ADT_CUR"});
+					theRenderer.addBreak({minValue:50000,maxValue:100000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),3.45, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"50,000 - 99,999",field:"ADT_CUR"});
+					theRenderer.addBreak({minValue:100000,maxValue:150000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),5.4, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"100,000 - 149,999",field:"ADT_CUR"});
+					theRenderer.addBreak({minValue:150000,maxValue:200000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),7.35, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"150,000 - 199,999",field:"ADT_CUR"});
+					theRenderer.addBreak({minValue:200000,maxValue:250000,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),9.3, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:"200,000 - 249,999",field:"ADT_CUR"});
+					theRenderer.addBreak({minValue:250000,maxValue:Infinity,symbol:(new esri.symbol.CartographicLineSymbol(esri.symbol.CartographicLineSymbol.STYLE_SOLID, new esri.Color("#FF0000"),11.25, esri.symbol.CartographicLineSymbol.CAP_ROUND, esri.symbol.CartographicLineSymbol.JOIN_MITER,5)),label:">= 250,000",field:"ADT_CUR"});
 
 		
 					
@@ -1266,8 +1268,18 @@
 					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
 	      				
+					var theRenderer = new ClassBreaksRenderer(null,function(feature){
+						return feature.attributes.PopUnsmoothed2010;
+					});
+
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"PopUnsmoothed2010"});
+					
+					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
+
+
 					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});
 					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
+					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,txTrunkLyr]);
 				}	
 				activeOverlay = txTrunkLyr;
@@ -1323,9 +1335,21 @@
 					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 					
+					var theRenderer = new ClassBreaksRenderer(null,function(feature){
+						return feature.attributes.PopUnsmoothed2010;
+					});
+
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"PopUnsmoothed2010"});
+					
+					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
+
+
 					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC", "RU"], infoTemplate: infoTemplate});	
+					
 					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
-					map.addLayers([UZALyr, FCLyr]);
+					UZALyr.setRenderer(theRenderer);
+					map.addLayers([UZALyr,FCLyr]);
+
 				}	
 				activeOverlay = FCLyr;		
 				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"}, {layer:FCLyr, title:"Functional Classification"}];			
@@ -1658,14 +1682,17 @@
 					map.addLayer(controlSectionLyr);
 					
 					//Labeling
+
 					var label_symbol =  new TextSymbol();
-					label_symbol.setColor(new Color("#000000"));
+					label_symbol.setColor(new Color([0,0,0]));
 					label_symbol.setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD));
-					//label_symbol.setHaloSize(2);
-					//label_symbol.setHaloColor(new Color([255,255,255]));
+					//label_symbol.setHaloSize(3);
+					//label_symbol.setHaloColor(new Color([253,253,253,253]));
+
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerCS = new LabelLayer({id:"CS_Labels"});
+
 					labelLayerCS.addFeatureLayer(controlSectionLyr, label_renderer, "{CTRL_SECT_NBR}");
 					map.addLayer(labelLayerCS);				
 				}		
