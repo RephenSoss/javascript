@@ -301,6 +301,11 @@
     	padding-bottom: 5px;
     	background: radial-gradient(white, lightyellow, yellow);
 	}
+	.esriLegendLayerLabel td{
+	     display: none;
+	     font-weight:bold;
+	     color: #4C4C4C;
+	 }
 
   </style>
   <script src="http://js.arcgis.com/3.16"></script>
@@ -333,7 +338,8 @@
 	var COGLyr;
 	var FCLyr;
 	var UZAlyr;
-	var FreightLyr;
+	var NatlFreightLyr;
+	var TXFreightLyr;
 	var NHSLyr;	
 	var maintOfficeLyr;	
 	var txTrunkLyr;	
@@ -501,10 +507,29 @@
 		
 		function createLegend() {
 			if (activeOverlay) {
-				var div = document.getElementById("legendDiv");
-				div.innerHTML = '';
-				theLegend.refresh();
-
+				var div = document.getElementById("legendDiv");	
+				var link = document.getElementById("legendLink");
+				var name = activeOverlay.name;
+				console.log(activeOverlay);
+				console.log(name);
+				if (name == "National Highway Freight Network") {
+					link.href = "http://ops.fhwa.dot.gov/freight/infrastructure/nfn/index.htm";
+					link.innerHTML = "FHWA Website";
+					div.innerHTML = 'The National Highway Freight Network (NHFN) was developed by the Federal Highway Administration under the FAST Act, and replaces the National Freight Network previously developed under MAP-21.';
+					document.getElementById("legendLink").style.display="block";
+				}
+				if (name == "Freight_Network") {
+					link.href = "http://www.dot.state.tx.us/move-texas-freight/freight_plan.htm";
+					link.innerHTML = "Texas Freight Mobility Plan Website";
+					div.innerHTML = 'The Texas Highway Freight Network is comprised of a Primary Freight Network and a Secondary Freight Network and includes interstates, the NHS, and the Texas Trunk System.';
+					document.getElementById("legendLink").style.display="block";
+				}				
+				else {
+					div.innerHTML = '';
+					theLegend.refresh();
+					document.getElementById("legendLink").style.display="none";
+				}
+				theLegend.refresh();	
 			}
 			else {
 				var div = document.getElementById("legendDiv");
@@ -915,7 +940,8 @@
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
 			if (FCLyr) {UZALyr.hide();}
-			if (FreightLyr) {FreightLyr.hide();}		
+			if (NatlFreightLyr) {NatlFreightLyr.hide();}
+			if (TXFreightLyr) {TXFreightLyr.hide();}		
 			if (maintOfficeLyr) {maintOfficeLyr.hide();}		
 			if (txTrunkLyr) {txTrunkLyr.hide();}
 			if (txTrunkLyr) {UZALyr.hide();}		
@@ -1264,8 +1290,28 @@
 					UZATableText += "<tr><td>Pop Code</td><td>${POP_CODE}</td></tr>";			
 					UZATableText += "</table>";
 
-					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);
-					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);
+					function setUZAPopupContent(graphic){
+						console.log(graphic);
+						UZATableText = "";
+						UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.NAMELSAD10+"</td></tr>";
+						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CODE+"</td></tr>";	
+						if (graphic.attributes.UrbanAreaType == "SUA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Small Urban (Population 5,000 – 49,999)</td></tr>";
+						}
+						if (graphic.attributes.UrbanAreaType == "UA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Urbanized (Population 50,000 – 199,999)</td></tr>";
+						}			
+						if (graphic.attributes.UrbanAreaType == "LUA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Large Urbanized (Population 200,000+)</td></tr>";
+						}											
+						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
+						UZATableText += "</table>";							
+						return UZATableText;
+					}								
+
+					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
 	      				
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
@@ -1314,25 +1360,57 @@
 					UZALyr.show();
 				}
 				else {
-					tableText = "";
-					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Highway</td><td>${RTE_NM}</td></tr>";
-					tableText += "<tr><td>Proposed</td><td>${PROPOSED}</td></tr>";
-					tableText += "<tr><td>FC Code</td><td>${FC}</td></tr>";
-					tableText += "<tr><td>FC Description</td><td>${FC_DESC}</td></tr>";
-					tableText += "<tr><td>Rural/Urban Code</td><td>${RU}</td></tr>";				
-					tableText += "</table>";
 
-					UZATableText = "";
-					UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					UZATableText += "<tr><td>Name</td><td>${NAMELSAD10}</td></tr>";
-					UZATableText += "<tr><td>Urban Area Type</td><td>${UrbanAreaType}</td></tr>";
-					UZATableText += "<tr><td>Urban Area Number</td><td>${UrbanAreaNumber}</td></tr>";
-					UZATableText += "<tr><td>Pop Code</td><td>${POP_CODE}</td></tr>";			
-					UZATableText += "</table>";								
+							
 					
-					var infoTemplate = new InfoTemplate("Functional Classification:",tableText);
-					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",UZATableText);		
+					// Manipulate the contents of the popup infoTemplate
+					var infoTemplate = new InfoTemplate("Functional Classification:",setPopupContent);
+					function setPopupContent(graphic){
+						console.log(graphic);
+						tableText = "";
+						tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+						tableText += "<tr><td>Highway</td><td>"+graphic.attributes.RTE_NM+"</td></tr>";
+						tableText += "<tr><td>Proposed</td><td>"+graphic.attributes.PROPOSED+"</td></tr>";
+						tableText += "<tr><td>FC Code</td><td>"+graphic.attributes.FC+"</td></tr>";
+						tableText += "<tr><td>FC Description</td><td>"+graphic.attributes.FC_DESC+"</td></tr>";
+						tableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.RU+"</td></tr>";
+						if (graphic.attributes.RU == 1){
+							tableText += "<tr><td>Rural/Urban Description</td><td>Rural (Population < 5,000)</td></tr>";
+						}
+						if (graphic.attributes.RU == 2){
+							tableText += "<tr><td>Rural/Urban Description</td><td>Small Urban (Population 5,000 – 49,999)</td></tr>";
+						}						
+						if (graphic.attributes.RU == 3){
+							tableText += "<tr><td>Rural/Urban Description</td><td>Urbanized (Population 50,000 – 199,999)</td></tr>";
+						}
+						if (graphic.attributes.RU == 4){
+							tableText += "<tr><td>Rural/Urban Description</td><td>Large Urbanized (Population 200,000+)</td></tr>";
+						}																		
+						tableText += "</table>";						
+						return tableText;
+					}
+
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);
+					function setUZAPopupContent(graphic){
+						console.log(graphic);
+						UZATableText = "";
+						UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.NAMELSAD10+"</td></tr>";
+						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CODE+"</td></tr>";	
+						if (graphic.attributes.UrbanAreaType == "SUA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Small Urban (Population 5,000 – 49,999)</td></tr>";
+						}
+						if (graphic.attributes.UrbanAreaType == "UA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Urbanized (Population 50,000 – 199,999)</td></tr>";
+						}			
+						if (graphic.attributes.UrbanAreaType == "LUA"){
+							UZATableText += "<tr><td>Rural/Urban Description</td><td>Large Urbanized (Population 200,000+)</td></tr>";
+						}											
+						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
+						UZATableText += "</table>";							
+						return UZATableText;
+					}					
+	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 					
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
@@ -1353,11 +1431,32 @@
 				}	
 				activeOverlay = FCLyr;		
 				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"}, {layer:FCLyr, title:"Functional Classification"}];			
-			}		
+			}			
 			
-			if (theLayer=="Freight_Network") {	
-				if (FreightLyr) {
-					FreightLyr.show();
+			if (theLayer=="Natl_Freight_Network") {	
+				if (NatlFreightLyr) {
+					NatlFreightLyr.show();
+				}
+				else {
+					tableText = "";
+					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+					tableText += "<tr><td>Highway</td><td>${HWY}</td></tr>";
+					tableText += "<tr><td>Network Type</td><td>${FR_TYPE}</td></tr>";
+					tableText += "</table>";		
+					
+					var infoTemplate = new InfoTemplate("Freight Network:",tableText);	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_National_HighwayFreight_Network/FeatureServer/0";		
+					
+					NatlFreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
+					map.addLayer(NatlFreightLyr);
+				}	
+				activeOverlay = NatlFreightLyr;		
+				theLegend.layerInfos=[{layer:NatlFreightLyr, title:"National Highway Freight Network"}];			
+			}
+
+			if (theLayer=="TX_Freight_Network") {	
+				if (TXFreightLyr) {
+					TXFreightLyr.show();
 				}
 				else {
 					tableText = "";
@@ -1369,12 +1468,12 @@
 					var infoTemplate = new InfoTemplate("Freight Network:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/1";		
 					
-					FreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
-					map.addLayer(FreightLyr);
+					TXFreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["HWY","FR_TYPE"], infoTemplate: infoTemplate});		
+					map.addLayer(TXFreightLyr);
 				}	
-				activeOverlay = FreightLyr;		
-				theLegend.layerInfos=[{layer:FreightLyr, title:"Freight Network"}];			
-			}		
+				activeOverlay = TXFreightLyr;		
+				theLegend.layerInfos=[{layer:TXFreightLyr, title:"Texas Freight Mobility Plan Network"}];			
+			}					
 			
 			if (theLayer=="Vertical_Clearance") {	
 				if (VerticalLyr) {
@@ -2313,28 +2412,29 @@
 		  <tr class="alt"><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='COG'>COG</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Control_Section'>Control Section</td></tr>
-		  <tr><td class="Overlay" id='Freight_Network'>Freight Network</td></tr>		  
-		  <tr class="alt"><td class="Overlay" id='Functional_Classification'>Functional Classification & UZA</td></tr>
-		  <tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>		  
-	 	  <tr><td class="Overlay" id='Maintenance_Offices'>Maintenance Office</td></tr>	  
-		  <tr class="alt"><td class="Overlay" id='MPO'>MPO</td></tr>	
-		  <tr><td class="Overlay" id='NHS'>National Highway System</td></tr>		  
-		  <tr class="alt"><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
-		  <tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
-          <tr class="alt"><td class="Overlay" id='Feasibility_Studies'>Projects - Feasibility Studies</td></tr>
-		  <tr><td class="Overlay" id='Unfunded_Projects'>Projects - Future Candidates</td></tr>	
-		  <tr class="alt"><td class="Overlay" id='Funded_Projects'>Projects - 10 Year Program</td></tr>
-          <tr><td class="Overlay" id='Proposition_One'>Projects - Proposition One</td></tr>		  
-		  <tr class="alt"><td class="Overlay" id='Railroads'>Railroads</td></tr>
-	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
-		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
-		  <tr class="alt"><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
-		  <tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & UZA</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
-		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
-		  <tr class="alt"><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>			  
+		  <tr><td class="Overlay" id='Natl_Freight_Network'>National Highway Freight Network</td></tr>
+		  <tr class="alt"><td class="Overlay" id='TX_Freight_Network'>Texas Mobility Plan Freight Network</td></tr>			  
+		  <tr><td class="Overlay" id='Functional_Classification'>Functional Classification & UZA</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
+		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>		  
+	 	  <tr class="alt"><td class="Overlay" id='Maintenance_Offices'>Maintenance Office</td></tr>	  
+		  <tr><td class="Overlay" id='MPO'>MPO</td></tr>	
+		  <tr class="alt"><td class="Overlay" id='NHS'>National Highway System</td></tr>		  
+		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
+          <tr><td class="Overlay" id='Feasibility_Studies'>Projects - Feasibility Studies</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Unfunded_Projects'>Projects - Future Candidates</td></tr>	
+		  <tr><td class="Overlay" id='Funded_Projects'>Projects - 10 Year Program</td></tr>
+          <tr class="alt"><td class="Overlay" id='Proposition_One'>Projects - Proposition One</td></tr>		  
+		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
+	      <tr class="alt"><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
+		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
+		  <tr class="alt"><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
+		  <tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
+		  <tr class="alt"><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & UZA</td></tr>
+		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
+		  <tr class="alt"><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
+		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>			  
 		  <!--<tr class="alt"><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr>-->
 		</table>
 	  </div>
@@ -2455,10 +2555,13 @@
 			<table class="tocTables">
 				<tr><th align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map Legend</th><tr> 
 				<tr><td>
-					<div id="legendDiv">
-						<!--Legend-->
-					</div>
+					<div id="legendDiv"></div>
+				</td><tr>
+				<tr><td>
+
+					<br><a id="legendLink" target="_blank" style="display:none"></a>
 				</td><tr>				
+								
 			</table>
 		</div>		
 		<div id="aboutTab">
