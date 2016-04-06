@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/ -->
+
 <html>
 <head>
   <title>Statewide Planning Map</title>
@@ -925,7 +926,7 @@
 				       top100Lyr.setDefinitionExpression("");
 				       labelLayerTop100.hide();
 					}
-					if (map.getZoom()>9) {
+					if (map.getZoom()>8) {
 				       top100Lyr.setDefinitionExpression("");	
 				       labelLayerTop100.show();
 					}				
@@ -1446,7 +1447,6 @@
 					
 					var infoTemplate = new InfoTemplate("National Highway Freight Network:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_National_Highway_Freight_Network/FeatureServer/0";
-					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_National_HighwayFreight_Network/FeatureServer/0";		
 					
 					NatlFreightLyr = new FeatureLayer(projectsUrl, {id:"National Highway Freight Network",visible: true,outFields:["RTE_RB_NM","NATL_FRT"], infoTemplate: infoTemplate});		
 					map.addLayer(NatlFreightLyr);
@@ -1460,26 +1460,17 @@
 					TXFreightLyr.show();
 				}
 				else {
-					function txFreightPopUp(graphic){
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Highway</td><td>"+graphic.attributes.RTE_RB_NM+"</td></tr>";
-					
-					if (graphic.attributes.PRMRY_FRT == 1){
-							tableText += "<tr><td>Network Type</td><td>Primary</td></tr>";
-						}
-					if (graphic.attributes.PRMRY_FRT == 0){
-							tableText += "<tr><td>Network Type</td><td>Secondary</td></tr>";
-						}
+					tableText += "<tr><td>Highway</td><td>${RTE_RB_NM}</td></tr>";
+					tableText += "<tr><td>Network Type</td><td>${TIER}</td></tr>";
 					tableText += "</table>";
-					return tableText;
-					}		
+	
 					
-					var infoTemplate = new InfoTemplate("Freight Network:",txFreightPopUp);	
+					var infoTemplate = new InfoTemplate("Freight Network:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Texas_Highway_Freight_Network/FeatureServer/0";
-					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/1";		
 					
-					TXFreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["RTE_RB_NM","PRMRY_FRT"], infoTemplate: infoTemplate});		
+					TXFreightLyr = new FeatureLayer(projectsUrl, {id:"Freight Network",visible: true,outFields:["RTE_RB_NM","TIER"], infoTemplate: infoTemplate});		
 					map.addLayer(TXFreightLyr);
 				}	
 				activeOverlay = TXFreightLyr;		
@@ -1614,14 +1605,19 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
+					tableText += "<tr><td>Representative</td><td>${REP_NM}</td></tr>";
+					tableText += "<tr><td colspan='2'><a href='http://www.house.state.tx.us' target='_blank'>Texas House of Representatives</a></td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State House District:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/0";
-
-					StateHouseLyr = new FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_State_House_Districts/FeatureServer/0";
+					
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([105,105,105,255]), 2.25), new Color([211,211,211,.4]));	
+					var theRenderer = new SimpleRenderer(theSymbol);
+					
+					StateHouseLyr = new FeatureLayer(projectsUrl, {id:"State House District",visible: true,outFields:["DIST_NBR","REP_NM"], infoTemplate: infoTemplate});		
+					StateHouseLyr.setRenderer(theRenderer);	
 					map.addLayer(StateHouseLyr);
 				}	
 				activeOverlay = StateHouseLyr;	
@@ -1635,14 +1631,19 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
+					tableText += "<tr><td>Senator</td><td>${REP_NM}</td></tr>";
+					tableText += "<tr><td colspan='2'><a href='http://www.senate.state.tx.us' target='_blank'>Texas Senate</a></td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/1";				
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_State_Senate_Districts/FeatureServer/0";
+					
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([65,105,225,255]), 2.25), new Color([135,206,235,.2]));	
+					var theRenderer = new SimpleRenderer(theSymbol);				
 
-					StateSenateLyr = new FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					StateSenateLyr = new FeatureLayer(projectsUrl, {id:"State Senate District",visible: true,outFields:["DIST_NBR","REP_NM"], infoTemplate: infoTemplate});
+					StateSenateLyr.setRenderer(theRenderer);		
 					map.addLayer(StateSenateLyr);
 				}	
 				activeOverlay = StateSenateLyr;
@@ -1656,14 +1657,19 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>District</td><td>${District}</td></tr>";
-					// tableText += "<tr><td>Plan Name</td><td>${PLAN_NM}</td></tr>";			
+					tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
+					tableText += "<tr><td>Representative</td><td>${REP_NM}</td></tr>";
+					tableText += "<tr><td colspan='2'><a href='http://www.house.gov' target='_blank'>US House of Representatives</a></td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("US House District:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Political_Boundaries/FeatureServer/2";				
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_US_House_Districts/FeatureServer/0";
+					
+					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([233,150,122,255]), 2.25), new Color([255,160,122,.15]));	
+					var theRenderer = new SimpleRenderer(theSymbol);				
 
-					USHouseLyr = new FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["District","PLAN_NM"], infoTemplate: infoTemplate});		
+					USHouseLyr = new FeatureLayer(projectsUrl, {id:"US House District",visible: true,outFields:["DIST_NBR","REP_NM"], infoTemplate: infoTemplate});
+					USHouseLyr.setRenderer(theRenderer);		
 					map.addLayer(USHouseLyr);
 				}	
 				activeOverlay = USHouseLyr;	
@@ -1856,9 +1862,9 @@
 					map.infoWindow.resize(350,400);
 					//Labeling
 					var label_symbol =  new TextSymbol();
-					label_symbol.setColor(new Color([0,0,0]));
-					label_symbol.setFont(new Font("11pt").setWeight(Font.WEIGHT_BOLD));
-					label_symbol.setHaloColor(new Color([255,255,0]));
+					label_symbol.setColor(new Color([255,255,0]));
+					label_symbol.setFont(new Font("11pt"));
+					label_symbol.setHaloColor(new Color([0,0,0]));
 					label_symbol.setHaloSize(2);
 
 
@@ -2367,22 +2373,19 @@
 </div> -->
 <div id="releaseNotesDiv">
 	<h1><strong>RELEASE NOTES</strong></h1>
-	<p3>Version 4.1.1 info</p3>
+	<p3>Version 4.1.2 Pitt</p3>
 	<br>
 	<br>
 	<ul>
-	  <li>Features returned in Search tab are now highlighted</li>
-	  <li>Added Jump-to-Google/Bing button</li>
-	  <li>Added Survey/Feedback button</li>
-	  <li>Added Release Notes and version control to About tab</li>
-	  <li>Cleared legend when no overlay is selected</li>
-	  <li>Fixed legend for Railroad overlay</li>
-	  <li>Updated MPO overlay</li>
-	  <li>Updated Area Office overlay</li>
-	  <li>Updated and re-symbolized Highway Designations overlay</li>
-	  <li>Added link in Highway Designation popup window to Minute Order website</li>
-	  <li>Fixed bug in Measure tab</li>
-	  <li>Various bug fixes and user experience improvements</li>
+	  <li>Updated Esri Javascript API to 3.16</li>
+	  <li>Added 2010 Adjusted UZA layer to Functional Class, and Texas Trunk layers</li>
+	  <li>Added 2014 values to AADT layer</li>
+	  <li>Updated Future Traffic and Truck Percent to 2014 values</li>
+	  <li>Added Top 100 Congested Roadways layer with search capability</li>
+	  <li>Added Texas Highway Freight Network</li>
+	  <li>Updated National Highway Freight Network</li>
+	  <li>Updated Functional Classification symbology and added Urban/Rural information</li>
+	  <li>Updated Political Boundaries and included Representative/Senator names</li>
 	</ul>  
 	<br>
 	<br>
@@ -2582,7 +2585,7 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
-				<br><br><button type="button" id="btnReleaseNotes">Version 4.1.1 info</button>
+				<br><br><button type="button" id="btnReleaseNotes">Version 4.1.2 Pitt</button>
 				</td><tr>				
 			</table>
 		</div>	
