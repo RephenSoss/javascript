@@ -508,8 +508,10 @@
 		
 		function createLegend() {
 			if (activeOverlay) {
-				var div = document.getElementById("legendDiv");	
+				var div = document.getElementById("legendDiv");
+				var div2 = document.getElementById("legendDiv2");	
 				var link = document.getElementById("legendLink");
+				var link2 = document.getElementById("legendLink2");
 				var name = activeOverlay.name;
 				console.log(activeOverlay);
 				console.log(name);
@@ -518,17 +520,29 @@
 					link.innerHTML = "FHWA Website";
 					div.innerHTML = 'The National Highway Freight Network (NHFN) was developed by the Federal Highway Administration under the FAST Act, and replaces the National Freight Network previously developed under MAP-21.';
 					document.getElementById("legendLink").style.display="block";
+					document.getElementById("legendLink2").style.display="none";
 				}
 				else if (name == "Texas Highway Freight Network") {
 					link.href = "http://www.dot.state.tx.us/move-texas-freight/freight_plan.htm";
 					link.innerHTML = "Texas Freight Mobility Plan Website";
 					div.innerHTML = 'The Texas Highway Freight Network is comprised of a Primary Freight Network and a Secondary Freight Network/Emerging Freight Corridors. It includes interstates, the NHS and the Texas Trunk System.';
 					document.getElementById("legendLink").style.display="block";
+					document.getElementById("legendLink2").style.display="none";
 				}				
+				else if (name =="Top 100 Congested Roadways"){
+					link.href = "http://www.txdot.gov/inside-txdot/projects/100-congested-roadways.html";
+					link.innerHTML = "TxDOT Top 100 Website";
+					div.innerHTML = "This layer provides a list of the Top 100 Most Congested Roadways in the State as determined by Texas A&M Transportation Institute(TTI). For more information please visit the links below."
+					link2.href = "http://mobility.tamu.edu/texas-most-congested-roadways/";
+					link2.innerHTML = "TTI Website";
+					document.getElementById("legendLink").style.display = "block";
+					document.getElementById("legendLink2").style.display = "block";					
+				}
 				else {
 					div.innerHTML = '';
 					theLegend.refresh();
 					document.getElementById("legendLink").style.display="none";
+					document.getElementById("legendLink2").style.display="none";
 				}
 				theLegend.refresh();	
 			}
@@ -1606,8 +1620,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
-					tableText += "<tr><td>Representative</td><td>${REP_NM}</td></tr>";
-					tableText += "<tr><td colspan='2'><a href='http://www.house.state.tx.us' target='_blank'>Texas House of Representatives</a></td></tr>";			
+					tableText += "<tr><td>Representative</td><td><a href='http://www.house.state.tx.us/members/member-page/?district=${DIST_NBR}' target='_blank'>${REP_NM}</a></td></tr>";
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State House District:",tableText);	
@@ -1632,8 +1645,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
-					tableText += "<tr><td>Senator</td><td>${REP_NM}</td></tr>";
-					tableText += "<tr><td colspan='2'><a href='http://www.senate.state.tx.us' target='_blank'>Texas Senate</a></td></tr>";			
+					tableText += "<tr><td>Senator</td><td><a href='http://www.senate.state.tx.us/75r/Senate/members/dist${DIST_NBR}/dist${DIST_NBR}.htm' target='_blank'>${REP_NM}</a></td></tr>";			
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
@@ -1684,15 +1696,15 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Highway</td><td>${RTE_NM}</td></tr>";
-					tableText += "<tr><td>System Type</td><td>${SYS_TYPE}</td></tr>";
+					tableText += "<tr><td>System Type</td><td>${Sys_Type}</td></tr>";
 					tableText += "<tr><td>NHS Code</td><td>${NHS_CD}</td></tr>";
 					tableText += "<tr><td>NHS Type</td><td>${NHS_TYPE}</td></tr>";				
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("NHS:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/12";				
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_National_Highway_System/FeatureServer/0";						
 
-					NHSLyr = new FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","SYS_TYPE","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});		
+					NHSLyr = new FeatureLayer(projectsUrl, {id:"NHS",visible: true,outFields:["RTE_NM","Sys_Type","NHS_CD","NHS_TYPE"], infoTemplate: infoTemplate});		
 					map.addLayer(NHSLyr);
 				}	
 				activeOverlay = NHSLyr;		
@@ -1879,7 +1891,8 @@
 				}
 
 				activeOverlay = top100Lyr;
-				theLegend.layerInfos=[{layer:top100Lyr, title:"Top 100 Congested Roadways"}];
+				theLegend.layerInfos=[null];
+				//theLegend.layerInfos=[{ title:"Top 100 Congested Roadways"}];
 			}
 
 			
@@ -2570,10 +2583,12 @@
 				<tr><th align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map Legend</th><tr> 
 				<tr><td>
 					<div id="legendDiv"></div>
+					<div id="legendDiv2"></div>
 				</td><tr>
 				<tr><td>
 
 					<br><a id="legendLink" target="_blank" style="display:none"></a>
+					<br><a id="legendLink2" target="_blank" style="display:none"></a>
 				</td><tr>				
 								
 			</table>
