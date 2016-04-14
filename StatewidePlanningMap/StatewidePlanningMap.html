@@ -1903,8 +1903,8 @@
 			tableText = "";
 			tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 			tableText += "<tr><td>Highway</td><td>${HWY}</td></tr>";
-			tableText += "<tr><td>AADT</td><td>${ADT_CUR}</td></tr>";
-			tableText += "<tr><td>AADT Future</td><td>${ADT_DESGN}</td></tr>";		
+			tableText += "<tr><td>AADT</td><td>${ADT_CUR:NumberFormat}</td></tr>";
+			tableText += "<tr><td>AADT Future</td><td>${ADT_DESGN:NumberFormat}</td></tr>";		
 			tableText += "<tr><td>Lanes</td><td>${NUM_LANES}</td></tr>";
 			tableText += "<tr><td>Speed</td><td>${SPD_MAX}</td></tr>";
 			tableText += "<tr><td>Truck PCT</td><td>${TRK_AADT}</td></tr>";	
@@ -1914,8 +1914,8 @@
 			tableText += "<tr><td>Median Width</td><td>${MED_WID}</td></tr>";
 			tableText += "</table>";	
 
-			var infoTemplate = new InfoTemplate("Roadway Inventory:",tableText);		
-			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";
+			var infoTemplate = new InfoTemplate("Roadway Inventory:",tableText);
+			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem_2014/FeatureServer/0";		
 				
 			//var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 5);	
 			var theSymbol = new CartographicLineSymbol(CartographicLineSymbol.STYLE_SOLID, new Color("#FF0000"), 5, CartographicLineSymbol.CAP_ROUND, CartographicLineSymbol.JOIN_MITER, 5);				
@@ -2400,6 +2400,7 @@
 	  <li>Updated Functional Classification symbology and added Urban/Rural information</li>
 	  <li>Updated Political Boundaries and included Representative/Senator names</li>
 	  <li>Updated National Highway System</li>
+	  <li>Updated Query Function to use 2014 Inventory Data</li>
 	</ul>  
 	<br>
 	<br>
@@ -2440,8 +2441,8 @@
 		  <tr class="alt"><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='COG'>COG</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Control_Section'>Control Section</td></tr>
-		  <tr><td class="Overlay" id='Natl_Freight_Network'>National Highway Freight Network</td></tr>
-		  <tr class="alt"><td class="Overlay" id='TX_Freight_Network'>Texas Highway Freight Network</td></tr>			  
+		  <tr><td class="Overlay" id='Natl_Freight_Network'>Freight Network (FHWA)</td></tr>
+		  <tr class="alt"><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>			  
 		  <tr><td class="Overlay" id='Functional_Classification'>Functional Classification & UZA</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>		  
@@ -2502,7 +2503,7 @@
 	  </div>
 	  <div id="queryTab">
 		<table class="tocTables">
-			<tr><th colspan=2>Query 2013 Inventory Data</th><tr> 
+			<tr><th colspan=2>Query 2014 Inventory Data</th><tr> 
 			<tr><td>Route:</td><td><input Class="queryFields" id="rteName" type="text"></td></tr>
 			<tr><td>Attribute:</td><td>
 				<select Class="queryFields" id="attrSelect">
