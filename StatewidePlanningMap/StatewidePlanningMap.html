@@ -41,7 +41,7 @@
 	 	z-index: 101;	 	
 	 }
 	 #releaseNotesDiv{
-	 	height: 510px;
+	 	height: 540px;
 	 	width: 400px;
 	 	top: 45%;
   		left: 50%;
@@ -356,10 +356,10 @@
 	var StateHouseLyr;	
 	var StateSenateLyr;	
 	var futureTrafficLyr;
-	var pOneLyr;
-    var feasStudyLyr;	
-	var unfundedLyr;
-	var fundedLyr;
+	var longTermPlanLyr;
+    var constScheduledLyr;	
+	var finalForConstLyr;
+	var underDevLyr;
 	var minuteOrderLyr;
 	var pavementConditionLyr;
 	var VerticalLyr;
@@ -537,6 +537,13 @@
 					link2.innerHTML = "TTI Website";
 					document.getElementById("legendLink").style.display = "block";
 					document.getElementById("legendLink2").style.display = "block";					
+				}
+				else if (name =="TxDOT_Projects"){
+					link.href = "http://www.txdot.gov/inside-txdot/projects/project-tracker.html";
+					link.innerHTML = "Project Tracker Website";
+					div.innerHTML = "";
+					document.getElementById("legendLink").style.display="block";
+					document.getElementById("legendLink2").style.display="none";
 				}
 				else {
 					div.innerHTML = '';
@@ -971,10 +978,10 @@
 			if (speedLimitLyr) {speedLimitLyr.hide();}
 			if (StateSenateLyr) {StateSenateLyr.hide();}
 			if (futureTrafficLyr) {futureTrafficLyr.hide();}
-			if (pOneLyr) {pOneLyr.hide();}
-			if (feasStudyLyr) {feasStudyLyr.hide();}
-			if (unfundedLyr) {unfundedLyr.hide();}
-			if (fundedLyr) {fundedLyr.hide();}	
+			if (longTermPlanLyr) {longTermPlanLyr.hide();}
+			if (constScheduledLyr) {constScheduledLyr.hide();}
+			if (finalForConstLyr) {finalForConstLyr.hide();}
+			if (underDevLyr) {underDevLyr.hide();}	
 			if (minuteOrderLyr) {minuteOrderLyr.hide();}
 			if (pavementConditionLyr) {pavementConditionLyr.hide();}
 			if (VerticalLyr) {VerticalLyr.hide();}
@@ -1072,9 +1079,9 @@
 				theLegend.layerInfos=[{layer:speedLimitLyr, title:"Speed Limits"}]; 			
 			}
 
-			if (theLayer=="Proposition_One") {	
-				if (pOneLyr) {
-					pOneLyr.show();
+			if (theLayer=="Long_Term_Planning") {	
+				if (longTermPlanLyr) {
+					longTermPlanLyr.show();
 				}
 				else {
 					tableText = "";
@@ -1089,22 +1096,27 @@
 					tableText += "<tr><td>PID</td><td>${TPP_PID}</td></tr>";
 					tableText += "<tr><td>Est. Construction Cost</td><td>$${EST_CONST_COST:NumberFormat(places:0)}</td></tr>";
 					tableText += "<tr><td>Funding</td><td>$${UTP_TOTAL_FUNDING_AVAILABLE:NumberFormat(places:0)}</td></tr>";					
-					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
+					//tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";	
 					
-					var infoTemplate = new InfoTemplate("Proposition One:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/3";	
+					var infoTemplate = new InfoTemplate("Long Term Planning:",tableText);	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
-					pOneLyr = new FeatureLayer(projectsUrl, {id:"Proposition_One",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});		
-					map.addLayer(pOneLyr);
+					var theSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([44,123,182]),3);
+					var theRenderer = new SimpleRenderer(theSymbol);	
+
+					longTermPlanLyr = new FeatureLayer(projectsUrl, {id:"Long_Term_Planning",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE","PRJ_STATUS"], infoTemplate: infoTemplate});		
+					longTermPlanLyr.setDefinitionExpression("PRJ_STATUS = 'Long Term Planning'");
+					longTermPlanLyr.setRenderer(theRenderer);
+					map.addLayer(longTermPlanLyr);
 				}	
-				activeOverlay = pOneLyr;	
-				theLegend.layerInfos=[{layer:pOneLyr, title:"Proposition One"}]; 
+				activeOverlay = longTermPlanLyr;	
+				theLegend.layerInfos=[{layer:longTermPlanLyr, title:"TxDOT Projects - Long Term Planning"}]; 
 			}	
 
-			if (theLayer=="Feasibility_Studies") {	
-				if (feasStudyLyr) {
-					feasStudyLyr.show();
+			if (theLayer=="Construction_Scheduled") {	
+				if (constScheduledLyr) {
+					constScheduledLyr.show();
 				}
 				else {
 					tableText = "";
@@ -1119,23 +1131,28 @@
 					tableText += "<tr><td>PID</td><td>${TPP_PID}</td></tr>";
 					tableText += "<tr><td>Est. Construction Cost</td><td>$${EST_CONST_COST:NumberFormat(places:0)}</td></tr>";
 					tableText += "<tr><td>Funding</td><td>TBD</td></tr>";				
-					tableText += "<tr><td>Strategic Score</td><td>${UTP_STRATEGIC_SCORE:NumberFormat(places:0)}</td></tr>";				
-					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
+					//tableText += "<tr><td>Strategic Score</td><td>${UTP_STRATEGIC_SCORE:NumberFormat(places:0)}</td></tr>";				
+					//tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Feasibility Study:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/0";	
+					var infoTemplate = new InfoTemplate("Construction Scheduled:",tableText);	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
-					feasStudyLyr = new FeatureLayer(projectsUrl, {id:"Feasibility_Studies",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});
-					map.addLayer(feasStudyLyr);
+					var theSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([215,25,28]),3);
+					var theRenderer = new SimpleRenderer(theSymbol);	
+
+					constScheduledLyr = new FeatureLayer(projectsUrl, {id:"Construction_Scheduled",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE", "PRJ_STATUS"], infoTemplate: infoTemplate});
+					constScheduledLyr.setDefinitionExpression("PRJ_STATUS = 'Construction Scheduled'");
+					constScheduledLyr.setRenderer(theRenderer);
+					map.addLayer(constScheduledLyr);
 				}	
-				activeOverlay = feasStudyLyr;	
-				theLegend.layerInfos=[{layer:feasStudyLyr, title:"Feasibility Studies"}]; 
+				activeOverlay = constScheduledLyr;	
+				theLegend.layerInfos=[{layer:constScheduledLyr, title:"TxDOT Projects - Construction Scheduled"}]; 
 			}
 			
-			if (theLayer=="Unfunded_Projects") {	
-				if (unfundedLyr) {
-					unfundedLyr.show();
+			if (theLayer=="Finalizing_for_Construction") {	
+				if (finalForConstLyr) {
+					finalForConstLyr.show();
 				}
 				else {
 					tableText = "";
@@ -1154,20 +1171,24 @@
 					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Project - Future Candidate:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/2";	
+					var infoTemplate = new InfoTemplate("Finalizing for Construction:",tableText);
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
-					unfundedLyr = new FeatureLayer(projectsUrl, {id:"Unfunded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-					unfundedLyr.setDefinitionExpression("TPP_WORK_PROGRAM <> 'CANDPA' AND RIGHT(CONTROL_SECT_JOB,3) Not Like '9%'");
-					map.addLayer(unfundedLyr);
+					var theSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([253,174,97]),3);
+					var theRenderer = new SimpleRenderer(theSymbol);
+
+					finalForConstLyr = new FeatureLayer(projectsUrl, {id:"Finalizing_for_Construction",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE","PRJ_STATUS"], infoTemplate: infoTemplate});	
+					finalForConstLyr.setDefinitionExpression("PRJ_STATUS = 'Finalizing for Construction'");
+					finalForConstLyr.setRenderer(theRenderer);
+					map.addLayer(finalForConstLyr);
 				}	
-				activeOverlay = unfundedLyr;			
-				theLegend.layerInfos=[{layer:unfundedLyr, title:"Future Candidates"}]; 			
+				activeOverlay = finalForConstLyr;			
+				theLegend.layerInfos=[{layer:finalForConstLyr, title:"TxDOT Projects - Finalizing for Construction"}]; 			
 			}	
 
-			if (theLayer=="Funded_Projects") {	
-				if (fundedLyr) {
-					fundedLyr.show();
+			if (theLayer=="Under_Development") {	
+				if (underDevLyr) {
+					underDevLyr.show();
 				}
 				else {
 					tableText = "";
@@ -1182,18 +1203,23 @@
 					tableText += "<tr><td>PID</td><td>${TPP_PID}</td></tr>";
 					tableText += "<tr><td>Est. Construction Cost</td><td>$${EST_CONST_COST:NumberFormat(places:0)}</td></tr>";
 					tableText += "<tr><td>Funding</td><td>$${UTP_TOTAL_FUNDING_AVAILABLE:NumberFormat(places:0)}</td></tr>";				
-					tableText += "<tr><td>Strategic Score</td><td>${UTP_STRATEGIC_SCORE:NumberFormat(places:0)}</td></tr>";				
-					tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
+					//tableText += "<tr><td>Strategic Score</td><td>${UTP_STRATEGIC_SCORE:NumberFormat(places:0)}</td></tr>";				
+					//tableText += "<tr><td>Total Score</td><td>${UTP_TOTAL_SCORE:NumberFormat(places:0)}</td></tr>";								
 					tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Project - 10 Year Program:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planned_Projects/FeatureServer/1";	
+					var infoTemplate = new InfoTemplate("Under Development:",tableText);	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
-					fundedLyr = new FeatureLayer(projectsUrl, {id:"Funded_Projects",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE"], infoTemplate: infoTemplate});	
-					map.addLayer(fundedLyr);
+					var theSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([128,205,193]),3);
+					var theRenderer = new SimpleRenderer(theSymbol);	
+
+					underDevLyr = new FeatureLayer(projectsUrl, {id:"Under_Development",visible: true,outFields:["HIGHWAY_NUMBER","CONTROL_SECT_JOB","PROJ_CLASS","TYPE_OF_WORK","LAYMAN_DESCRIPTION1","TPP_WORK_PROGRAM","TPP_CATEGORY_P2","TPP_PID","EST_CONST_COST","UTP_TOTAL_FUNDING_AVAILABLE","UTP_STRATEGIC_SCORE","UTP_TOTAL_SCORE","PRJ_STATUS"], infoTemplate: infoTemplate});	
+					underDevLyr.setDefinitionExpression("PRJ_STATUS = 'Under Development'");
+					underDevLyr.setRenderer(theRenderer);
+					map.addLayer(underDevLyr);
 				}	
-				activeOverlay = fundedLyr;	
-				theLegend.layerInfos=[{layer:fundedLyr, title:"10 Year Program"}]; 						
+				activeOverlay = underDevLyr;	
+				theLegend.layerInfos=[{layer:underDevLyr, title:"TxDOT Projects - Under Development"}]; 						
 			}			
 			
 			if (theLayer=="Future_Traffic") {	
@@ -1456,7 +1482,7 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Highway</td><td>${RTE_RB_NM}</td></tr>";
-					tableText += "<tr><td>Network Type</td><td>Primary</td></tr>";
+					//tableText += "<tr><td>Network Type</td><td>Primary</td></tr>";
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("National Highway Freight Network:",tableText);	
@@ -2401,6 +2427,7 @@
 	  <li>Updated Political Boundaries and included Representative/Senator names</li>
 	  <li>Updated National Highway System</li>
 	  <li>Updated Query Function to use 2014 Inventory Data</li>
+	  <li>Updated Project layers to match <a href='http://www.txdot.gov/inside-txdot/projects/project-tracker.html' target='_blank'>Project Tracker</a></li>
 	</ul>  
 	<br>
 	<br>
@@ -2451,10 +2478,10 @@
 		  <tr class="alt"><td class="Overlay" id='NHS'>National Highway System</td></tr>		  
 		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
-          <tr><td class="Overlay" id='Feasibility_Studies'>Projects - Feasibility Studies</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Unfunded_Projects'>Projects - Future Candidates</td></tr>	
-		  <tr><td class="Overlay" id='Funded_Projects'>Projects - 10 Year Program</td></tr>
-          <tr class="alt"><td class="Overlay" id='Proposition_One'>Projects - Proposition One</td></tr>		  
+          <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction Scheduled</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Finalizing_for_Construction'>Projects - Finalizing for Construction</td></tr>	
+		  <tr><td class="Overlay" id='Under_Development'>Projects - Under Development</td></tr>
+          <tr class="alt"><td class="Overlay" id='Long_Term_Planning'>Projects - Long Term Planning</td></tr>		  
 		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
 	      <tr class="alt"><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
 		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
