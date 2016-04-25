@@ -1365,12 +1365,12 @@
 
 
 					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});
-					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
 					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,txTrunkLyr]);
 				}	
 				activeOverlay = txTrunkLyr;
-				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"},{layer:txTrunkLyr, title:"Texas Trunk System"}];
+				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"},{layer:txTrunkLyr, title:"Texas Trunk System"}];
 			}			
 			
 			if (theLayer=="Maintenance_Offices") {	
@@ -1465,13 +1465,13 @@
 
 					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC", "RU"], infoTemplate: infoTemplate});	
 					
-					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
 					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,FCLyr]);
 
 				}	
 				activeOverlay = FCLyr;		
-				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urbanized Area"}, {layer:FCLyr, title:"Functional Classification"}];			
+				theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"}, {layer:FCLyr, title:"Functional Classification"}];			
 			}			
 			
 			if (theLayer=="Natl_Freight_Network") {	
@@ -2470,7 +2470,7 @@
 		  <tr class="alt"><td class="Overlay" id='Control_Section'>Control Section</td></tr>
 		  <tr><td class="Overlay" id='Natl_Freight_Network'>Freight Network (FHWA)</td></tr>
 		  <tr class="alt"><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>			  
-		  <tr><td class="Overlay" id='Functional_Classification'>Functional Classification & UZA</td></tr>
+		  <tr><td class="Overlay" id='Functional_Classification'>Functional Classification & Urban Areas</td></tr>
 		  <tr class="alt"><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>		  
 	 	  <tr class="alt"><td class="Overlay" id='Maintenance_Offices'>Maintenance Office</td></tr>	  
@@ -2487,7 +2487,7 @@
 		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
 		  <tr class="alt"><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
 		  <tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
-		  <tr class="alt"><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & UZA</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
 		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
 		  <tr class="alt"><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
 		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>			  
