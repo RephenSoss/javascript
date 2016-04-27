@@ -1331,7 +1331,7 @@
 					UZATableText += "<tr><td>Pop Code</td><td>${POP_CODE}</td></tr>";			
 					UZATableText += "</table>";
 
-					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);
+					
 					function setUZAPopupContent(graphic){
 						console.log(graphic);
 						UZATableText = "";
@@ -1350,7 +1350,8 @@
 						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
 						UZATableText += "</table>";							
 						return UZATableText;
-					}								
+					}
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);								
 
 					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
@@ -1405,7 +1406,7 @@
 							
 					
 					// Manipulate the contents of the popup infoTemplate
-					var infoTemplate = new InfoTemplate("Functional Classification:",setPopupContent);
+					
 					function setPopupContent(graphic){
 						console.log(graphic);
 						tableText = "";
@@ -1430,8 +1431,9 @@
 						tableText += "</table>";						
 						return tableText;
 					}
+					var infoTemplate = new InfoTemplate("Functional Classification:",setPopupContent);
 
-					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);
+					
 					function setUZAPopupContent(graphic){
 						console.log(graphic);
 						UZATableText = "";
@@ -1450,7 +1452,8 @@
 						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
 						UZATableText += "</table>";							
 						return UZATableText;
-					}					
+					}
+					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);					
 	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
 					
@@ -1867,7 +1870,7 @@
     				return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 					}	
 					
-					var infoTemplate = new InfoTemplate("Rank: ${Rank_2015}",getTextContent);
+					
 					function getTextContent(graphic){
 						var costDelay = "$"+(graphic.attributes.CostDelay/1000000).toFixed(2)+" Million";
 						var costTruck = "$"+(graphic.attributes.CostTruck/1000000).toFixed(2)+" Million";
@@ -1893,6 +1896,7 @@
 						tableText += "</table>";
 						return tableText;
 					}
+					var infoTemplate = new InfoTemplate("Rank: ${Rank_2015}",getTextContent);
 
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0";
 					top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["Rank_2015","Truck_2015","SegID","Roadway","DelayMile","TruckDelay","TCI","CostDelay","CostTruck","District"], infoTemplate: infoTemplate});
