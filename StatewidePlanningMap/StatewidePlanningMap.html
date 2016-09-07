@@ -429,7 +429,7 @@
 		window.onresize = handleIEProblem;
 		handleIEProblem();
 				
-		map = new Map("mapDiv", {minZoom:6, maxZoom:15, logo: false});
+		map = new Map("mapDiv", {minZoom:3, maxZoom:15, logo: false});
 		map.infoWindow.set("titleInBody", false);
 
 		tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
@@ -848,14 +848,14 @@
 						
 				if (FCLyr) {
 					if (map.getZoom()<9) {
-				       FCLyr.setDefinitionExpression("RTE_PRFX='IH' AND RTE_TYPE='KG'");				
+				       FCLyr.setDefinitionExpression("RIA_RTE_ID LIKE'IH%' AND RIA_RTE_ID LIKE '%KG'");				
 					}
 					if (map.getZoom()>8&&map.getZoom()<11) {
-				       FCLyr.setDefinitionExpression("(RTE_PRFX='IH' or RTE_PRFX='US') AND RTE_TYPE='KG'");				
+				       FCLyr.setDefinitionExpression("(RIA_RTE_ID LIKE'IH%' or RIA_RTE_ID LIKE'US%') AND RIA_RTE_ID LIKE '%KG'");				
 					}
 
 					if (map.getZoom()>10&&map.getZoom()<13) {
-                       FCLyr.setDefinitionExpression("NOT RTE_TYPE IN ('AG', 'XG') OR RTE_TYPE IS NULL");                                                                
+                       FCLyr.setDefinitionExpression("NOT RIA_RTE_ID LIKE '%AG' AND NOT RIA_RTE_ID LIKE '%XG' ");                                                                
                     }
 
 					if (map.getZoom()>=13) {
@@ -880,21 +880,29 @@
 
 				if (controlSectionLyr) {
 					if (map.getZoom()<9) {
-				       controlSectionLyr.setDefinitionExpression("RTE_PRFX_CD='IH'");
+				       controlSectionLyr.setDefinitionExpression("RTE_PRFX='IH'");
 				       labelLayerCS.hide();
 					}
 					if (map.getZoom()>8&&map.getZoom()<10) {
-				       controlSectionLyr.setDefinitionExpression("(RTE_PRFX_CD='IH' or RTE_PRFX_CD='US')");	
+				       controlSectionLyr.setDefinitionExpression("(RTE_PRFX='IH' or RTE_PRFX='US')");	
 				       labelLayerCS.hide();
 					}
-					if (map.getZoom()>9&&map.getZoom()<12) {
-				       controlSectionLyr.setDefinitionExpression("(RTE_PRFX_CD='IH' or RTE_PRFX_CD='SH' or RTE_PRFX_CD='US' or RTE_PRFX_CD='SL')");
+					if (map.getZoom()>9&&map.getZoom()<11) {
+				       controlSectionLyr.setDefinitionExpression("(RTE_PRFX='IH' or RTE_PRFX='SH' or RTE_PRFX='US' or RTE_PRFX='SL')");
 				       labelLayerCS.show();
 					}				
-					if (map.getZoom()>11) {
+					if (map.getZoom()>10&&map.getZoom()<13) {
+				       controlSectionLyr.setDefinitionExpression("RTE_PRFX NOT IN ('CS', 'FC', 'CR', 'FD', 'PR')");	
+				       labelLayerCS.show();
+					}		
+					if (map.getZoom()>12&&map.getZoom()<15) {
+				       controlSectionLyr.setDefinitionExpression("RTE_PRFX <> 'CS'");	
+				       labelLayerCS.show();
+					}		
+					if (map.getZoom()>14) {
 				       controlSectionLyr.setDefinitionExpression("");	
 				       labelLayerCS.show();
-					}				
+					}		
 				}		
 
 				if (speedLimitLyr) {
@@ -929,13 +937,13 @@
 
 				if (pavementConditionLyr) {
 					if (map.getZoom()<9) {
-				       pavementConditionLyr.setDefinitionExpression("LEFT(SIGNED_HIG,2)='IH'");				
+				       pavementConditionLyr.setDefinitionExpression("LEFT(ROUTE_ID,2)='IH'");				
 					}
 					if (map.getZoom()>8&&map.getZoom()<11) {
-				       pavementConditionLyr.setDefinitionExpression("(LEFT(SIGNED_HIG,2)='IH' or LEFT(SIGNED_HIG,2)='US')");				
+				       pavementConditionLyr.setDefinitionExpression("(LEFT(ROUTE_ID,2)='IH' or LEFT(ROUTE_ID,2)='US')");				
 					}
 					if (map.getZoom()>10&&map.getZoom()<13) {
-				       pavementConditionLyr.setDefinitionExpression("(LEFT(SIGNED_HIG,2)='IH' or LEFT(SIGNED_HIG,2)='US' or LEFT(SIGNED_HIG,2)='SH' or LEFT(SIGNED_HIG,2)='SL')");				
+				       pavementConditionLyr.setDefinitionExpression("(LEFT(ROUTE_ID,2)='IH' or LEFT(ROUTE_ID,2)='US' or LEFT(ROUTE_ID,2)='SH' or LEFT(ROUTE_ID,2)='SL')");				
 					}				
 					if (map.getZoom()>12) {
 				       pavementConditionLyr.setDefinitionExpression("");				
@@ -1013,21 +1021,21 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Highway Name</td><td>${SIGNED_HIG}</td></tr>";
-					tableText += "<tr><td>Pavement Type</td><td>${PVMNT_TYPE}</td></tr>";			
-					tableText += "<tr><td>Distress Score</td><td>${DISTRESS_S}</td></tr>";						
-					tableText += "<tr><td>Condition Score</td><td>${CONDITION_}</td></tr>";									
-					tableText += "<tr><td>Ride Score</td><td>${RIDE_SCORE}</td></tr>";					
+					tableText += "<tr><td>Highway</td><td>${ROUTE_ID}</td></tr>";						
+					tableText += "<tr><td>Condition</td><td>${CONDITION}</td></tr>";									
+					tableText += "<tr><td>Begin DFO</td><td>${BEGIN_POIN}</td></tr>";										
+					tableText += "<tr><td>End DFO</td><td>${END_POINT}</td></tr>";				
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Pavement Conditions:",tableText);	
-					//var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions/MapServer/0";	
-					var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
+					// var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Pavement_Conditions/FeatureServer/0";
 					
-					pavementConditionLyr = new FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["SIGNED_HIG","PVMNT_TYPE","DISTRESS_S","CONDITION_","RIDE_SCORE"], infoTemplate: infoTemplate});			
+					pavementConditionLyr = new FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["ROUTE_ID","BEGIN_POIN","END_POINT","CONDITION"], infoTemplate: infoTemplate});			
 					map.addLayer(pavementConditionLyr);
 				}
 				activeOverlay = pavementConditionLyr;	
+				theLegend.layerInfos=[{layer:pavementConditionLyr, title:"Pavement Condition"}]; 
 			}			
 			
 			if (theLayer=="Minute_Orders") {	
@@ -1047,7 +1055,7 @@
 					
 					var infoTemplate = new InfoTemplate("Highway Designations:",tableText);	
 					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Highway_Designations/MapServer/0";
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Highway_Designations_AGO/FeatureServer/0"					
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Highway_Designations/FeatureServer/0"					
 
 					minuteOrderLyr = new FeatureLayer(projectsUrl, {id:"Minute Orders",visible: true,outFields:["RTE_NM","CTRL_SECT","MO_NBR","APRV_DT","DSPN_DSCR","AASHTO_APPLN"], infoTemplate: infoTemplate});	
 					map.addLayer(minuteOrderLyr);
@@ -1070,7 +1078,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Speed Limit:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/1";			
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Speed_Limits/FeatureServer/0";			
 					
 					speedLimitLyr = new FeatureLayer(projectsUrl, {id:"Speed_Limit",visible: true,outFields:["RIA_RTE_ID","SPD_MAX","FRM_DFO","TO_DFO"], infoTemplate: infoTemplate});		
 					map.addLayer(speedLimitLyr);
@@ -1236,7 +1244,7 @@
 					tableText += "</table><br>Future Traffic and Percent Truck data is for main lanes only.";		
 					
 					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Future_Traffic_AGO/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Future_Traffic/FeatureServer/0";
 					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Inventory_Themes/FeatureServer/0";
 							
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
@@ -1268,21 +1276,21 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Railroad Name</td><td>{RR_NM}</td></tr>";
+					tableText += "<tr><td>Railroad Name</td><td>{RR_COMPANY}</td></tr>";
 					tableText += "<tr><td>Railroad Abbreviation</td><td>{RR_ABRVN}</td></tr>";			
-					tableText += "<tr><td>Status</td><td>{RR_STAT}</td></tr>";
-					tableText += "<tr><td>Type</td><td>{RR_TYPE}</td></tr>";						
+					tableText += "<tr><td>Status</td><td>{RR_STATUS}</td></tr>";
+					tableText += "<tr><td>Type</td><td>{RR_TYP}</td></tr>";						
 					tableText += "<tr><td>Number</td><td>{RR_NBR}</td></tr>";					
 					tableText += "</table>";		
 					
 					var infoTemplate = new PopupTemplate({description : tableText});
 					infoTemplate.setTitle("Railroads:");
 					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Railroads/MapServer/0";
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Railroads_AGO/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Railroads/FeatureServer/0";
 
 					
-					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_NM","RR_ABRVN","RR_STAT","RR_TYPE","RR_NBR"], infoTemplate: infoTemplate});
-					railRoadLyr.setDefinitionExpression("RR_STAT='A' AND RR_TYPE='M'");	
+					railRoadLyr = new FeatureLayer(projectsUrl, {id:"Railroads",visible: true,outFields:["RR_COMPANY","RR_ABRVN","RR_STATUS","RR_TYP","RR_NBR"], infoTemplate: infoTemplate});
+					railRoadLyr.setDefinitionExpression("RR_STATUS='Active' AND RR_TYP='Main Line'");	
 					map.addLayer(railRoadLyr);					
 				}	
 				activeOverlay = railRoadLyr;	
@@ -1302,13 +1310,13 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Non Attainment:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/8";			
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_NonAttainment_Areas/FeatureServer/0";			
 
 					nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});			
 					map.addLayer(nonAttainLyr);
 				}	
 				activeOverlay = nonAttainLyr;
-				theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non-Attainment or Near Non Attainment Areas"}];			
+				theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"}];			
 			}		
 			
 			if (theLayer=="Texas_Trunk") {	
@@ -1319,8 +1327,8 @@
 				else {
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Highway</td><td>${RTE_NM}</td></tr>";
-					tableText += "<tr><td>Trunk Type</td><td>${CMNT}</td></tr>";			
+					tableText += "<tr><td>Highway</td><td>${RTE_RB_NM}</td></tr>";
+					tableText += "<tr><td>Trunk Type</td><td>${TRUNK_TYP}</td></tr>";			
 					tableText += "</table>";		
 					
 					UZATableText = "";
@@ -1354,7 +1362,7 @@
 					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);								
 
 					var infoTemplate = new InfoTemplate("Texas Trunk:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Texas_Trunk_System/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Texas_Trunk_System/FeatureServer/0";
 	      				
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
 						return feature.attributes.PopUnsmoothed2010;
@@ -1365,7 +1373,7 @@
 					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
 
 
-					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_NM","CMNT"], infoTemplate: infoTemplate});
+					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_RB_NM","TRUNK_TYP"], infoTemplate: infoTemplate});
 					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
 					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,txTrunkLyr]);
@@ -1382,14 +1390,13 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Office Name</td><td>${OFFICE_NM}</td></tr>";
-					tableText += "<tr><td>Section Number</td><td>${MNT_SEC_NBR}</td></tr>";
-					tableText += "<tr><td>Published</td><td>${CREATE_DT}</td></tr>";				
+					tableText += "<tr><td>Section Number</td><td>${MNT_SEC_NBR}</td></tr>";				
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Maintenance Office:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Maintenance_Sections_AGO/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Maintenance_Sections/FeatureServer/0";
 
-					maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR","CREATE_DT"], infoTemplate: infoTemplate});		
+					maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR"], infoTemplate: infoTemplate});		
 					map.addLayer(maintOfficeLyr);
 				}	
 				activeOverlay = maintOfficeLyr;			
@@ -1402,18 +1409,15 @@
 					UZALyr.show();
 				}
 				else {
-
-							
-					
 					// Manipulate the contents of the popup infoTemplate
 					
 					function setPopupContent(graphic){
 						console.log(graphic);
 						tableText = "";
 						tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-						tableText += "<tr><td>Highway</td><td>"+graphic.attributes.RTE_NM+"</td></tr>";
+						tableText += "<tr><td>Highway</td><td>"+graphic.attributes.FAC_NAM+"</td></tr>";
 						tableText += "<tr><td>Proposed</td><td>"+graphic.attributes.PROPOSED+"</td></tr>";
-						tableText += "<tr><td>FC Code</td><td>"+graphic.attributes.FC+"</td></tr>";
+						tableText += "<tr><td>FC Code</td><td>"+graphic.attributes.F_SYSTEM+"</td></tr>";
 						tableText += "<tr><td>FC Description</td><td>"+graphic.attributes.FC_DESC+"</td></tr>";
 						tableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.RU+"</td></tr>";
 						if (graphic.attributes.RU == 1){
@@ -1455,7 +1459,7 @@
 					}
 					var UZAInfoTemplate = new InfoTemplate("Urbanized Area:",setUZAPopupContent);					
 	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Functional_Classification/FeatureServer/0";			
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Functional_Classification/FeatureServer/0";			
 					
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
 						return feature.attributes.PopUnsmoothed2010;
@@ -1466,7 +1470,7 @@
 					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
 
 
-					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["RTE_NM","PROPOSED","FC","FC_DESC", "RU"], infoTemplate: infoTemplate});	
+					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["FAC_NAM","PROPOSED","F_SYSTEM","FC_DESC", "RU"], infoTemplate: infoTemplate});	
 					
 					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
 					UZALyr.setRenderer(theRenderer);
@@ -1485,11 +1489,11 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Highway</td><td>${RTE_RB_NM}</td></tr>";
-					//tableText += "<tr><td>Network Type</td><td>Primary</td></tr>";
+					// tableText += "<tr><td>Network Type</td><td>${NATL_FRT}</td></tr>";
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("National Highway Freight Network:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_National_Highway_Freight_Network/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_National_Highway_Freight_Network/FeatureServer/0";
 					
 					NatlFreightLyr = new FeatureLayer(projectsUrl, {id:"National Highway Freight Network",visible: true,outFields:["RTE_RB_NM","NATL_FRT"], infoTemplate: infoTemplate});		
 					map.addLayer(NatlFreightLyr);
@@ -1531,7 +1535,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Vertical Clearance:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Freight_Network/FeatureServer/0";		
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vertical_Clearances/FeatureServer/0";		
 					
 					VerticalLyr = new FeatureLayer(projectsUrl, {id:"Vertical Clearance",visible: true,outFields:["STATUS"], infoTemplate: infoTemplate});	
 					map.addLayer(VerticalLyr);
@@ -1552,7 +1556,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Permanent Count Station:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Permanent_Stations/FeatureServer/0";				
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Permanent_Count_Stations/FeatureServer/0";				
 					
 					permStationLyr = new FeatureLayer(projectsUrl, {id:"Permanent Stations",visible: true,outFields:["T_FLAG","STATION_TYPE"], infoTemplate: infoTemplate});		
 					map.addLayer(permStationLyr);
@@ -1582,7 +1586,7 @@
 					tableText += "</table><br>This count includes frontage roads when present.";		
 					
 					var infoTemplate = new InfoTemplate("Traffic Count Station:",tableText);	
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_AADT_AGO/FeatureServer/0";			
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_AADT/FeatureServer/0";			
 
 					aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2014_TRAF","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
 					map.addLayer(aadtLyr);
@@ -1753,7 +1757,7 @@
 					
 					var infoTemplate = new InfoTemplate("Area Office:",tableText);	
 					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/TxDOT_Area_Offices/MapServer/0";
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Area_Offices_AGO/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Area_Offices/FeatureServer/0";
 
 					// Create renderer to deal with transparency problem
 					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([238,59,59,1]), 2), new Color([238,59,59,0.05]));	
@@ -1780,7 +1784,7 @@
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("COG:",tableText);		
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Planning_Map_Overlays/FeatureServer/9";	
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Councils_of_Governments/FeatureServer/0";	
 					
 					COGLyr = new FeatureLayer(projectsUrl, {id:"COG",visible: true,outFields:["COG_NM","COG_ABRVN"], infoTemplate: infoTemplate});		
 					map.addLayer(COGLyr);
@@ -1803,14 +1807,9 @@
 					
 					var infoTemplate = new InfoTemplate("MPO:",tableText);		
 					// var projectsUrl = "http://maps.dot.state.tx.us/arcgis/rest/services/TPPuser/Texas_Metropolitan_Planning_Organization/MapServer/0";
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Metropolitan_Planning_Organizations_AGO/FeatureServer/0";
-
-					// Create renderer to deal with transparency problem
-					var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([255,140,0,1]), 2), new Color([255,140,0,0.07]));	
-					var theRenderer = new SimpleRenderer(theSymbol);						
-					
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_Metropolitan_Planning_Organizations/FeatureServer/0";
+			
 					MPOLyr = new FeatureLayer(projectsUrl, {id:"MPO",visible: true,outFields:["MPO_NM","MPO_LBL","MPO_NBR"], infoTemplate: infoTemplate});
-					MPOLyr.setRenderer(theRenderer);		
 					map.addLayer(MPOLyr);
 				}			
 				activeOverlay = MPOLyr;
@@ -1825,17 +1824,16 @@
 				else {			
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Control Section</td><td>${CTRL_SECT_NBR}</td></tr>";
-					tableText += "<tr><td>Highway</td><td>${RTE_NM}</td></tr>";
-					tableText += "<tr><td>Begin Mile Point</td><td>${BEGIN_MPT_MS}</td></tr>";
-					tableText += "<tr><td>End Mile Point</td><td>${END_MPT_MS}</td></tr>";			
-					tableText += "<tr><td>Color Class</td><td>${CTRL_SECT_CLR_NBR}</td></tr>";					
+					tableText += "<tr><td>Control Section</td><td>${CTRL_SECT_LN_NBR}</td></tr>";
+					tableText += "<tr><td>Highway</td><td>${RTE_RB_NM}</td></tr>";
+					tableText += "<tr><td>Begin Mile Point</td><td>${BEGIN_MPT}</td></tr>";
+					tableText += "<tr><td>End Mile Point</td><td>${END_MPT}</td></tr>";					
 					tableText += "</table>";		
 					
 					var infoTemplate = new InfoTemplate("Control Section:",tableText);
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/SPM_Control_Section/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0";
 
-					controlSectionLyr = new FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_NBR","RTE_NM","BEGIN_MPT_MS","END_MPT_MS","CTRL_SECT_CLR_NBR"], infoTemplate: infoTemplate});	
+					controlSectionLyr = new FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_LN_NBR","RTE_RB_NM","BEGIN_MPT","END_MPT"], infoTemplate: infoTemplate});	
 					map.addLayer(controlSectionLyr);
 					
 					//Labeling
@@ -1843,14 +1841,24 @@
 					var label_symbol =  new TextSymbol();
 					label_symbol.setColor(new Color([0,0,0]));
 					label_symbol.setFont(new Font("10pt").setWeight(Font.WEIGHT_BOLD));
-					//label_symbol.setHaloSize(3);
-					//label_symbol.setHaloColor(new Color([253,253,253,253]));
+					// label_symbol.setHaloSize(1);
+					// label_symbol.setHaloColor(new Color([253,253,253,253]));
 
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerCS = new LabelLayer({id:"CS_Labels"});
+					console.log(labelLayerCS);
+					labelLayerCS.addFeatureLayer(controlSectionLyr, label_renderer, "{CTRL_SECT_LN_NBR}");
+					console.log(labelLayerCS);
 
-					labelLayerCS.addFeatureLayer(controlSectionLyr, label_renderer, "{CTRL_SECT_NBR}");
+					// function to crack open the label text and manipulate to add a hyphen in the CS number
+					labelLayerCS._buildLabelText = function (b, d, c, e) {
+					    var csNbr = d.CTRL_SECT_LN_NBR;
+					    var firstFour = csNbr.substring(0,4);
+					    var lastTwo = csNbr.substring(4,6);
+					    var fixed = firstFour + "-" + lastTwo;
+					    return fixed;
+					}
 					map.addLayer(labelLayerCS);				
 				}		
 				activeOverlay = controlSectionLyr;	
@@ -2481,21 +2489,21 @@
 		  <tr><td class="Overlay" id='MPO'>MPO</td></tr>	
 		  <tr class="alt"><td class="Overlay" id='NHS'>National Highway System</td></tr>		  
 		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
-          <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction Scheduled</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Finalizing_for_Construction'>Projects - Finalizing for Construction</td></tr>	
-		  <tr><td class="Overlay" id='Under_Development'>Projects - Under Development</td></tr>
-          <tr class="alt"><td class="Overlay" id='Long_Term_Planning'>Projects - Long Term Planning</td></tr>		  
-		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
-	      <tr class="alt"><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
-		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
-		  <tr class="alt"><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
-		  <tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
-		  <tr class="alt"><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
-		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
-		  <tr class="alt"><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
-		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>			  
-		  <!--<tr class="alt"><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr>-->
+		  <tr class="alt"><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr>
+		  <tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
+          <tr class="alt"><td class="Overlay" id='Construction_Scheduled'>Projects - Construction Scheduled</td></tr>
+		  <tr><td class="Overlay" id='Finalizing_for_Construction'>Projects - Finalizing for Construction</td></tr>	
+		  <tr class="alt"><td class="Overlay" id='Under_Development'>Projects - Under Development</td></tr>
+          <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Long Term Planning</td></tr>		  
+		  <tr class="alt"><td class="Overlay" id='Railroads'>Railroads</td></tr>
+	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
+		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
+		  <tr class="alt"><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
+		  <tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
+		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
+		  <tr class="alt"><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
 		</table>
 	  </div>
 	  <div id="searchTab">
