@@ -501,7 +501,7 @@
 			//map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr]);
 
 			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Top_100_Search/FeatureServer/0";		
-			top100SearchLyr = new FeatureLayer(projectsUrl, {id:"Top100_Search",visible: false,outFields:["Rank_2015","xCoord","yCoord"]});
+			top100SearchLyr = new FeatureLayer(projectsUrl, {id:"Top100_Search",visible: false,outFields:["RANK","xCoord","yCoord"]});
 			map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr,top100SearchLyr]);
 
 		}
@@ -1872,21 +1872,21 @@
 					
 					
 					function getTextContent(graphic){
-						var costDelay = "$"+(graphic.attributes.CostDelay/1000000).toFixed(2)+" Million";
-						var costTruck = "$"+(graphic.attributes.CostTruck/1000000).toFixed(2)+" Million";
-						var delayMile = addCommas(Math.round(parseFloat(graphic.attributes.DelayMile)));
-						var truckDelay = addCommas(Math.round(parseFloat(graphic.attributes.TruckDelay)));
+						var costDelay = "$"+(graphic.attributes.COST_DLAY/1000000).toFixed(2)+" Million";
+						var costTruck = "$"+(graphic.attributes.COST_TRK/1000000).toFixed(2)+" Million";
+						var delayMile = addCommas(Math.round(parseFloat(graphic.attributes.DLAY_MILE)));
+						var truckDelay = addCommas(Math.round(parseFloat(graphic.attributes.TRK_DLAY)));
 						tableText = "";
 						tableText += "<table border=1  cellspacing=0 cellpadding=3 style='font-size:small'>";
-						tableText += "<tr><td>Roadway Name</td><td>"+graphic.attributes.Roadway+"</td></tr>";				
-						tableText += "<tr><td>TxDOT District</td><td>"+graphic.attributes.District+"</td></tr>";
+						tableText += "<tr><td>Roadway Name</td><td>"+graphic.attributes.RD_NM+"</td></tr>";				
+						tableText += "<tr><td>TxDOT District</td><td>"+graphic.attributes.DIST_NM+"</td></tr>";
 						tableText += "<tr><td>Annual Cost of Delay</td><td>"+costDelay+"</td></tr>";
 						tableText += "<tr><td>Annual Hours of Delay per Mile</td><td>"+delayMile+"</td></tr>";
-						if (graphic.attributes.Truck_2015 == 0){
+						if (graphic.attributes.TRK_RANK == 0){
 							tableText += "<tr><td>Truck Delay Rank</td><td>-</td></tr>";
 						}
 						else{
-							tableText += "<tr><td>Truck Delay Rank</td><td>"+graphic.attributes.Truck_2015+"</td></tr>";
+							tableText += "<tr><td>Truck Delay Rank</td><td>"+graphic.attributes.TRK_RANK+"</td></tr>";
 						}
 						tableText += "<tr><td>Annual Hours of Truck Delay per Mile</td><td>"+truckDelay+"</td></tr>";
 						tableText += "<tr><td>Annual Cost of Truck Delay</td><td>"+costTruck+"</td></tr>";
@@ -1896,10 +1896,11 @@
 						tableText += "</table>";
 						return tableText;
 					}
-					var infoTemplate = new InfoTemplate("Rank: ${Rank_2015}",getTextContent);
+					var infoTemplate = new InfoTemplate("Rank: ${RANK} / Year: ${YR}",getTextContent);
 
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0";
-					top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["Rank_2015","Truck_2015","SegID","Roadway","DelayMile","TruckDelay","TCI","CostDelay","CostTruck","District"], infoTemplate: infoTemplate});
+					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0";
+					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/100_test_service/FeatureServer/0"
+					top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["RANK","TRK_RANK","SEG_ID","RD_NM","DLAY_MILE","TRK_DLAY","TCI","COST_DLAY","COST_TRK","DIST_NM","YR"], infoTemplate: infoTemplate});
 					map.addLayer(top100Lyr);
 					map.infoWindow.resize(350,400);
 					//Labeling
@@ -1914,7 +1915,7 @@
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerTop100 = new LabelLayer({id:"Top_100_Labels"});
-					labelLayerTop100.addFeatureLayer(top100Lyr, label_renderer, "{Rank_2015}",{lineLabelPosition:"InLine",labelRotation:false});
+					labelLayerTop100.addFeatureLayer(top100Lyr, label_renderer, "{RANK}",{lineLabelPosition:"InLine",labelRotation:false});
 
 					map.addLayer(labelLayerTop100);
 
