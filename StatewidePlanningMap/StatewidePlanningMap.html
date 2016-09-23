@@ -41,7 +41,7 @@
 	 	z-index: 101;	 	
 	 }
 	 #releaseNotesDiv{
-	 	height: 540px;
+	 	height: 300px;
 	 	width: 400px;
 	 	top: 45%;
   		left: 50%;
@@ -500,8 +500,9 @@
 			highwaySearchLyr = new FeatureLayer(projectsUrl, {id:"Highway_Search",visible: false,outFields:["RTE_NM","xCoord","yCoord","CNTY_NM"]});
 			//map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr]);
 
-			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Top_100_Search/FeatureServer/0";		
-			top100SearchLyr = new FeatureLayer(projectsUrl, {id:"Top100_Search",visible: false,outFields:["Rank_2015","xCoord","yCoord"]});
+			projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Top_100_Search/FeatureServer/0";
+			//projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/100_test_search_service/FeatureServer/0";		
+			top100SearchLyr = new FeatureLayer(projectsUrl, {id:"Top100_Search",visible: false,outFields:["RANK","xCoord","yCoord"]});
 			map.addLayers([citySearchLyr, countySearchLyr, csSearchLyr, districtSearchLyr, highwaySearchLyr,top100SearchLyr]);
 
 		}
@@ -1238,9 +1239,9 @@
 					tableText = "";
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Route ID</td><td>${RIA_RTE_ID}</td></tr>";
-					tableText += "<tr><td>2014 AADT</td><td>${ADT_CUR:NumberFormat}</td></tr>";			
-					tableText += "<tr><td>2034 Estimated AADT</td><td>${ADT_DESGN:NumberFormat}</td></tr>";
-					tableText += "<tr><td>24 Hour Truck Percentage</td><td>${TRK_AADT}</td></tr>";											
+					tableText += "<tr><td>${ADT_YEAR} AADT</td><td>${ADT_CUR:NumberFormat}</td></tr>";			
+					tableText += "<tr><td>${DESGN_YR} Estimated AADT</td><td>${ADT_DESGN:NumberFormat}</td></tr>";
+					tableText += "<tr><td>24 Hour Truck Percentage</td><td>${TRK_AADT_PCT}</td></tr>";											
 					tableText += "</table><br>Future Traffic and Percent Truck data is for main lanes only.";		
 					
 					var infoTemplate = new InfoTemplate("Future Traffic:",tableText);	
@@ -1260,7 +1261,7 @@
 
 		
 					
-					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT"], infoTemplate: infoTemplate});
+					futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT_PCT","ADT_YEAR","DESGN_YR"], infoTemplate: infoTemplate});
 					futureTrafficLyr.setRenderer(theRenderer);							
 					map.addLayer(futureTrafficLyr);
 				}	
@@ -1575,6 +1576,7 @@
 					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 					tableText += "<tr><td>Station Flag</td><td>${T_FLAG}</td></tr>";
 					tableText += "<tr><td>Site ID</td><td>${T_SITE_ID}</td></tr>";
+					tableText += "<tr><td>AADT 2015</td><td>${F2015_TRAF:NumberFormat}</td></tr>";
 					tableText += "<tr><td>AADT 2014</td><td>${F2014_TRAF:NumberFormat}</td></tr>";
 					tableText += "<tr><td>AADT 2013</td><td>${F2013_TRAF:NumberFormat}</td></tr>";								
 					tableText += "<tr><td>AADT 2012</td><td>${F2012_TRAF:NumberFormat}</td></tr>";
@@ -1588,7 +1590,7 @@
 					var infoTemplate = new InfoTemplate("Traffic Count Station:",tableText);	
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_AADT/FeatureServer/0";			
 
-					aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2014_TRAF","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
+					aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","T_SITE_ID","F2015_TRAF","F2014_TRAF","F2013_TRAF","F2012_TRAF","F2011_TRAF","F2010_TRAF","F2009_TRAF","F2008_TRAF","F2007_TRAF"], infoTemplate: infoTemplate});			
 					map.addLayer(aadtLyr);
 					
 					//Labeling
@@ -1600,7 +1602,14 @@
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerAADT = new LabelLayer({id:"AADT_Labels"});
-					labelLayerAADT.addFeatureLayer(aadtLyr, label_renderer, "{F2014_TRAF}");
+					labelLayerAADT.addFeatureLayer(aadtLyr, label_renderer, "{F2015_TRAF}");
+
+					// function to crack open the label text and manipulate to add a thousands separator
+					// labelLayerAADT._buildLabelText = function(b,d){
+					// 	var aadtCount = d.F2015_TRAF;
+					// 	return aadtCount.toLocaleString();
+					// }
+
 					map.addLayer(labelLayerAADT);
 				}	
 				activeOverlay = aadtLyr;
@@ -1880,21 +1889,21 @@
 					
 					
 					function getTextContent(graphic){
-						var costDelay = "$"+(graphic.attributes.CostDelay/1000000).toFixed(2)+" Million";
-						var costTruck = "$"+(graphic.attributes.CostTruck/1000000).toFixed(2)+" Million";
-						var delayMile = addCommas(Math.round(parseFloat(graphic.attributes.DelayMile)));
-						var truckDelay = addCommas(Math.round(parseFloat(graphic.attributes.TruckDelay)));
+						var costDelay = "$"+(graphic.attributes.COST_DLAY/1000000).toFixed(2)+" Million";
+						var costTruck = "$"+(graphic.attributes.COST_TRK/1000000).toFixed(2)+" Million";
+						var delayMile = addCommas(Math.round(parseFloat(graphic.attributes.DLAY_MILE)));
+						var truckDelay = addCommas(Math.round(parseFloat(graphic.attributes.TRK_DLAY)));
 						tableText = "";
 						tableText += "<table border=1  cellspacing=0 cellpadding=3 style='font-size:small'>";
-						tableText += "<tr><td>Roadway Name</td><td>"+graphic.attributes.Roadway+"</td></tr>";				
-						tableText += "<tr><td>TxDOT District</td><td>"+graphic.attributes.District+"</td></tr>";
+						tableText += "<tr><td>Roadway Name</td><td>"+graphic.attributes.RD_NM+"</td></tr>";				
+						tableText += "<tr><td>TxDOT District</td><td>"+graphic.attributes.DIST_NM+"</td></tr>";
 						tableText += "<tr><td>Annual Cost of Delay</td><td>"+costDelay+"</td></tr>";
 						tableText += "<tr><td>Annual Hours of Delay per Mile</td><td>"+delayMile+"</td></tr>";
-						if (graphic.attributes.Truck_2015 == 0){
+						if (graphic.attributes.TRK_RANK == 0){
 							tableText += "<tr><td>Truck Delay Rank</td><td>-</td></tr>";
 						}
 						else{
-							tableText += "<tr><td>Truck Delay Rank</td><td>"+graphic.attributes.Truck_2015+"</td></tr>";
+							tableText += "<tr><td>Truck Delay Rank</td><td>"+graphic.attributes.TRK_RANK+"</td></tr>";
 						}
 						tableText += "<tr><td>Annual Hours of Truck Delay per Mile</td><td>"+truckDelay+"</td></tr>";
 						tableText += "<tr><td>Annual Cost of Truck Delay</td><td>"+costTruck+"</td></tr>";
@@ -1904,10 +1913,11 @@
 						tableText += "</table>";
 						return tableText;
 					}
-					var infoTemplate = new InfoTemplate("Rank: ${Rank_2015}",getTextContent);
+					var infoTemplate = new InfoTemplate("Rank: ${RANK} / Year: ${YR}",getTextContent);
 
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0";
-					top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["Rank_2015","Truck_2015","SegID","Roadway","DelayMile","TruckDelay","TCI","CostDelay","CostTruck","District"], infoTemplate: infoTemplate});
+					//var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/100_test_service/FeatureServer/0"
+					top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["RANK","TRK_RANK","SEG_ID","RD_NM","DLAY_MILE","TRK_DLAY","TCI","COST_DLAY","COST_TRK","DIST_NM","YR"], infoTemplate: infoTemplate});
 					map.addLayer(top100Lyr);
 					map.infoWindow.resize(350,400);
 					//Labeling
@@ -1922,7 +1932,7 @@
 
 					var label_renderer = new SimpleRenderer(label_symbol);
 					labelLayerTop100 = new LabelLayer({id:"Top_100_Labels"});
-					labelLayerTop100.addFeatureLayer(top100Lyr, label_renderer, "{Rank_2015}",{lineLabelPosition:"InLine",labelRotation:false});
+					labelLayerTop100.addFeatureLayer(top100Lyr, label_renderer, "{RANK}",{lineLabelPosition:"InLine",labelRotation:false});
 
 					map.addLayer(labelLayerTop100);
 
@@ -1936,8 +1946,8 @@
 			
 			scaleDependentQueries();
 		}
-
-		function addInventoryData() { 
+		function addInventoryData() {
+			
 			tableText = "";
 			tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 			tableText += "<tr><td>Highway</td><td>${HWY}</td></tr>";
@@ -1945,7 +1955,7 @@
 			tableText += "<tr><td>AADT Future</td><td>${ADT_DESGN:NumberFormat}</td></tr>";		
 			tableText += "<tr><td>Lanes</td><td>${NUM_LANES}</td></tr>";
 			tableText += "<tr><td>Speed</td><td>${SPD_MAX}</td></tr>";
-			tableText += "<tr><td>Truck PCT</td><td>${TRK_AADT}</td></tr>";	
+			tableText += "<tr><td>Truck PCT</td><td>${TRK_AADT_PCT}</td></tr>";	
 			tableText += "<tr><td>ROW Width</td><td>${ROW_W_USL}</td></tr>";		
 			tableText += "<tr><td>Surface Width</td><td>${SUR_W}</td></tr>";
 			tableText += "<tr><td>Roadbed Width</td><td>${RB_WID}</td></tr>";
@@ -1953,14 +1963,14 @@
 			tableText += "</table>";	
 
 			var infoTemplate = new InfoTemplate("Roadway Inventory:",tableText);
-			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem_2014/FeatureServer/0";		
+			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";		
 				
 			//var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 5);	
 			var theSymbol = new CartographicLineSymbol(CartographicLineSymbol.STYLE_SOLID, new Color("#FF0000"), 5, CartographicLineSymbol.CAP_ROUND, CartographicLineSymbol.JOIN_MITER, 5);				
 			var theRenderer = new SimpleRenderer(theSymbol);
 
 			//Add the layer - outFields: ["*"] if you want to use all fields
-			projectsRI = new FeatureLayer(projectsUrl, {id:"RoadwayInventory",visible: false,outFields:["HWY","ADT_CUR","ADT_DESGN","NUM_LANES","SPD_MAX","TRK_AADT","ROW_W_USL","SUR_W","RB_WID","MED_WID","HSYS"], infoTemplate: infoTemplate});	
+			projectsRI = new FeatureLayer(projectsUrl, {id:"RoadwayInventory",visible: false,outFields:["HWY","ADT_CUR","ADT_DESGN","NUM_LANES","SPD_MAX","TRK_AADT_PCT","ROW_W_USL","SUR_W","RB_WID","MED_WID","HSYS","ADT_YEAR"], infoTemplate: infoTemplate});
 			projectsRI.setRenderer(theRenderer);
 			projectsRI.setAutoGeneralize(false);	
 			map.addLayer(projectsRI);		
@@ -2111,7 +2121,7 @@
 				if (theSearchLayer=="Top_100_Congested") {
 					var query = new Query();
 					query.returnGeometry = false;
-					query.where = "[Rank_2015] LIKE '" + userInput + "%'";				
+					query.where = "[Rank] LIKE '" + userInput + "%'";				
 					top100SearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
 				}
 
@@ -2195,7 +2205,7 @@
 			  }
 
 			  else if (theSearchLayer=="Top_100_Congested"){
-			  	resultText += "<span class='SearchResult' id='" + finalSet[2] + "," + finalSet[3] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
+			  	resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
 			  }
 
 			  else if (theSearchLayer=="TxDOT_Control_Section"){
@@ -2424,22 +2434,14 @@
 </div> -->
 <div id="releaseNotesDiv">
 	<h1><strong>RELEASE NOTES</strong></h1>
-	<p3>Version 4.1.2 Pitt</p3>
+	<p3>Version 4.2.0</p3>
 	<br>
 	<br>
 	<ul>
-	  <li>Updated Esri Javascript API to 3.16</li>
-	  <li>Added 2010 Adjusted UZA layer to Functional Class, and Texas Trunk layers</li>
-	  <li>Added 2014 values to AADT layer</li>
-	  <li>Updated Future Traffic and Truck Percent to 2014 values</li>
-	  <li>Added Top 100 Congested Roadways layer with search capability</li>
-	  <li>Added Texas Highway Freight Network</li>
-	  <li>Updated National Highway Freight Network</li>
-	  <li>Updated Functional Classification symbology and added Urban/Rural information</li>
-	  <li>Updated Political Boundaries and included Representative/Senator names</li>
-	  <li>Updated National Highway System</li>
-	  <li>Updated Query Function to use 2014 Inventory Data</li>
-	  <li>Updated Project layers to match <a href='http://www.txdot.gov/inside-txdot/projects/project-tracker.html' target='_blank'>Project Tracker</a></li>
+	  <li>Added 2015 values to AADT layer</li>
+	  <li>Updated Top 100 Congested Roadways layer to 2016 ranks</li>
+	  <li>Updated Query Function to use 2015 Inventory Data</li>
+	  <li>Updated Future Traffic & Percent Truck with 2015 Data</li>
 	</ul>  
 	<br>
 	<br>
@@ -2542,13 +2544,13 @@
 	  </div>
 	  <div id="queryTab">
 		<table class="tocTables">
-			<tr><th colspan=2>Query 2014 Inventory Data</th><tr> 
+			<tr><th colspan=2>Query Inventory Data</th><tr> 
 			<tr><td>Route:</td><td><input Class="queryFields" id="rteName" type="text"></td></tr>
 			<tr><td>Attribute:</td><td>
 				<select Class="queryFields" id="attrSelect">
 				  <option value="ADT_CUR">AADT</option>
 				  <option value="ADT_DESGN">AADT Future</option>
-				  <option value="TRK_AADT">Percent Truck</option>
+				  <option value="TRK_AADT_PCT">Percent Truck</option>
 				  <option value="SPD_MAX">Speed Limit</option>
 				  <option value="NUM_LANES">Lanes</option>
 				  <option value="ROW_W_USL">ROW Width</option>
@@ -2641,7 +2643,7 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
-				<br><br><button type="button" id="btnReleaseNotes">Version 4.1.2 Pitt</button>
+				<br><br><button type="button" id="btnReleaseNotes">Version 4.2.0</button>
 				</td><tr>				
 			</table>
 		</div>	
