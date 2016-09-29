@@ -1015,29 +1015,29 @@
 				activeOverlay="";
 			}
 			
-			if (theLayer=="Pavement_Conditions") {	
-				if (pavementConditionLyr) {
-					pavementConditionLyr.show();
-				}
-				else {
-					tableText = "";
-					tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-					tableText += "<tr><td>Highway</td><td>${ROUTE_ID}</td></tr>";						
-					tableText += "<tr><td>Condition</td><td>${CONDITION}</td></tr>";									
-					tableText += "<tr><td>Begin DFO</td><td>${BEGIN_POIN}</td></tr>";										
-					tableText += "<tr><td>End DFO</td><td>${END_POINT}</td></tr>";				
-					tableText += "</table>";		
+			// if (theLayer=="Pavement_Conditions") {	
+			// 	if (pavementConditionLyr) {
+			// 		pavementConditionLyr.show();
+			// 	}
+			// 	else {
+			// 		tableText = "";
+			// 		tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+			// 		tableText += "<tr><td>Highway</td><td>${ROUTE_ID}</td></tr>";						
+			// 		tableText += "<tr><td>Condition</td><td>${CONDITION}</td></tr>";									
+			// 		tableText += "<tr><td>Begin DFO</td><td>${BEGIN_POIN}</td></tr>";										
+			// 		tableText += "<tr><td>End DFO</td><td>${END_POINT}</td></tr>";				
+			// 		tableText += "</table>";		
 					
-					var infoTemplate = new InfoTemplate("Pavement Conditions:",tableText);	
-					// var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
-					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Pavement_Conditions/FeatureServer/0";
+			// 		var infoTemplate = new InfoTemplate("Pavement Conditions:",tableText);	
+			// 		// var projectsUrl = "https://maps.dot.state.tx.us/ArcGIS/rest/services/PavementConditions_Dynamic/MapServer/0";
+			// 		var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Pavement_Conditions/FeatureServer/0";
 					
-					pavementConditionLyr = new FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["ROUTE_ID","BEGIN_POIN","END_POINT","CONDITION"], infoTemplate: infoTemplate});			
-					map.addLayer(pavementConditionLyr);
-				}
-				activeOverlay = pavementConditionLyr;	
-				theLegend.layerInfos=[{layer:pavementConditionLyr, title:"Pavement Condition"}]; 
-			}			
+			// 		pavementConditionLyr = new FeatureLayer(projectsUrl, {id:"Pavement Conditions",visible: true,outFields:["ROUTE_ID","BEGIN_POIN","END_POINT","CONDITION"], infoTemplate: infoTemplate});			
+			// 		map.addLayer(pavementConditionLyr);
+			// 	}
+			// 	activeOverlay = pavementConditionLyr;	
+			// 	theLegend.layerInfos=[{layer:pavementConditionLyr, title:"Pavement Condition"}]; 
+			// }			
 			
 			if (theLayer=="Minute_Orders") {	
 				if (minuteOrderLyr) {
@@ -2439,7 +2439,6 @@
 	<br>
 	<ul>
 	  <li>Added 2015 values to AADT layer</li>
-	  <li>Added Pavement Conditions overlay</li>
 	  <li>Updated Top 100 Congested Roadways layer to 2016 ranks</li>
 	  <li>Updated Query Function to use 2015 Inventory Data</li>
 	  <li>Updated Future Traffic & Percent Truck with 2015 Data</li>
@@ -2492,21 +2491,21 @@
 		  <tr><td class="Overlay" id='MPO'>MPO</td></tr>	
 		  <tr class="alt"><td class="Overlay" id='NHS'>National Highway System</td></tr>		  
 		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr>
-		  <tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
-          <tr class="alt"><td class="Overlay" id='Construction_Scheduled'>Projects - Construction Scheduled</td></tr>
-		  <tr><td class="Overlay" id='Finalizing_for_Construction'>Projects - Finalizing for Construction</td></tr>	
-		  <tr class="alt"><td class="Overlay" id='Under_Development'>Projects - Under Development</td></tr>
-          <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Long Term Planning</td></tr>		  
-		  <tr class="alt"><td class="Overlay" id='Railroads'>Railroads</td></tr>
-	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
-		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
-		  <tr class="alt"><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
-		  <tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
-		  <tr class="alt"><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
-		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
-		  <tr class="alt"><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
+		  <!-- <tr class="alt"><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr> -->
+		  <tr class="alt"><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>	
+          <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction Scheduled</td></tr>
+		  <tr class="alt"><td class="Overlay" id='Finalizing_for_Construction'>Projects - Finalizing for Construction</td></tr>	
+		  <tr><td class="Overlay" id='Under_Development'>Projects - Under Development</td></tr>
+          <tr class="alt"><td class="Overlay" id='Long_Term_Planning'>Projects - Long Term Planning</td></tr>		  
+		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
+	      <tr class="alt"><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
+		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
+		  <tr class="alt"><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
+		  <tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>	
+		  <tr class="alt"><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
+		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
+		  <tr class="alt"><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>			  
+		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
 		</table>
 	  </div>
 	  <div id="searchTab">
