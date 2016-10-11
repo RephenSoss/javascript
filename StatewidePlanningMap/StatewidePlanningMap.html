@@ -429,7 +429,7 @@
 		window.onresize = handleIEProblem;
 		handleIEProblem();
 				
-		map = new Map("mapDiv", {minZoom:3, maxZoom:15, logo: false});
+		map = new Map("mapDiv", {minZoom:6, maxZoom:15, logo: false});
 		map.infoWindow.set("titleInBody", false);
 
 		tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
@@ -1345,18 +1345,18 @@
 						console.log(graphic);
 						UZATableText = "";
 						UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.NAMELSAD10+"</td></tr>";
-						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CODE+"</td></tr>";	
-						if (graphic.attributes.UrbanAreaType == "SUA"){
+						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.CENSUS_NM+"</td></tr>";
+						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CD+"</td></tr>";	
+						if (graphic.attributes.POP_CD == 2){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Small Urban (Population 5,000 – 49,999)</td></tr>";
 						}
-						if (graphic.attributes.UrbanAreaType == "UA"){
+						if (graphic.attributes.POP_CD == 3){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Urbanized (Population 50,000 – 199,999)</td></tr>";
 						}			
-						if (graphic.attributes.UrbanAreaType == "LUA"){
+						if (graphic.attributes.POP_CD == 4){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Large Urbanized (Population 200,000+)</td></tr>";
 						}											
-						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
+						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UZA_NBR+"</td></tr>";								
 						UZATableText += "</table>";							
 						return UZATableText;
 					}
@@ -1366,16 +1366,16 @@
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Texas_Trunk_System/FeatureServer/0";
 	      				
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
-						return feature.attributes.PopUnsmoothed2010;
+						return feature.attributes.POP2010;
 					});
 
-					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"PopUnsmoothed2010"});
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"POP2010"});
 					
-					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
+					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "POP2010"});
 
 
 					txTrunkLyr = new FeatureLayer(projectsUrl, {id:"Texas_Trunk",visible: true,outFields:["RTE_RB_NM","TRUNK_TYP"], infoTemplate: infoTemplate});
-					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});			
 					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,txTrunkLyr]);
 				}	
@@ -1443,18 +1443,18 @@
 						console.log(graphic);
 						UZATableText = "";
 						UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.NAMELSAD10+"</td></tr>";
-						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CODE+"</td></tr>";	
-						if (graphic.attributes.UrbanAreaType == "SUA"){
+						UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.CENSUS_NM+"</td></tr>";
+						UZATableText += "<tr><td>Rural/Urban Code</td><td>"+graphic.attributes.POP_CD+"</td></tr>";	
+						if (graphic.attributes.POP_CD == 2){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Small Urban (Population 5,000 – 49,999)</td></tr>";
 						}
-						if (graphic.attributes.UrbanAreaType == "UA"){
+						if (graphic.attributes.POP_CD == 3){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Urbanized (Population 50,000 – 199,999)</td></tr>";
 						}			
-						if (graphic.attributes.UrbanAreaType == "LUA"){
+						if (graphic.attributes.POP_CD == 4){
 							UZATableText += "<tr><td>Rural/Urban Description</td><td>Large Urbanized (Population 200,000+)</td></tr>";
 						}											
-						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UrbanAreaNumber+"</td></tr>";								
+						UZATableText += "<tr><td>Urban Area Number</td><td>"+graphic.attributes.UZA_NBR+"</td></tr>";								
 						UZATableText += "</table>";							
 						return UZATableText;
 					}
@@ -1463,17 +1463,17 @@
 					var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Functional_Classification/FeatureServer/0";			
 					
 					var theRenderer = new ClassBreaksRenderer(null,function(feature){
-						return feature.attributes.PopUnsmoothed2010;
+						return feature.attributes.POP2010;
 					});
 
-					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"PopUnsmoothed2010"});
+					theRenderer.addBreak({minValue:-Infinity,maxValue:50000,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([230,152,0]), 2.25),new esri.Color([182,137,48,0.50]))),label:"Small Urban Area",field:"POP2010"});
 					
-					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "PopUnsmoothed2010"});
+					theRenderer.addBreak({minValue:50000,maxValue:Infinity,symbol:(new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DOT, new esri.Color([0,77,168]), 2.25),new esri.Color([90,147,168,0.50]))),label:"Urbanized Area",field: "POP2010"});
 
 
 					FCLyr = new FeatureLayer(projectsUrl, {id:"Functional_Classification",visible: true,outFields:["FAC_NAM","PROPOSED","F_SYSTEM","FC_DESC", "RU"], infoTemplate: infoTemplate});	
 					
-					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/2010_Adjusted_Urban_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
+					UZALyr = new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Urbanized_Areas/FeatureServer/0",{outFields:["*"], infoTemplate:UZAInfoTemplate});		
 					UZALyr.setRenderer(theRenderer);
 					map.addLayers([UZALyr,FCLyr]);
 
@@ -1960,7 +1960,7 @@
 			tableText += "<tr><td>Surface Width</td><td>${SUR_W}</td></tr>";
 			tableText += "<tr><td>Roadbed Width</td><td>${RB_WID}</td></tr>";
 			tableText += "<tr><td>Median Width</td><td>${MED_WID}</td></tr>";
-			tableText += "</table>";	
+			tableText += "</table>";	 
 
 			var infoTemplate = new InfoTemplate("Roadway Inventory:",tableText);
 			var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";		
@@ -2434,7 +2434,7 @@
 </div> -->
 <div id="releaseNotesDiv">
 	<h1><strong>RELEASE NOTES</strong></h1>
-	<p3>Version 4.2.0</p3>
+	<p3>Version 4.2.1 Slovakia</p3>
 	<br>
 	<br>
 	<ul>
@@ -2643,7 +2643,7 @@
 				<br><br>Although we try to update information as often as possible, we are not assuming any responsibility for any damages or inaccuracies if you rely on it. 
 				<br><br>We offer no warranty that this application is accurate or complete. The information shown is for informational purposes and may not have been prepared for or be suitable for legal, engineering, or surveying purposes. 
 				<br><br>It does not represent an on-the-ground survey and represents only the approximate relative location of property/administrative boundaries. 
-				<br><br><button type="button" id="btnReleaseNotes">Version 4.2.0</button>
+				<br><br><button type="button" id="btnReleaseNotes">Version 4.2.1 Slovakia</button>
 				</td><tr>				
 			</table>
 		</div>	
