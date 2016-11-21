@@ -41,9 +41,9 @@
 	 	z-index: 101;	 	
 	 }
 	 #releaseNotesDiv{
-/*	 	height: 300px;
-	 	width: 400px;*/
-	    left:0;
+	 	height: 380px;
+	 	width: 280px;
+	 	left:0;
     	right:0;
     	top: 0;
     	bottom: 0;
@@ -59,7 +59,7 @@
 	  	padding: 10px;
 	 	position: absolute;
 	 	display: none;
-	 	z-index: 101;	 	
+	 	z-index: 101;
 	 }
 	 #overlaysWarningDiv{
 	 	height: 160px;
@@ -180,7 +180,7 @@
 	 #legendTab{
 		display: none;
 	    overflow: auto;	
-		height: 750px;
+		height: auto;
 	 }
 	 #aboutTab{
 	   display: none;
@@ -336,6 +336,9 @@
 	     display: none;
 	     font-weight:bold;
 	     color: #4C4C4C;
+	 }
+	 .esriLegendMsg{
+	 	display: none;
 	 }
 
   </style>
@@ -500,12 +503,20 @@
 		  attachTo: "bottom-left"
         });	
 
+        map.on("layer-add-result", function (evt) {
+	        // var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+	        	console.log(evt.layer.id);
+	          // return {layer:layer.layer, title:layer.layer.name};
+	        	// });
+    	});
+        var layerInfo = [];
 		theLegend = new Legend({map:map},"legendDiv");
+		theLegend.layerInfos=layerInfo; 
 
-		function turnOnTop100(){
-			var fakeevent = {target:{id:"Top_100"}};
-			changeOverlay(fakeevent);
-			}
+		// function turnOnTop100(){
+		// 	var fakeevent = {target:{id:"Top_100"}};
+		// 	changeOverlay(fakeevent);
+		// 	}
 	
 	
 		//Function to force IE8 to work, eventually this will not be needed.
@@ -547,55 +558,78 @@
 		}
 		
 		function createLegend() {
-			if (activeOverlay) {
-				var div = document.getElementById("legendDiv");
-				var div2 = document.getElementById("legendDiv2");	
-				var link = document.getElementById("legendLink");
-				var link2 = document.getElementById("legendLink2");
-				var name = activeOverlay.name;
 				console.log(activeOverlay);
-				console.log(name);
-				if (name == "National Highway Freight Network") {
-					link.href = "http://ops.fhwa.dot.gov/freight/infrastructure/nfn/index.htm";
-					link.innerHTML = "FHWA Website";
-					div.innerHTML = 'The National Highway Freight Network (NHFN) was developed by the Federal Highway Administration under the FAST Act, and replaces the National Freight Network previously developed under MAP-21.';
-					document.getElementById("legendLink").style.display="block";
-					document.getElementById("legendLink2").style.display="none";
-				}
-				else if (name == "Texas Highway Freight Network") {
-					link.href = "http://www.dot.state.tx.us/move-texas-freight/freight_plan.htm";
-					link.innerHTML = "Texas Freight Mobility Plan Website";
-					div.innerHTML = 'The Texas Highway Freight Network is comprised of a Primary Freight Network and a Secondary Freight Network/Emerging Freight Corridors. It includes interstates, the NHS and the Texas Trunk System.';
-					document.getElementById("legendLink").style.display="block";
-					document.getElementById("legendLink2").style.display="none";
-				}				
-				else if (name =="Top 100 Congested Roadways"){
-					link.href = "http://www.txdot.gov/inside-txdot/projects/100-congested-roadways.html";
-					link.innerHTML = "TxDOT Top 100 Website";
-					div.innerHTML = "This layer provides a list of the Top 100 Most Congested Roadways in the State as determined by Texas A&M Transportation Institute(TTI). For more information please visit the links below."
-					link2.href = "http://mobility.tamu.edu/texas-most-congested-roadways/";
-					link2.innerHTML = "TTI Website";
-					document.getElementById("legendLink").style.display = "block";
-					document.getElementById("legendLink2").style.display = "block";					
-				}
-				else if (name =="TxDOT_Projects"){
-					link.href = "http://www.txdot.gov/inside-txdot/projects/project-tracker.html";
-					link.innerHTML = "Project Tracker Website";
-					div.innerHTML = "";
-					document.getElementById("legendLink").style.display="block";
-					document.getElementById("legendLink2").style.display="none";
-				}
-				else {
-					div.innerHTML = '';
-					theLegend.refresh();
-					document.getElementById("legendLink").style.display="none";
-					document.getElementById("legendLink2").style.display="none";
-				}
+			if (activeOverlay) {				
+				var div = document.getElementById("legendDiv");
+				var divDesc = document.getElementById("legendDescDiv");	
+				div.innerHTML = '';
+				divDesc.innerHTML = '';	
+				document.getElementById("legendNotesDiv").style.display="none";
+				console.log(activeOverlaysArray); 
+				array.forEach(activeOverlaysArray, function(name){	
+					var para = document.createElement("P");
+					var link = document.createElement("a");
+					var para2 = document.createElement("P");
+					var link2 = document.createElement("a");
+					para2.appendChild(link2);
+					link.target="_blank";
+					link2.target="_blank";
+					document.getElementById("legendDescDiv").appendChild(para);	
+					document.getElementById("legendDescDiv").appendChild(link);
+					document.getElementById("legendDescDiv").appendChild(para2);				
+					if (name == "Natl_Freight_Network") {
+						var text = document.createTextNode('The National Highway Freight Network (NHFN) was developed by the Federal Highway Administration under the FAST Act, and replaces the National Freight Network previously developed under MAP-21.');
+						var linkText = document.createTextNode('FHWA Website');						
+						para.appendChild(text);
+						link.appendChild(linkText);
+						link.href = "http://ops.fhwa.dot.gov/freight/infrastructure/nfn/index.htm"
+						document.getElementById("legendNotesDiv").style.display="block"; 	
+					}
+					else if (name == "TX_Freight_Network") {						
+						var text = document.createTextNode('The Texas Highway Freight Network is comprised of a Primary Freight Network and a Secondary Freight Network/Emerging Freight Corridors. It includes interstates, the NHS and the Texas Trunk System.');
+						para.appendChild(text);
+						var linkText = document.createTextNode("Texas Freight Mobility Plan Website");
+						link.appendChild(linkText);
+						link.href = "http://www.dot.state.tx.us/move-texas-freight/";
+						document.getElementById("legendNotesDiv").style.display="block"; 	
+					}				
+					else if (name =="Top_100"){
+						var title = document.createTextNode('No Legend for Top 100 due to number of segment colors.');
+						para.appendChild(title);
+						var br = document.createElement("br");
+						para.appendChild(br);
+						var br = document.createElement("br");
+						para.appendChild(br);
+						var text = document.createTextNode('The Top 100 layer provides a list of the Top 100 Most Congested Roadways in the State as determined by Texas A&M Transportation Institute (TTI). For more information please visit the links below.');
+						para.appendChild(text);		
+						var linkText = document.createTextNode("TxDOT Top 100 Website");
+						link.appendChild(linkText);
+						link.href = "http://www.txdot.gov/inside-txdot/projects/100-congested-roadways.html";
+						var link2Text = document.createTextNode("TTI Website");
+						link2.appendChild(link2Text);
+						link2.href = "http://mobility.tamu.edu/texas-most-congested-roadways/";
+						document.getElementById("legendNotesDiv").style.display="block"; 				
+					}
+					else if (name =="Construction_Scheduled" | name =="Finalizing_for_Construction" | name =="Under_Development" | name =="Long_Term_Planning"){
+						var linkText = document.createTextNode("Project Tracker Website");
+						link.appendChild(linkText);
+						link.href = "http://www.txdot.gov/inside-txdot/projects/project-tracker.html";
+						document.getElementById("legendNotesDiv").style.display="block"; 
+					}
+					else {
+						div.innerHTML = '';
+						theLegend.refresh();
+					}
+				});
+				
 				theLegend.refresh();	
 			}
 			else {
 				var div = document.getElementById("legendDiv");
+				var divDesc = document.getElementById("legendDescDiv");	
 				div.innerHTML = 'Select an overlay from the Maps tab to see its legend.';
+				divDesc.innerHTML = '';
+				document.getElementById("legendNotesDiv").style.display="none"; 
 			}
 		}
 		
@@ -1069,11 +1103,14 @@
 				on(result, "click", changeOverlay);				
 		});
 		function changeOverlay(event) {
+			console.log(map.layerIds);
+			console.log(map.graphicLayerIds);
 			var tableText="";
 	        clearStyle("tocData");
 			hideAllOverlays();
 			map.infoWindow.hide();			
 			var theLayer = event.target.id;
+			layerInfo.length = 0;
 
 			if (theLayer=="CLEAR") {
 				activeOverlay="";
@@ -1091,7 +1128,7 @@
 					// push the selected overlay name into an array
 					activeOverlaysArray.push(theLayer);
 				}
-
+				console.log(activeOverlaysArray);
 				// popup an alert to warn the user that only 2 overlays may be turned on at a time
 				if (activeOverlaysArray.length > 2){
 					// alert ("Maximum of 2 layers on at a time. Please turn off a layer in order to select another.");
@@ -1100,7 +1137,7 @@
 					activeOverlaysArray.pop();
 				}
 
-				// turn each of the cueerntly selected overlay names red in the TOC
+				// turn each of the currently selected overlay names red in the TOC
 				array.forEach(activeOverlaysArray, function(item){
 					document.getElementById(item).style.color='red';
 				});
@@ -1131,8 +1168,10 @@
 				// }			
 				
 				if (activeOverlaysArray.indexOf("Minute_Orders")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Minute_Orders");
 					if (minuteOrderLyr) {
 						minuteOrderLyr.show();
+						map.reorderLayer(minuteOrderLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1153,12 +1192,15 @@
 						map.addLayer(minuteOrderLyr);
 					}	
 					activeOverlay = minuteOrderLyr;	
-					theLegend.layerInfos=[{layer:minuteOrderLyr, title:"Highway Designations"}]; 
+					// theLegend.layerInfos=[{layer:minuteOrderLyr, title:"Highway Designations"}]; 
+					layerInfo.push({layer:minuteOrderLyr, title:"Highway Designations"});
 				}						
 				
-				if (activeOverlaysArray.indexOf("Speed_Limit")> -1) {	
+				if (activeOverlaysArray.indexOf("Speed_Limit")> -1) {
+					var pos = activeOverlaysArray.indexOf("Speed_Limit");
 					if (speedLimitLyr) {
 						speedLimitLyr.show();
+						map.reorderLayer(speedLimitLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1176,12 +1218,16 @@
 						map.addLayer(speedLimitLyr);
 					}	
 					activeOverlay = speedLimitLyr;	
-					theLegend.layerInfos=[{layer:speedLimitLyr, title:"Speed Limits"}]; 			
+					// theLegend.layerInfos=[{layer:speedLimitLyr, title:"Speed Limits"}]; 	
+					layerInfo.push({layer:speedLimitLyr, title:"Speed Limits"});		
 				}
 
-				if (activeOverlaysArray.indexOf("Long_Term_Planning")> -1) {	
+				if (activeOverlaysArray.indexOf("Long_Term_Planning")> -1) {
+					var pos = activeOverlaysArray.indexOf("Long_Term_Planning");
+					console.log(pos);					
 					if (longTermPlanLyr) {
 						longTermPlanLyr.show();
+						map.reorderLayer(longTermPlanLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1211,12 +1257,15 @@
 						map.addLayer(longTermPlanLyr);
 					}	
 					activeOverlay = longTermPlanLyr;	
-					theLegend.layerInfos=[{layer:longTermPlanLyr, title:"TxDOT Projects - Long Term Planning"}]; 
+					// theLegend.layerInfos=[{layer:longTermPlanLyr, title:"TxDOT Projects - Long Term Planning"}]; 
+					layerInfo.push({layer:longTermPlanLyr, title:"TxDOT Projects - Long Term Planning"});
 				}	
 
-				if (activeOverlaysArray.indexOf("Construction_Scheduled")> -1) {	
+				if (activeOverlaysArray.indexOf("Construction_Scheduled")> -1) {
+					var pos = activeOverlaysArray.indexOf("Construction_Scheduled");
 					if (constScheduledLyr) {
 						constScheduledLyr.show();
+						map.reorderLayer(constScheduledLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1247,12 +1296,15 @@
 						map.addLayer(constScheduledLyr);
 					}	
 					activeOverlay = constScheduledLyr;	
-					theLegend.layerInfos=[{layer:constScheduledLyr, title:"TxDOT Projects - Construction Scheduled"}]; 
+					// theLegend.layerInfos=[{layer:constScheduledLyr, title:"TxDOT Projects - Construction Scheduled"}];  
+					layerInfo.push({layer:constScheduledLyr, title:"TxDOT Projects - Construction Scheduled"});
 				}
 				
-				if (activeOverlaysArray.indexOf("Finalizing_for_Construction")> -1) {	
+				if (activeOverlaysArray.indexOf("Finalizing_for_Construction")> -1) {
+					var pos = activeOverlaysArray.indexOf("Finalizing_for_Construction");							
 					if (finalForConstLyr) {
 						finalForConstLyr.show();
+						map.reorderLayer(finalForConstLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1283,12 +1335,15 @@
 						map.addLayer(finalForConstLyr);
 					}	
 					activeOverlay = finalForConstLyr;			
-					theLegend.layerInfos=[{layer:finalForConstLyr, title:"TxDOT Projects - Finalizing for Construction"}]; 			
+					// theLegend.layerInfos=[{layer:finalForConstLyr, title:"TxDOT Projects - Finalizing for Construction"}]; 	 
+					layerInfo.push({layer:finalForConstLyr, title:"TxDOT Projects - Finalizing for Construction"});		
 				}	
 
 				if (activeOverlaysArray.indexOf("Under_Development")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Under_Development");
 					if (underDevLyr) {
 						underDevLyr.show();
+						map.reorderLayer(underDevLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1319,12 +1374,15 @@
 						map.addLayer(underDevLyr);
 					}	
 					activeOverlay = underDevLyr;	
-					theLegend.layerInfos=[{layer:underDevLyr, title:"TxDOT Projects - Under Development"}]; 						
+					// theLegend.layerInfos=[{layer:underDevLyr, title:"TxDOT Projects - Under Development"}];	 
+					layerInfo.push({layer:underDevLyr, title:"TxDOT Projects - Under Development"});		 						
 				}			
 				
-				if (activeOverlaysArray.indexOf("Future_Traffic")> -1) {	
+				if (activeOverlaysArray.indexOf("Future_Traffic")> -1) {
+					var pos = activeOverlaysArray.indexOf("Future_Traffic");
 					if (futureTrafficLyr) {
 						futureTrafficLyr.show();
+						map.reorderLayer(futureTrafficLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1355,15 +1413,19 @@
 						futureTrafficLyr = new FeatureLayer(projectsUrl, {id:"Future_Traffic",visible: true,outFields:["RIA_RTE_ID","ADT_CUR","ADT_DESGN","TRK_AADT_PCT","ADT_YEAR","DESGN_YR"], infoTemplate: infoTemplate});
 						futureTrafficLyr.setRenderer(theRenderer);							
 						map.addLayer(futureTrafficLyr);
+						// map.reorderLayer(futureTrafficLyr,1);
 					}	
 					
 					activeOverlay = futureTrafficLyr;		
-					theLegend.layerInfos=[{layer:futureTrafficLyr, title:"Future Traffic and Percent Trucks.  Future is calculated as 2% growth rate and percent truck is 24 hour."}];
+					// theLegend.layerInfos=[{layer:futureTrafficLyr, title:"Future Traffic and Percent Trucks.  Future is calculated as 2% growth rate and percent truck is 24 hour."}]; 
+					layerInfo.push({layer:futureTrafficLyr, title:"Future Traffic and Percent Trucks.  Future is calculated as 2% growth rate and percent truck is 24 hour."});		
 				}		
 				
-				if (activeOverlaysArray.indexOf("Railroads")> -1) {	
+				if (activeOverlaysArray.indexOf("Railroads")> -1) {		
+					var pos = activeOverlaysArray.indexOf("Railroads");
 					if (railRoadLyr) {
 						railRoadLyr.show();
+						map.reorderLayer(railRoadLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1386,12 +1448,15 @@
 						map.addLayer(railRoadLyr);					
 					}	
 					activeOverlay = railRoadLyr;	
-					theLegend.layerInfos=[{layer:railRoadLyr, title:"Mainline Railroads"}];
+					// theLegend.layerInfos=[{layer:railRoadLyr, title:"Mainline Railroads"}];
+					layerInfo.push({layer:railRoadLyr, title:"Mainline Railroads"});		
 				}				
 				
 				if (activeOverlaysArray.indexOf("Non_Attainment")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Non_Attainment");	
 					if (nonAttainLyr) {
 						nonAttainLyr.show();
+						map.reorderLayer(nonAttainLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1408,13 +1473,16 @@
 						map.addLayer(nonAttainLyr);
 					}	
 					activeOverlay = nonAttainLyr;
-					theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"}];			
+					// theLegend.layerInfos=[{layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"}];	
+					layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});				
 				}		
 				
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Texas_Trunk");	
 					if (txTrunkLyr) {
-						txTrunkLyr.show();
 						UZALyr.show();
+						txTrunkLyr.show();						
+						map.reorderLayer(txTrunkLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1471,12 +1539,15 @@
 						map.addLayers([UZALyr,txTrunkLyr]);
 					}	
 					activeOverlay = txTrunkLyr;
-					theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"},{layer:txTrunkLyr, title:"Texas Trunk System"}];
+					// theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"},{layer:txTrunkLyr, title:"Texas Trunk System"}];	
+					layerInfo.push({layer:UZALyr, title:"2010 Adjusted Urban Areas"},{layer:txTrunkLyr, title:"Texas Trunk System"});			
 				}			
 				
-				if (activeOverlaysArray.indexOf("Maintenance_Offices")> -1) {	
+				if (activeOverlaysArray.indexOf("Maintenance_Offices")> -1) {		
+					var pos = activeOverlaysArray.indexOf("Maintenance_Offices");
 					if (maintOfficeLyr) {
-						maintOfficeLyr.show();
+						maintOfficeLyr.show();						
+						map.reorderLayer(maintOfficeLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1496,13 +1567,16 @@
 						map.addLayer(maintOfficeLyr);
 					}	
 					activeOverlay = maintOfficeLyr;			
-					theLegend.layerInfos=[{layer:maintOfficeLyr, title:"TxDOT Maintenance Offices"}];			
+					// theLegend.layerInfos=[{layer:maintOfficeLyr, title:"TxDOT Maintenance Offices"}];		
+					layerInfo.push({layer:maintOfficeLyr, title:"TxDOT Maintenance Offices"});				
 				}				
 				
-				if (activeOverlaysArray.indexOf("Functional_Classification")> -1) {	
+				if (activeOverlaysArray.indexOf("Functional_Classification")> -1) {			
+					var pos = activeOverlaysArray.indexOf("Functional_Classification");
 					if (FCLyr) {
 						FCLyr.show();
-						UZALyr.show();
+						UZALyr.show();						
+						map.reorderLayer(FCLyr,pos);
 					}
 					else {
 						// Manipulate the contents of the popup infoTemplate
@@ -1574,12 +1648,15 @@
 
 					}	
 					activeOverlay = FCLyr;		
-					theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"}, {layer:FCLyr, title:"Functional Classification"}];			
+					// theLegend.layerInfos=[{layer:UZALyr, title:"2010 Adjusted Urban Areas"}, {layer:FCLyr, title:"Functional Classification"}];			
+					layerInfo.push({layer:UZALyr, title:"2010 Adjusted Urban Areas"}, {layer:FCLyr, title:"Functional Classification"});			
 				}			
 				
-				if (activeOverlaysArray.indexOf("Natl_Freight_Network")> -1) {	
+				if (activeOverlaysArray.indexOf("Natl_Freight_Network")> -1) {			
+					var pos = activeOverlaysArray.indexOf("Natl_Freight_Network");
 					if (NatlFreightLyr) {
-						NatlFreightLyr.show();
+						NatlFreightLyr.show();						
+						map.reorderLayer(NatlFreightLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1595,12 +1672,15 @@
 						map.addLayer(NatlFreightLyr);
 					}	
 					activeOverlay = NatlFreightLyr;		
-					theLegend.layerInfos=[{layer:NatlFreightLyr, title:"National Highway Freight Network"}];			
+					// theLegend.layerInfos=[{layer:NatlFreightLyr, title:"National Highway Freight Network"}];		
+					layerInfo.push({layer:NatlFreightLyr, title:"National Highway Freight Network"});					
 				}
 
-				if (activeOverlaysArray.indexOf("TX_Freight_Network")> -1) {
+				if (activeOverlaysArray.indexOf("TX_Freight_Network")> -1) {			
+					var pos = activeOverlaysArray.indexOf("TX_Freight_Network");
 					if (TXFreightLyr) {
-						TXFreightLyr.show();
+						TXFreightLyr.show();						
+						map.reorderLayer(TXFreightLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1617,12 +1697,15 @@
 						map.addLayer(TXFreightLyr);
 					}	
 					activeOverlay = TXFreightLyr;		
-					theLegend.layerInfos=[{layer:TXFreightLyr, title:"Texas Highway Freight Network"}];			
+					// theLegend.layerInfos=[{layer:TXFreightLyr, title:"Texas Highway Freight Network"}];		
+					layerInfo.push({layer:TXFreightLyr, title:"Texas Highway Freight Network"});			
 				}					
 				
-				if (activeOverlaysArray.indexOf("Vertical_Clearance")> -1) {	
+				if (activeOverlaysArray.indexOf("Vertical_Clearance")> -1) {				
+					var pos = activeOverlaysArray.indexOf("Vertical_Clearance");
 					if (VerticalLyr) {
-						VerticalLyr.show();
+						VerticalLyr.show();						
+						map.reorderLayer(VerticalLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1637,12 +1720,15 @@
 						map.addLayer(VerticalLyr);
 					}	
 					activeOverlay = VerticalLyr;		
-					theLegend.layerInfos=[{layer:VerticalLyr, title:"Vertical Clearance"}];			
+					// theLegend.layerInfos=[{layer:VerticalLyr, title:"Vertical Clearance"}];			
+					layerInfo.push({layer:VerticalLyr, title:"Vertical Clearance"});				
 				}
 				
-				if (activeOverlaysArray.indexOf("Permanent_Stations")> -1) {	
+				if (activeOverlaysArray.indexOf("Permanent_Stations")> -1) {					
+					var pos = activeOverlaysArray.indexOf("Permanent_Stations");
 					if (permStationLyr) {
-						permStationLyr.show();
+						permStationLyr.show();						
+						map.reorderLayer(permStationLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1658,13 +1744,16 @@
 						map.addLayer(permStationLyr);
 					}	
 					activeOverlay = permStationLyr;		
-					theLegend.layerInfos=[{layer:permStationLyr, title:"Permanent Count Stations"}];			
+					// theLegend.layerInfos=[{layer:permStationLyr, title:"Permanent Count Stations"}];			
+					layerInfo.push({layer:permStationLyr, title:"Permanent Count Stations"});			
 				}		
 				
-				if (activeOverlaysArray.indexOf("AADT")> -1) {	
+				if (activeOverlaysArray.indexOf("AADT")> -1) {						
+					var pos = activeOverlaysArray.indexOf("AADT");
 					if (aadtLyr) {
 						aadtLyr.show();
-						labelLayerAADT.show();
+						labelLayerAADT.show();					
+						map.reorderLayer(aadtLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1708,13 +1797,16 @@
 						map.addLayer(labelLayerAADT);
 					}	
 					activeOverlay = aadtLyr;
-					theLegend.layerInfos=[{layer:aadtLyr, title:"Annual Average Daily Traffic - Count Location"}];
+					// theLegend.layerInfos=[{layer:aadtLyr, title:"Annual Average Daily Traffic - Count Location"}];			
+					layerInfo.push({layer:aadtLyr, title:"Annual Average Daily Traffic - Count Location"});
 				}	
 				
-				if (activeOverlaysArray.indexOf("Reference_Markers")> -1) {	
+				if (activeOverlaysArray.indexOf("Reference_Markers")> -1) {							
+					var pos = activeOverlaysArray.indexOf("Reference_Markers");
 					if (MarkerLyr) {
 						MarkerLyr.show();
-						labelLayerMarker.show();
+						labelLayerMarker.show();					
+						map.reorderLayer(MarkerLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1746,12 +1838,15 @@
 						map.addLayer(labelLayerMarker);		
 					}	
 					activeOverlay = MarkerLyr;	
-					theLegend.layerInfos=[{layer:MarkerLyr, title:"Reference Markers"}]; 
+					// theLegend.layerInfos=[{layer:MarkerLyr, title:"Reference Markers"}]; 			
+					layerInfo.push({layer:MarkerLyr, title:"Reference Markers"});
 				}		
 				
-				if (activeOverlaysArray.indexOf("State_House_Districts")> -1) {	
+				if (activeOverlaysArray.indexOf("State_House_Districts")> -1) {								
+					var pos = activeOverlaysArray.indexOf("State_House_Districts");
 					if (StateHouseLyr) {
-						StateHouseLyr.show();
+						StateHouseLyr.show();					
+						map.reorderLayer(StateHouseLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1771,12 +1866,15 @@
 						map.addLayer(StateHouseLyr);
 					}	
 					activeOverlay = StateHouseLyr;	
-					theLegend.layerInfos=[{layer:StateHouseLyr, title:"Texas House Districts"}];			
+					// theLegend.layerInfos=[{layer:StateHouseLyr, title:"Texas House Districts"}]; 			
+					layerInfo.push({layer:StateHouseLyr, title:"Texas House Districts"});			
 				}	
 
-				if (activeOverlaysArray.indexOf("State_Senate_Districts")> -1) {	
+				if (activeOverlaysArray.indexOf("State_Senate_Districts")> -1) {								
+					var pos = activeOverlaysArray.indexOf("State_Senate_Districts");	
 					if (StateSenateLyr) {
-						StateSenateLyr.show();
+						StateSenateLyr.show();					
+						map.reorderLayer(StateSenateLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1796,12 +1894,15 @@
 						map.addLayer(StateSenateLyr);
 					}	
 					activeOverlay = StateSenateLyr;
-					theLegend.layerInfos=[{layer:StateSenateLyr, title:"Texas Senate Districts"}];			
+					// theLegend.layerInfos=[{layer:StateSenateLyr, title:"Texas Senate Districts"}];				
+					layerInfo.push({layer:StateSenateLyr, title:"Texas Senate Districts"});				
 				}	
 
-				if (activeOverlaysArray.indexOf("US_House_Districts")> -1) {	
+				if (activeOverlaysArray.indexOf("US_House_Districts")> -1) {								
+					var pos = activeOverlaysArray.indexOf("US_House_Districts");	
 					if (USHouseLyr) {
-						USHouseLyr.show();
+						USHouseLyr.show();					
+						map.reorderLayer(USHouseLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1822,12 +1923,16 @@
 						map.addLayer(USHouseLyr);
 					}	
 					activeOverlay = USHouseLyr;	
-					theLegend.layerInfos=[{layer:USHouseLyr, title:"US House Districts"}];			
+					// theLegend.layerInfos=[{layer:USHouseLyr, title:"US House Districts"}];				
+					layerInfo.push({layer:USHouseLyr, title:"US House Districts"});						
 				}			
 				
-				if (activeOverlaysArray.indexOf("NHS")> -1) {	
+				if (activeOverlaysArray.indexOf("NHS")> -1) {									
+					var pos = activeOverlaysArray.indexOf("NHS");
+					console.log(pos);
 					if (NHSLyr) {
-						NHSLyr.show();
+						NHSLyr.show();					
+						map.reorderLayer(NHSLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1845,12 +1950,15 @@
 						map.addLayer(NHSLyr);
 					}	
 					activeOverlay = NHSLyr;		
-					theLegend.layerInfos=[{layer:NHSLyr, title:"National Highway System"}];			
+					// theLegend.layerInfos=[{layer:NHSLyr, title:"National Highway System"}];					
+					layerInfo.push({layer:NHSLyr, title:"National Highway System"});					
 				}			
 				
-				if (activeOverlaysArray.indexOf("Area_Offices")> -1) {	
+				if (activeOverlaysArray.indexOf("Area_Offices")> -1) {										
+					var pos = activeOverlaysArray.indexOf("Area_Offices");
 					if (areaOfficeLyr) {
-						areaOfficeLyr.show();
+						areaOfficeLyr.show();					
+						map.reorderLayer(areaOfficeLyr,pos);
 					}
 					else {
 						tableText = "";
@@ -1873,12 +1981,15 @@
 
 					}	
 					activeOverlay = areaOfficeLyr;
-					theLegend.layerInfos=[{layer:areaOfficeLyr, title:"TxDOT Area Offices"}];			
+					// theLegend.layerInfos=[{layer:areaOfficeLyr, title:"TxDOT Area Offices"}];				
+					layerInfo.push({layer:areaOfficeLyr, title:"TxDOT Area Offices"});						
 				}		
 				
-				if (activeOverlaysArray.indexOf("COG")> -1) {
+				if (activeOverlaysArray.indexOf("COG")> -1) {										
+					var pos = activeOverlaysArray.indexOf("COG");
 					if (COGLyr) {
-						COGLyr.show();
+						COGLyr.show();					
+						map.reorderLayer(COGLyr,pos);
 					}
 					else {		
 						tableText = "";
@@ -1894,12 +2005,15 @@
 						map.addLayer(COGLyr);
 					}	
 					activeOverlay = COGLyr;
-					theLegend.layerInfos=[{layer:COGLyr, title:"Council of Governments"}];
+					// theLegend.layerInfos=[{layer:COGLyr, title:"Council of Governments"}];				
+					layerInfo.push({layer:COGLyr, title:"Council of Governments"});			
 				}	
 
-				if (activeOverlaysArray.indexOf("MPO")> -1) {		
+				if (activeOverlaysArray.indexOf("MPO")> -1) {										
+					var pos = activeOverlaysArray.indexOf("MPO");		
 					if (MPOLyr) {
-						MPOLyr.show();
+						MPOLyr.show();					
+						map.reorderLayer(MPOLyr,pos);
 					}
 					else {		
 						tableText = "";
@@ -1917,10 +2031,12 @@
 						map.addLayer(MPOLyr);
 					}			
 					activeOverlay = MPOLyr;
-					theLegend.layerInfos=[{layer:MPOLyr, title:"Metropolitan Planning Organizations"}];
+					// theLegend.layerInfos=[{layer:MPOLyr, title:"Metropolitan Planning Organizations"}];				
+					layerInfo.push({layer:MPOLyr, title:"Metropolitan Planning Organizations"});	
 				}		
 				
-				if (activeOverlaysArray.indexOf("Control_Section")> -1) {		
+				if (activeOverlaysArray.indexOf("Control_Section")> -1) {
+					var pos = activeOverlaysArray.indexOf("Control_Section");
 					if (controlSectionLyr) {
 						controlSectionLyr.show();
 						labelLayerCS.show();
@@ -1946,7 +2062,7 @@
 						var projectsUrl = "http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0";
 
 						controlSectionLyr = new FeatureLayer(projectsUrl, {id:"Control_Section",visible: true,outFields:["CTRL_SECT_LN_NBR","RTE_RB_NM","BEGIN_MPT","END_MPT"], infoTemplate: infoTemplate});	
-						map.addLayer(controlSectionLyr);
+						map.addLayer(controlSectionLyr, pos);
 						
 						//Labeling
 
@@ -1959,10 +2075,7 @@
 
 						var label_renderer = new SimpleRenderer(label_symbol);
 						labelLayerCS = new LabelLayer({id:"CS_Labels"});
-						console.log(labelLayerCS);
 						labelLayerCS.addFeatureLayer(controlSectionLyr, label_renderer, "{CTRL_SECT_LN_NBR}");
-						console.log(labelLayerCS);
-
 						// function to crack open the label text and manipulate to add a hyphen in the CS number
 						labelLayerCS._buildLabelText = function (b, d, c, e) {
 						    var csNbr = d.CTRL_SECT_LN_NBR;
@@ -1974,15 +2087,16 @@
 						map.addLayer(labelLayerCS);				
 					}		
 					activeOverlay = controlSectionLyr;	
-					theLegend.layerInfos=[{layer:controlSectionLyr, title:"Control Section Segment colors only serve to distinguish one segment from the next."}]; 
+					// theLegend.layerInfos=[{layer:controlSectionLyr, title:"Control Section segment colors only serve to distinguish one segment from the next."}]; 			
+					layerInfo.push({layer:controlSectionLyr, title:"Control Section segment colors only serve to distinguish one segment from the next."});	
 				}
 
 				if (activeOverlaysArray.indexOf("Top_100")> -1) {
-
+					var pos = activeOverlaysArray.indexOf("Top_100");
 					if (top100Lyr) {
 						top100Lyr.show();
-						labelLayerTop100.show();
-						
+						labelLayerTop100.show();					
+						map.reorderLayer(top100Lyr,pos);						
 					}
 					else {
 
@@ -2042,13 +2156,15 @@
 					}
 
 					activeOverlay = top100Lyr;
-					theLegend.layerInfos=[null];
-					//theLegend.layerInfos=[{ title:"Top 100 Congested Roadways"}];
+					// theLegend.layerInfos=[null];
+					// theLegend.layerInfos=[{ layer: null, title:"Top 100 Congested Roadways"}];
 				}
 
-				if (activeOverlaysArray.indexOf("Roadway_Inventory")> -1) {		
+				if (activeOverlaysArray.indexOf("Roadway_Inventory")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Roadway_Inventory");	
 					if (rdwyInvLyr) {
-						rdwyInvLyr.show();
+						rdwyInvLyr.show();					
+						map.reorderLayer(rdwyInvLyr,pos);
 					}
 					else {
 						
@@ -2101,12 +2217,15 @@
 						map.infoWindow.resize(275,400);
 					}			
 					activeOverlay = rdwyInvLyr;
-					theLegend.layerInfos=[{layer:rdwyInvLyr, title:"Roadway Inventory"}];
+					// theLegend.layerInfos=[{layer:rdwyInvLyr, title:"Roadway Inventory"}];			
+					layerInfo.push({layer:rdwyInvLyr, title:"Roadway Inventory"});	
 				}
 
-				if (activeOverlaysArray.indexOf("Cemetery")> -1) {		
+				if (activeOverlaysArray.indexOf("Cemetery")> -1) {	
+					var pos = activeOverlaysArray.indexOf("Cemetery");		
 					if (cemeteryLyr) {
-						cemeteryLyr.show();
+						cemeteryLyr.show();					
+						map.reorderLayer(cemeteryLyr,pos);
 					}
 					else {		
 						tableText = "";
@@ -2122,11 +2241,11 @@
 						map.addLayer(cemeteryLyr);
 					}			
 					activeOverlay = cemeteryLyr;
-					theLegend.layerInfos=[{layer:cemeteryLyr, title:"Cemetery"}];
+					// theLegend.layerInfos=[{layer:cemeteryLyr, title:"Cemetery"}];		
+					layerInfo.push({layer:cemeteryLyr, title:"Cemetery"});	
 				}		
 
 			}					
-
 			
 			scaleDependentQueries();
 		}
@@ -2585,8 +2704,8 @@
 
  		on(dom.byId("btnReleaseNotes"), "click", showReleaseNotes);
         function showReleaseNotes(){
-        	document.getElementById("maskDiv").style.display="flex";
-        	document.getElementById("releaseNotesDiv").style.display="flex";
+        	document.getElementById("maskDiv").style.display="block";
+        	document.getElementById("releaseNotesDiv").style.display="block";
     	}
 	});
 		// These functions are outside of the Require so that they will be recognized in the HTML below.
@@ -2640,6 +2759,9 @@
 	  <li>Added Roadway Inventory Overlay</li>
 	  <li>Added Cemetery Overlay</li>
 	  <li>Added Length field to Control Section popup</li>
+	  <li>Added ability to turn on 2 layers at a time</li>
+	  <li>Updated Legend</li>
+	  <li>Upgraded API to 3.18</li>
 	  <li>Various User Interface Improvements</li>
 	</ul>
 	<button id="btnClose" style="padding: 5px 10px; position:relative; bottom: 5px; " onclick="closeReleaseNotes()">Close</button>
@@ -2825,14 +2947,9 @@
 				<tr><th align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map Legend</th><tr> 
 				<tr><td>
 					<div id="legendDiv"></div>
-					<div id="legendDiv2"></div>
-				</td><tr>
-				<tr><td>
-
-					<br><a id="legendLink" target="_blank" style="display:none"></a>
-					<br><a id="legendLink2" target="_blank" style="display:none"></a>
-				</td><tr>				
-								
+					<div id="legendNotesDiv" style="display:none"><b>NOTES:</b></div>
+					<div id="legendDescDiv"></div>
+				</td><tr>								
 			</table>
 		</div>		
 		<div id="aboutTab">
