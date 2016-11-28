@@ -473,7 +473,7 @@
 
 		// Enables the use of the WMTS Google Imagery layer
           // Local Proxy call
-          esriConfig.defaults.io.proxyUrl = "/javascript/StatewidePlanningMap/AGS_Proxy/proxy.ashx";
+          // esriConfig.defaults.io.proxyUrl = "/javascript/StatewidePlanningMap/AGS_Proxy/proxy.ashx";
 
 		// Google Imagery WMTS layer info
         var WMTSLayerInfo = new WMTSLayerInfo({
@@ -482,8 +482,15 @@
           format: "png"
         });
 
+        var resourceInfo = {
+          version: "1.0.0",
+          layerInfos: [layerInfo1, layerInfo2],
+          copyright: "open layer"
+        };
+
         var options = {
           serviceMode: "KVP",
+          resourceInfo: resourceInfo,
           layerInfo: WMTSLayerInfo
         };
 
