@@ -358,6 +358,7 @@
 	var polyline;
 	var activeOverlaysArray = [];
 	var vectorTileLayer;
+	var layerInfo = [];
 	
 	//Search variables
 	var citySearchLyr;
@@ -455,69 +456,140 @@
 		"dojo/number",
 		"dojo/_base/array",
 		"esri/layers/VectorTileLayer",
+        "esri/layers/WMTSLayer",
+        "esri/layers/WMTSLayerInfo",
 
 		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on,
 			Query, QueryTask, arcgisUtils, Legend, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
 			SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,
-			Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer) {
+			Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo) {
 			
 		parser.parse();
 		
 		window.onresize = handleIEProblem;
 		handleIEProblem();
-				
-		map = new Map("mapDiv", {minZoom:6, maxZoom:16, logo: false});
-		map.infoWindow.set("titleInBody", false);
 
-		tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
-		map.addLayer(tiled);
+		// Enables the use of the WMTS Google Imagery layer
+          // Local Proxy call
+          esriConfig.defaults.io.proxyUrl = "/javascript/StatewidePlanningMap/AGS_Proxy/proxy.ashx";
 
-		// vectorTileLayer = new VectorTileLayer("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Test_Tile_Package6/VectorTileServer");
-		// map.addLayer(vectorTileLayer);
+		// Google Imagery WMTS layer info
+        var WMTSLayerInfo = new WMTSLayerInfo({
+          identifier: "texas",
+          tileMatrixSet: "0to20",
+          format: "png"
+        });
+
+        var options = {
+          serviceMode: "KVP",
+          layerInfo: WMTSLayerInfo
+        };
+
+        // Add Google Imagery WMTS layer
+        var wmtsLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", options);
+
+		// Use an AGO Web Map for the basemap, rather than a tile layer.  Use the createMap method from Utils passing in the web map id and map div
+		//  Note: Anything that refrences the map object must go inside of the callback function below.
+		var mapDeferred = arcgisUtils.createMap("535d4d799a164898bdf52f706f489f6a", "mapDiv", {mapOptions: {slider: true, logo: false}});
+		// Success callback that contains the info from the web map
+		mapDeferred.addCallback(function(response) 
+		{	
+			map = response.map;
+			var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
+			map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
 		
-		var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
-		map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
-		
-		//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
-		addInventoryData();
-		addSearchLayers();
+			//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
+			addInventoryData();
+			addSearchLayers();
 
-		map.on("load", function() {
-		  map.on("mouse-move", showCoordinates);
-		  map.on("mouse-drag", showCoordinates);
-		  map.on("zoom-end", scaleDependentQueries);	  
+			map.on("mouse-move", showCoordinates);
+			map.on("mouse-drag", showCoordinates);
+			map.on("zoom-end", scaleDependentQueries);
+
+			// Turn on Google Imagery when zoomed past level 16
+			map.on("zoom-end", function(result){
+				var zoom = result.level;
+				if (zoom >= 17) {
+				  map.addLayer(wmtsLayer);
+				} else if (zoom < 17) {
+				  map.removeLayer(wmtsLayer);
+				}
+			});        
+
+			createToolbar();
+			map.on("click", logCoords);	
+			// Clear graphic line on Measure Tab when a new line is started
+			map.on("click", clearMeasuredLineGraphic);
+			map.on("mouse-move", newCoords);
+		
+			var scalebar = new Scalebar({
+      	        map: map,
+                scalebarUnit: "english",
+		  	    attachTo: "bottom-left"
+			});	
+
+			//Set up the legend and create an array of the layers that will show in the legend.
+			theLegend = new Legend({map:map},"legendDiv");
+			theLegend.layerInfos=layerInfo; 
 		});
-		
-		map.on("load", createToolbar);
-		map.on("click", logCoords);	
-		// Clear graphic line on Measure Tab if when a new line is started
-		map.on("click", clearMeasuredLineGraphic);
-		map.on("mouse-move", newCoords);
-		//map.on("load",turnOnTop100);
-		
-        var scalebar = new Scalebar({
-          map: map,
-          scalebarUnit: "english",
-		  attachTo: "bottom-left"
-        });	
+		// Failed callback
+		mapDeferred.addErrback(function(response) 
+		{
+            alert("There was an issue obtaining the Statewide Planning web map.");
+            return;
+		});
 
-        map.on("layer-add-result", function (evt) {
-	        // var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
-	        	console.log(evt.layer.id);
-	          // return {layer:layer.layer, title:layer.layer.name};
-	        	// });
-    	});
-        var layerInfo = [];
-		theLegend = new Legend({map:map},"legendDiv");
-		theLegend.layerInfos=layerInfo; 
+		//Uncomment the section below to use the SPM Tile Layer.  This is helpful when working on the code, since it doesn not require http to run (i.e. you can run off you hard drive for testing).
+				
+		// map = new Map("mapDiv", {minZoom:6, maxZoom:16, logo: false});
+		// map.infoWindow.set("titleInBody", false);
 
-		// function turnOnTop100(){
-		// 	var fakeevent = {target:{id:"Top_100"}};
-		// 	changeOverlay(fakeevent);
-		// 	}
-	
+		// tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer");
+		// map.addLayer(tiled);
+
+		// // vectorTileLayer = new VectorTileLayer("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Test_Tile_Package6/VectorTileServer");
+		// // map.addLayer(vectorTileLayer);
+		
+		// var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
+		// map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
+		
+		// //Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
+		// addInventoryData();
+		// addSearchLayers();
+
+		// map.on("load", function() {
+		//   map.on("mouse-move", showCoordinates);
+		//   map.on("mouse-drag", showCoordinates);
+		//   map.on("zoom-end", scaleDependentQueries);	  
+		// });
+		
+		// map.on("load", createToolbar);
+		// map.on("click", logCoords);	
+		// // Clear graphic line on Measure Tab if when a new line is started
+		// map.on("click", clearMeasuredLineGraphic);
+		// map.on("mouse-move", newCoords);
+		// //map.on("load",turnOnTop100);
+		
+  //       var scalebar = new Scalebar({
+  //         map: map,
+  //         scalebarUnit: "english",
+		//   attachTo: "bottom-left"
+  //       });	
+
+  //       map.on("layer-add-result", function (evt) {
+	 //        // var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+	 //        	console.log(evt.layer.id);
+	 //          // return {layer:layer.layer, title:layer.layer.name};
+	 //        	// });
+  //   	});
+
+  // 		//Set up the legend and create an array of the layers that will show in the legend.
+  //       var layerInfo = [];
+		// theLegend = new Legend({map:map},"legendDiv");
+		// theLegend.layerInfos=layerInfo; 
+
 	
 		//Function to force IE8 to work, eventually this will not be needed.
 		function handleIEProblem() {
