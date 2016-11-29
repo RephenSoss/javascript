@@ -870,7 +870,9 @@
 		});
 		function changeBaseMap(event) {
 			clearStyle("tocMaps");
-			map.removeLayer(map.getLayer(map.layerIds[0]));
+			var basemap;
+			// map.removeLayer(map.getLayer(map.layerIds[0]));
+			map.removeLayer(basemap);
 
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
@@ -879,11 +881,11 @@
 			// 	map.addLayer(tiled);
 			// }
 			if (newMap=="Google") {
-				var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
-				map.addLayer(GoogleLayer);
+				basemap = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
+				map.addLayer(basemap);
 			}	
 			else {
-				var basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
+				basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
 				map.addLayer(basemap);
 			}			
 
