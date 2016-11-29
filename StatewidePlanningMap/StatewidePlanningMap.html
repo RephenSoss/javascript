@@ -587,7 +587,6 @@
 
   //       map.on("layer-add-result", function (evt) {
 	 //        // var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
-	 //        	console.log(evt.layer.id);
 	 //          // return {layer:layer.layer, title:layer.layer.name};
 	 //        	// });
   //   	});
@@ -637,14 +636,12 @@
 		}
 		
 		function createLegend() {
-				console.log(activeOverlay);
 			if (activeOverlay) {				
 				var div = document.getElementById("legendDiv");
 				var divDesc = document.getElementById("legendDescDiv");	
 				div.innerHTML = '';
 				divDesc.innerHTML = '';	
 				document.getElementById("legendNotesDiv").style.display="none";
-				console.log(activeOverlaysArray); 
 				array.forEach(activeOverlaysArray, function(name){	
 					var para = document.createElement("P");
 					var link = document.createElement("a");
@@ -877,9 +874,13 @@
 
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
-			if (newMap=="Statewide_Planning_Map") {
-				var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
-				map.addLayer(tiled);	  
+			// if (newMap=="Statewide_Planning_Map") {
+			// 	var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
+			// 	map.addLayer(tiled);
+			if (newMap=="Google") {
+				var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
+				map.addLayer(GoogleLayer);
+			}	  
 			}
 			else {
 				var basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
@@ -1182,8 +1183,6 @@
 				on(result, "click", changeOverlay);				
 		});
 		function changeOverlay(event) {
-			console.log(map.layerIds);
-			console.log(map.graphicLayerIds);
 			var tableText="";
 	        clearStyle("tocData");
 			hideAllOverlays();
@@ -1207,7 +1206,6 @@
 					// push the selected overlay name into an array
 					activeOverlaysArray.push(theLayer);
 				}
-				console.log(activeOverlaysArray);
 				// popup an alert to warn the user that only 2 overlays may be turned on at a time
 				if (activeOverlaysArray.length > 2){
 					// alert ("Maximum of 2 layers on at a time. Please turn off a layer in order to select another.");
@@ -1303,7 +1301,6 @@
 
 				if (activeOverlaysArray.indexOf("Long_Term_Planning")> -1) {
 					var pos = activeOverlaysArray.indexOf("Long_Term_Planning");
-					console.log(pos);					
 					if (longTermPlanLyr) {
 						longTermPlanLyr.show();
 						map.reorderLayer(longTermPlanLyr,pos);
@@ -1580,7 +1577,6 @@
 
 						
 						function setUZAPopupContent(graphic){
-							console.log(graphic);
 							UZATableText = "";
 							UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 							UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.CENSUS_NM+"</td></tr>";
@@ -1661,7 +1657,6 @@
 						// Manipulate the contents of the popup infoTemplate
 						
 						function setPopupContent(graphic){
-							console.log(graphic);
 							tableText = "";
 							tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 							tableText += "<tr><td>Highway</td><td>"+graphic.attributes.FAC_NAM+"</td></tr>";
@@ -1688,7 +1683,6 @@
 
 						
 						function setUZAPopupContent(graphic){
-							console.log(graphic);
 							UZATableText = "";
 							UZATableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 							UZATableText += "<tr><td>Name</td><td>"+graphic.attributes.CENSUS_NM+"</td></tr>";
@@ -2008,7 +2002,6 @@
 				
 				if (activeOverlaysArray.indexOf("NHS")> -1) {									
 					var pos = activeOverlaysArray.indexOf("NHS");
-					console.log(pos);
 					if (NHSLyr) {
 						NHSLyr.show();					
 						map.reorderLayer(NHSLyr,pos);
@@ -2581,7 +2574,7 @@
 	          for (var attr in featureAttributes) {
 				finalSet.push(featureAttributes[attr]);
 	          }
-			  	console.log(finalSet);
+
 			  if (theSearchLayer=="OnSystem_Highway") {
 				resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "-" + finalSet[2] + " CO.</span>";			
 			  }
@@ -2866,7 +2859,7 @@
 		  <tr><th>Base Maps</th></tr>
           <tr><td class="Basemaps" id='Statewide_Planning_Map' style="color:red;">TxDOT</td></tr>		  
 		  <tr><td class="Basemaps" id='World_Street_Map'>ESRI Streets</td></tr>	  
-		  <tr><td class="Basemaps" id='World_Imagery'>Imagery</td></tr>
+		  <tr><td class="Basemaps" id='Google'>Google Imagery</td></tr>
 		  <tr><td class="Basemaps" id='World_Topo_Map'>Topographic</td></tr>
 		  <!--
 		  <tr class="alt"><td class="Basemaps" id='Canvas/World_Light_Gray_Base'>Gray Canvas</td></tr>	 
