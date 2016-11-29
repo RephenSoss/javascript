@@ -877,11 +877,11 @@
 			// if (newMap=="Statewide_Planning_Map") {
 			// 	var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
 			// 	map.addLayer(tiled);
+			// }
 			if (newMap=="Google") {
 				var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
 				map.addLayer(GoogleLayer);
-			}	  
-			}
+			}	
 			else {
 				var basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
 				map.addLayer(basemap);
