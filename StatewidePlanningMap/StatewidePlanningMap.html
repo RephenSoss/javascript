@@ -874,10 +874,10 @@
 			document.getElementById(newMap).style.color='red';
 			console.log(map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
 			console.log(map.getLayer(map.layerIds[1])); //"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer"
-			map.removeLayer(map.getLayer(map.layerIds[2]));
+			map.removeLayer(map.getLayer(map.layerIds[1]));
 			if (newMap=="Statewide_Planning_Map") {
 				// var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
-				console.log("blah");
+				console.log("yikes");
 			}
 			if (newMap=="Google") {
 				var google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
