@@ -360,7 +360,6 @@
 	var vectorTileLayer;
 	var layerInfo = [];
 	var credits ="TxDOT, TPP-GIS";
-	var basemap;
 	
 	//Search variables
 	var citySearchLyr;
@@ -871,21 +870,23 @@
 		});
 		function changeBaseMap(event) {
 			clearStyle("tocMaps");
-			console.log(basemap);
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
-			// if (newMap=="Statewide_Planning_Map") {
-			// 	var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
-			// 	map.addLayer(tiled);
-			// }
+			console.log(map.getLayer(map.layerIds[0]));
+			console.log(map.getLayer(map.layerIds[1]));
+			if (newMap=="Statewide_Planning_Map") {
+				// var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
+				console.log("blah");
+			}
 			if (newMap=="Google") {
-				basemap = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
+				var google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
+				map.addLayer(google);
 			}	
 			else {
 				basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});
+				map.addLayer(basemap);	
 			}	
-			map.removeLayer(basemap);
-			map.addLayer(basemap);		
+			
 
 			if (activeOverlay) {
 				activeOverlay.show();
