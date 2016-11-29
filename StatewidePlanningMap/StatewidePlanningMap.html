@@ -360,6 +360,7 @@
 	var vectorTileLayer;
 	var layerInfo = [];
 	var credits ="TxDOT, TPP-GIS";
+	var basemap;
 	
 	//Search variables
 	var citySearchLyr;
@@ -870,7 +871,6 @@
 		});
 		function changeBaseMap(event) {
 			clearStyle("tocMaps");
-			var basemap;
 			console.log(basemap);
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
