@@ -498,8 +498,7 @@
 			addSearchLayers();
 
 			map.on("mouse-move", showCoordinates);
-			map.on("mouse-drag", showCoordinates);			
-			map.on("zoom-end", showCoordinates);
+			map.on("mouse-drag", showCoordinates);
 			map.on("zoom-end", scaleDependentQueries);
 
 			// Turn on Google Imagery when zoomed past level 16
