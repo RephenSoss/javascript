@@ -359,6 +359,7 @@
 	var activeOverlaysArray = [];
 	var vectorTileLayer;
 	var layerInfo = [];
+	var credits ="TxDOT, TPP-GIS";
 	
 	//Search variables
 	var citySearchLyr;
@@ -505,9 +506,14 @@
 			map.on("zoom-end", function(result){
 				var zoom = result.level;
 				if (zoom >= 17) {
-				  map.addLayer(GoogleLayer);	
+				  map.addLayer(GoogleLayer);
+				  googleCredits = ", Google Imagery";
+				  credits.concat(googleCredits);
+				  document.getElementById("credits").innerHTML = credits;
+
 				} else if (zoom < 17) {
 				  map.removeLayer(GoogleLayer);
+				  document.getElementById("credits").innerHTML = credits;
 				}
 			});        
 
@@ -533,9 +539,6 @@
 	        // Add Google Imagery WMTS layer
 	        var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
 
-	        var basemap = map.getBasemap();
-	        console.log(basemap);
-	        // map.setBasemap();
 
 		});
 		// Failed callback
@@ -3046,7 +3049,7 @@
 	 	<span>x</span>
 	 </button>
  </div>
- <div id="credits">TxDOT, TPP-GIS</div>
+ <div id="credits"></div>
 <div>
 	<button type="button" id="btnSurvey" style=>Take the Survey</button>
 </div>	
