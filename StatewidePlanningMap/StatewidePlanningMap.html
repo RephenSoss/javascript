@@ -508,8 +508,8 @@
 				if (zoom >= 17) {
 				  map.addLayer(GoogleLayer);
 				  googleCredits = ", Google Imagery";
-				  credits.concat(googleCredits);
-				  document.getElementById("credits").innerHTML = credits;
+				  var concat = credits.concat(googleCredits);
+				  document.getElementById("credits").innerHTML = concat;
 
 				} else if (zoom < 17) {
 				  map.removeLayer(GoogleLayer);
