@@ -471,34 +471,20 @@
 		window.onresize = handleIEProblem;
 		handleIEProblem();
 
-		// Enables the use of the WMTS Google Imagery layer
-          // Local Proxy call
-          // esriConfig.defaults.io.proxyUrl = "/javascript/StatewidePlanningMap/AGS_Proxy/proxy.ashx";
-
 		// Google Imagery WMTS layer info
-        var WMTSLayerInfo = new WMTSLayerInfo({
+        var GoogleLayerInfo = new WMTSLayerInfo({
           identifier: "texas",
           tileMatrixSet: "0to20",
           format: "png"
         });
 
-        var resourceInfo = {
-          version: "1.0.0",
-          layerInfos: [layerInfo1, layerInfo2],
-          copyright: "open layer"
-        };
-
-        var options = {
+        var GoogleLayerOptions = {
           serviceMode: "KVP",
-          resourceInfo: resourceInfo,
-          layerInfo: WMTSLayerInfo
+          layerInfo: GoogleLayerInfo
         };
-
-        // Add Google Imagery WMTS layer
-        var wmtsLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", options);
 
 		// Use an AGO Web Map for the basemap, rather than a tile layer.  Use the createMap method from Utils passing in the web map id and map div
-		//  Note: Anything that refrences the map object must go inside of the callback function below.
+		// Note: Anything that refrences the map object must go inside of the callback function below.
 		var mapDeferred = arcgisUtils.createMap("535d4d799a164898bdf52f706f489f6a", "mapDiv", {mapOptions: {slider: true, logo: false}});
 		// Success callback that contains the info from the web map
 		mapDeferred.addCallback(function(response) 
@@ -519,9 +505,9 @@
 			map.on("zoom-end", function(result){
 				var zoom = result.level;
 				if (zoom >= 17) {
-				  map.addLayer(wmtsLayer);
+				  map.addLayer(GoogleLayer);	
 				} else if (zoom < 17) {
-				  map.removeLayer(wmtsLayer);
+				  map.removeLayer(GoogleLayer);
 				}
 			});        
 
@@ -540,6 +526,14 @@
 			//Set up the legend and create an array of the layers that will show in the legend.
 			theLegend = new Legend({map:map},"legendDiv");
 			theLegend.layerInfos=layerInfo; 
+
+	        // Name server with CORS enabled for Google Imagery
+			esriConfig.defaults.io.corsEnabledServers = ["https://txgi.tnris.org"];
+
+	        // Add Google Imagery WMTS layer
+	        var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
+	        
+
 		});
 		// Failed callback
 		mapDeferred.addErrback(function(response) 
