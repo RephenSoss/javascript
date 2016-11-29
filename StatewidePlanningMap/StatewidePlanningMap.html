@@ -485,7 +485,7 @@
 
 		// Use an AGO Web Map for the basemap, rather than a tile layer.  Use the createMap method from Utils passing in the web map id and map div
 		// Note: Anything that refrences the map object must go inside of the callback function below.
-		var mapDeferred = arcgisUtils.createMap("535d4d799a164898bdf52f706f489f6a", "mapDiv", {mapOptions: {slider: true, logo: false}});
+		var mapDeferred = arcgisUtils.createMap("535d4d799a164898bdf52f706f489f6a", "mapDiv", {mapOptions: {slider: true, maxZoom: 20; logo: false}});
 		// Success callback that contains the info from the web map
 		mapDeferred.addCallback(function(response) 
 		{	
@@ -498,7 +498,8 @@
 			addSearchLayers();
 
 			map.on("mouse-move", showCoordinates);
-			map.on("mouse-drag", showCoordinates);
+			map.on("mouse-drag", showCoordinates);			
+			map.on("zoom-end", showCoordinates);
 			map.on("zoom-end", scaleDependentQueries);
 
 			// Turn on Google Imagery when zoomed past level 16
@@ -532,7 +533,10 @@
 
 	        // Add Google Imagery WMTS layer
 	        var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
-	        
+
+	        var basemap = map.getBasemap();
+	        console.log(basemap);
+	        // map.setBasemap();
 
 		});
 		// Failed callback
