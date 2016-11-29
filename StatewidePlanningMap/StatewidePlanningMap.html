@@ -872,8 +872,8 @@
 			clearStyle("tocMaps");
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
-			console.log(map.getLayer(map.layerIds[0]));
-			console.log(map.getLayer(map.layerIds[1]));
+			map.removeLayer(map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+			map.removeLayer(map.getLayer(map.layerIds[1]));//"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer"
 			if (newMap=="Statewide_Planning_Map") {
 				// var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
 				console.log("blah");
