@@ -872,9 +872,6 @@
 			clearStyle("tocMaps");
 			var basemap;
 			console.log(basemap);
-			console.log(map.getLayer(map.layerIds[0]));
-			map.removeLayer(basemap);
-
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';
 			// if (newMap=="Statewide_Planning_Map") {
@@ -882,13 +879,13 @@
 			// 	map.addLayer(tiled);
 			// }
 			if (newMap=="Google") {
-				basemap = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
-				map.addLayer(basemap);
+				basemap = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
 			}	
 			else {
-				basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});	  
-				map.addLayer(basemap);
-			}			
+				basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});
+			}	
+			map.removeLayer(basemap);
+			map.addLayer(basemap);		
 
 			if (activeOverlay) {
 				activeOverlay.show();
