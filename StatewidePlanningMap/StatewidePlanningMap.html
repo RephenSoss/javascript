@@ -871,7 +871,8 @@
 		function changeBaseMap(event) {
 			clearStyle("tocMaps");
 			var basemap;
-			// map.removeLayer(map.getLayer(map.layerIds[0]));
+			console.log(basemap);
+			console.log(map.getLayer(map.layerIds[0]));
 			map.removeLayer(basemap);
 
 			var newMap = event.target.id;
