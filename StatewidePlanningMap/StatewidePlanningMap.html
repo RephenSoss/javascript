@@ -360,6 +360,9 @@
 	var vectorTileLayer;
 	var layerInfo = [];
 	var credits ="TxDOT, TPP-GIS";
+	var layer0;
+	var layer1;
+	var google;
 	
 	//Search variables
 	var citySearchLyr;
@@ -484,8 +487,13 @@
           layerInfo: GoogleLayerInfo
         };
 
+
+		// ***WEB MAP******************************************************************************************************************************************************************************************************
 		// Use an AGO Web Map for the basemap, rather than a tile layer.  Use the createMap method from Utils passing in the web map id and map div
 		// Note: Anything that refrences the map object must go inside of the callback function below.
+
+		// START HERE...
+
 		var mapDeferred = arcgisUtils.createMap("535d4d799a164898bdf52f706f489f6a", "mapDiv", {mapOptions: {slider: true, maxZoom: 20, logo: false}});
 		// Success callback that contains the info from the web map
 		mapDeferred.addCallback(function(response) 
@@ -502,26 +510,16 @@
 			map.on("mouse-drag", showCoordinates);
 			map.on("zoom-end", scaleDependentQueries);
 
-			// Turn on Google Imagery when zoomed past level 16
-			map.on("zoom-end", function(result){
-				var zoom = result.level;
-				if (zoom >= 17) {
-				  map.addLayer(GoogleLayer);
-				  googleCredits = ", Google Imagery";
-				  var concat = credits.concat(googleCredits);
-				  document.getElementById("credits").innerHTML = concat;
-
-				} else if (zoom < 17) {
-				  map.removeLayer(GoogleLayer);
-				  document.getElementById("credits").innerHTML = credits;
-				}
-			});        
-
 			createToolbar();
 			map.on("click", logCoords);	
 			// Clear graphic line on Measure Tab when a new line is started
 			map.on("click", clearMeasuredLineGraphic);
 			map.on("mouse-move", newCoords);
+
+			map.on("load", function(){
+				var layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+				var layer1 = (map.getLayer(map.layerIds[1])); //"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer")
+			});
 		
 			var scalebar = new Scalebar({
       	        map: map,
@@ -537,19 +535,41 @@
 			esriConfig.defaults.io.corsEnabledServers = ["https://txgi.tnris.org"];
 
 	        // Add Google Imagery WMTS layer
-	        var GoogleLayer = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
+	        google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
 
+
+			// Turn on Google Imagery when zoomed past level 16
+			// map.on("zoom-end", function(result){
+			// 	var zoom = result.level;
+			// 	if (zoom >= 17) {
+			// 	  map.addLayer(google);
+			// 	  googleCredits = ", Google Imagery";
+			// 	  var concat = credits.concat(googleCredits);
+			// 	  document.getElementById("credits").innerHTML = concat;
+
+			// 	} else if (zoom < 17) {
+			// 	  map.removeLayer(google);
+			// 	  document.getElementById("credits").innerHTML = credits;
+			// 	}
+			// });        
 
 		});
 		// Failed callback
 		mapDeferred.addErrback(function(response) 
 		{
-            alert("There was an issue obtaining the Statewide Planning web map.");
+            alert("There was an issue loading the Statewide Planning web map.");
             return;
 		});
 
-		//Uncomment the section below to use the SPM Tile Layer.  This is helpful when working on the code, since it doesn not require http to run (i.e. you can run off you hard drive for testing).
-				
+		// END HERE...
+
+
+
+		//***TILED BASEMAP*****************************************************************************************************************************************************************************************************
+		//Uncomment the section below to use the SPM Tile Layer.  This is helpful when working on the code, since it doesn not require http to run (i.e. you can run it locally for testing).
+
+		//START HERE...
+
 		// map = new Map("mapDiv", {minZoom:6, maxZoom:16, logo: false});
 		// map.infoWindow.set("titleInBody", false);
 
@@ -595,6 +615,14 @@
   //       var layerInfo = [];
 		// theLegend = new Legend({map:map},"legendDiv");
 		// theLegend.layerInfos=layerInfo; 
+
+		// // Name server with CORS enabled for Google Imagery
+		// esriConfig.defaults.io.corsEnabledServers = ["https://txgi.tnris.org"];
+
+  //       google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
+        
+
+		//END HERE...
 
 	
 		//Function to force IE8 to work, eventually this will not be needed.
@@ -871,23 +899,22 @@
 		function changeBaseMap(event) {
 			clearStyle("tocMaps");
 			var newMap = event.target.id;
-			document.getElementById(newMap).style.color='red';
-			var layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
-			var layer1 = (map.getLayer(map.layerIds[1])); //"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer"
+			document.getElementById(newMap).style.color='red';			
+			map.removeLayer(google);
 			//map.removeLayer(layer0);
-			map.removeLayer(layer1);
+			
+			// map.removeLayer(layer1);
 			if (newMap=="Statewide_Planning_Map") {
-				// var tiled = new Tiled("http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer",{id: newMap});
-				map.addLayers(layer0, layer1);
+				map.removeLayer(google);
 			}
 			if (newMap=="Google") {
-				var google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);
 				map.addLayer(google);
+				console.log("Google Imagery Added");
 			}	
-			else {
-				basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});
-				map.addLayer(basemap);	
-			}	
+			// else {
+			// 	basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});
+			// 	map.addLayer(basemap);	
+			// }	
 			
 
 			if (activeOverlay) {
@@ -1631,7 +1658,8 @@
 						tableText = "";
 						tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 						tableText += "<tr><td>Office Name</td><td>${OFFICE_NM}</td></tr>";
-						tableText += "<tr><td>Section Number</td><td>${MNT_SEC_NBR}</td></tr>";				
+						tableText += "<tr><td>Section Number</td><td>${MNT_SEC_NBR}</td></tr>";	
+						tableText += "<tr><td>District Name</td><td>${DIST_NM}</td></tr>";			
 						tableText += "</table>";		
 						
 						var infoTemplate = new InfoTemplate("Maintenance Office:",tableText);	
@@ -1640,7 +1668,7 @@
 						var theSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,new Color([197,0,255,255]), 2), new Color([197,0,255,0]));	
 						var theRenderer = new SimpleRenderer(theSymbol);
 
-						maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR"], infoTemplate: infoTemplate});	
+						maintOfficeLyr = new FeatureLayer(projectsUrl, {id:"Maintenance_Offices",visible: true,outFields:["OFFICE_NM","MNT_SEC_NBR", "DIST_NM"], infoTemplate: infoTemplate});	
 						maintOfficeLyr.setRenderer(theRenderer);	
 						map.addLayer(maintOfficeLyr);
 					}	
@@ -2835,6 +2863,7 @@
 	  <li>Added Cemetery Overlay</li>
 	  <li>Added Length field to Control Section popup</li>
 	  <li>Added ability to turn on 2 layers at a time</li>
+	  <li>Added District Name to Maintenance Office popup</li>
 	  <li>Updated Legend</li>
 	  <li>Upgraded API to 3.18</li>
 	  <li>Various User Interface Improvements</li>
