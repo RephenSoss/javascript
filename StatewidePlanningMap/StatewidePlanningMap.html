@@ -511,18 +511,13 @@
 			map.on("zoom-end", scaleDependentQueries);
 
 			createToolbar();
+			getBasemapLayers();
+
 			map.on("click", logCoords);	
 			// Clear graphic line on Measure Tab when a new line is started
 			map.on("click", clearMeasuredLineGraphic);
 			map.on("mouse-move", newCoords);
 
-			map.on("load", function(){
-				var layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
-				var layer1 = (map.getLayer(map.layerIds[1])); //"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer")
-				console.log(layer0);
-				console.log(layer1);
-			});
-		
 			var scalebar = new Scalebar({
       	        map: map,
                 scalebarUnit: "english",
@@ -625,6 +620,13 @@
         
 
 		//END HERE...
+
+		function getBasemapLayers(){
+				var layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+				var layer1 = (map.getLayer(map.layerIds[1])); //"http://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Statewide_Planning_Map/MapServer")
+				console.log(layer0);
+				console.log(layer1);
+		}
 
 	
 		//Function to force IE8 to work, eventually this will not be needed.
@@ -903,8 +905,6 @@
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';			
 			map.removeLayer(google);
-			
-			// map.removeLayer(layer1);
 			if (newMap=="Statewide_Planning_Map") {
 				console.log("changes");
 				map.reorderLayer(layer0, 0);
