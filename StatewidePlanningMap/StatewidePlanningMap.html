@@ -901,15 +901,18 @@
 			var newMap = event.target.id;
 			document.getElementById(newMap).style.color='red';			
 			map.removeLayer(google);
-			//map.removeLayer(layer0);
 			
 			// map.removeLayer(layer1);
 			if (newMap=="Statewide_Planning_Map") {
-				map.removeLayer(google);
+				map.reorderLayer(layer0, 0);
+				map.reorderLayer(layer1, 1);
 			}
 			if (newMap=="Google") {
 				map.addLayer(google);
-				console.log("Google Imagery Added");
+			}	
+			if (newMap=="LightGray") {
+				map.reorderLayer(layer0, 1);
+				map.reorderLayer(layer1, 0);
 			}	
 			// else {
 			// 	basemap = new Tiled("http://server.arcgisonline.com/ArcGIS/rest/services/" + newMap + "/MapServer", {id: newMap});
@@ -2890,9 +2893,10 @@
 		<table id="tocMaps" class="tocTables">
 		  <tr><th>Base Maps</th></tr>
           <tr><td class="Basemaps" id='Statewide_Planning_Map' style="color:red;">TxDOT</td></tr>		  
-		  <tr><td class="Basemaps" id='World_Street_Map'>ESRI Streets</td></tr>	  
+		  <!-- <tr><td class="Basemaps" id='World_Street_Map'>ESRI Streets</td></tr>	   -->
 		  <tr><td class="Basemaps" id='Google'>Google Imagery</td></tr>
-		  <tr><td class="Basemaps" id='World_Topo_Map'>Topographic</td></tr>
+		  <!-- <tr><td class="Basemaps" id='World_Topo_Map'>Topographic</td></tr> -->
+		  <tr><td class="Basemaps" id='LightGray'>Light Gray Basemap</td></tr>
 		  <!--
 		  <tr class="alt"><td class="Basemaps" id='Canvas/World_Light_Gray_Base'>Gray Canvas</td></tr>	 
 		  <tr><td class="Basemaps" id='NatGeo_World_Map'>National Geographic</td></tr>	
