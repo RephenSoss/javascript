@@ -535,7 +535,7 @@
 	        google = new WMTSLayer("https://txgi.tnris.org/login/path/pegasus-horizon-castro-comrade/wmts", GoogleLayerOptions);	
 
 
-			// Turn on Google Imagery when zoomed past level 16
+			// Turn on Google Imagery when zoomed past level 16 (!!NOW HANDLED IN WEB MAP!!)
 			// map.on("zoom-end", function(result){
 			// 	var zoom = result.level;
 			// 	if (zoom >= 17) {
@@ -749,12 +749,12 @@
 		}
 
 		// Clear graphic line on Measure Tab when a new line is started
-		function clearMeasuredLineGraphic (){
+		function clearMeasuredLineGraphic(){
 			if (document.getElementById("measureTab").style.display=="block"){
 				if (document.getElementById("mapDiv_graphics_layer").style.display=="block"){
-					map.graphics.clear();
 					if (xPointArray.length<2) {
 						document.getElementById("measuredDistance").innerHTML = "0.00";
+						map.graphics.clear();
 					}
 				}
 			}
