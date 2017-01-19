@@ -834,11 +834,14 @@
 		on(dom.byId("clearMeasure"), "click", clearMeasure);
 		function clearMeasure() {
 			map.graphics.clear();
-			document.getElementById("measuredDistance").innerHTML = "0.00";
-		    xPointArray.length=0;
+			deActivateTool("POLYLINE");
 			theDistMeasured=0;
+			xPointArray.length=0;	
+			document.getElementById("measuredDistance").innerHTML = "0.00";
 			currentMeasure=0;
+			deLength=0;
 			polyline = {};
+	        activateTool("POLYLINE");
 		}
 		
 		dojo.query(".MeasureUnits").forEach(function (result){
@@ -852,7 +855,7 @@
 
 		function createToolbar() {
 		  toolbar = new Draw(map);
-		  toolbar.on("draw-end", addToMap);
+		  toolbar.on("draw-complete", addToMap);
 		}	  
 		
 		function activateTool(theTool) {
@@ -2764,11 +2767,13 @@
 		on(dom.byId("btnClearProject"), "click", deClear);
 		function deClear() {
 			map.graphics.clear();
+			deActivateTool("POLYLINE");
 			document.getElementById("deCostResult").innerHTML = "";
 			theDistMeasured=0;
 			xPointArray.length=0;
 			currentMeasure=0;
 			deLength=0;
+	        activateTool("POLYLINE");
 		}
 
 		on(dom.byId("googleLink"), "click", openGoogleMaps);
