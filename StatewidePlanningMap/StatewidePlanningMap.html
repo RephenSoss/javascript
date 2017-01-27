@@ -41,7 +41,7 @@
 	 	z-index: 101;	 	
 	 }
 	 #releaseNotesDiv{
-	 	height: 450px;
+	 	height: 520px;
 	 	width: 280px;
 	 	left:0;
     	right:0;
@@ -370,15 +370,21 @@
 	     display: none;
 	     font-weight:bold;
 	     color: #4C4C4C;
-	 }
-	 .esriLegendMsg{
+	}
+	.esriLegendMsg{
 	 	display: none;
-	 }
-	 .esriSimpleSlider{
+	}
+	.esriSimpleSlider{
 	 	top:60px;
 	 	left:20px;
 	 	z-index:30;
-	 }
+	}
+	.esriPopupWrapper .title {
+    	cursor: move;
+	}
+	.esriPopup .hidden {
+    	display: none !important;
+	}
 
   </style>
   <script src="http://js.arcgis.com/3.18"></script>
@@ -458,6 +464,9 @@
 	    "esri/layers/LayerInfo",
 		"esri/dijit/Scalebar",
 		"dojo/on",
+		"dojo/dom-class",
+		"dojo/query",
+		"dojo/dnd/Moveable",
 
 		"esri/tasks/query", 
 		"esri/tasks/QueryTask",
@@ -503,7 +512,7 @@
         "esri/layers/WMTSLayer",
         "esri/layers/WMTSLayerInfo",
 
-		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on,
+		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable,
 			Query, QueryTask, arcgisUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
@@ -539,12 +548,27 @@
 		mapDeferred.addCallback(function(response) 
 		{	
 			map = response.map;
+			var handle = query(".title", map.infoWindow.domNode)[0];
+        	var dnd = new Moveable(map.infoWindow.domNode, {
+            handle: handle
+        	});
+        
+	        // when the infoWindow is moved, hide the arrow:
+	        on(dnd, 'FirstMove', function() {
+	            // hide pointer and outerpointer (used depending on where the pointer is shown)
+	            var arrowNode =  query(".outerPointer", map.infoWindow.domNode)[0];
+	            domClass.add(arrowNode, "hidden");
+	            
+	            var arrowNode =  query(".pointer", map.infoWindow.domNode)[0];
+	            domClass.add(arrowNode, "hidden");
+	        }.bind(this));
+
 			var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
 			map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
 		
 			//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
 			addInventoryData();
-			addSearchLayers();
+			//addSearchLayers();
 
 			map.on("mouse-move", showCoordinates);
 			map.on("mouse-drag", showCoordinates);
@@ -802,7 +826,7 @@
 
 		//END HERE...
 
-		
+
 
 		function getBasemapLayers(){
 				layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
@@ -1048,6 +1072,7 @@
 			}
 		 	toolbar.activate(tool);
 		  	map.hideZoomSlider();
+		  	//search.hide();
 		}
 
 		function deActivateTool(theTool) {
@@ -1057,6 +1082,7 @@
 			}
 		  	toolbar.deactivate(tool);
 		  	map.showZoomSlider();
+		  	//search.show();
 		}	
 		  
 		function addToMap(evt) {
@@ -2781,9 +2807,9 @@
 		// 	}
 		// }	
 		
-		// function noResults(theDiv,theText) {
-		// 	document.getElementById(theDiv).innerHTML = theText;
-		// }
+		function noResults(theDiv,theText) {
+			document.getElementById(theDiv).innerHTML = theText;
+		}
 		
 		// function showSearchResults(results,theZoom) {
 		// 	var resultItems = [];
@@ -3053,11 +3079,15 @@
 	<ul>	  
 	  <li>Switched to New Basemap</li>
 	  <li>Improved Search Function</li>
+	  		<ul>
+      			<li>Including Lat/Long</li>
+      		</ul>
 	  <li>Added Roadway Inventory Overlay</li>
 	  <li>Added Cemetery Overlay</li>
-	  <li>Added Length Field to Control Section popup</li>
-	  <li>Added Ability to Turn on 2 Layers at a Time</li>
+	  <li>Added Length Field to Control Section Popup</li>
+	  <li>Added Ability to Turn On 2 Layers at a Time</li>
 	  <li>Added District Name to Maintenance Office Popup</li>
+	  <li>Added Ability to Move Popup Windows</li>
 	  <li>Updated Legend</li>
 	  <li>Upgraded API to 3.18</li>
 	  <li>Various User Interface Improvements and Bug Fixes</li>
