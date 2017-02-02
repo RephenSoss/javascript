@@ -41,7 +41,7 @@
 	 	z-index: 101;	 	
 	 }
 	 #releaseNotesDiv{
-	 	height: 520px;
+	 	height: 380px;
 	 	width: 280px;
 	 	left:0;
     	right:0;
@@ -165,38 +165,8 @@
 	 #mapTab{
 	  display: block;
 	 }
-	 /*#searchTab{
+	 #searchTab{
 	  display: none; 
-	 }*/
-	 #search {
-	  display: block;
-	  position: absolute;
-	  z-index: 31;
-	  top: 20px;
-	  left: 227px;
-     }
-     .arcgisSearch{
-     	font:;
-     }
-/*     .arcgisSearch .searchMenu{
-     	position: absolute;
-     	left:50px;
-     }*/
-     .arcgisSearch .searchMenu .menuHeader{
-       background:#6699CC;
-	 }
-	 .arcgisSearch .searchMenu li.active {
-	   background-color: #6699CC;
-	 }
-	 .arcgisSearch .searchClear{
-	 	color:#FFFF00;
-	 	background-color:#D3D3D3;
-	 }
-	 .arcgisSearch .searchBtn{
-	 	padding: 6px 5px;
-	 }
-	 .arcgisSearch .searchGroup .searchInput{
-	 	width: 214px;
 	 }
 	 #measureTab{
 	   display: none;
@@ -267,7 +237,6 @@
 	.queryFields {
 		width: 127px;
 	}
-	
 	nav {
 	position: absolute;
     top: 20px;
@@ -282,13 +251,13 @@
 		}
 	nav ul {
 		background: #6699CC; 
-		/*box-shadow: 0px 0px 10px rgba(0,0,0,0.5);*/
 		padding: 0 0px;
 		border-radius: 5px;  
 		list-style: none;
 		position: relative;
 		display: inline-table;
 		margin: inherit;
+		width: 120px;
 	}
 		nav ul:after {
 			content: "";
@@ -297,41 +266,38 @@
 
 		}
 		nav ul li {
-			float: left;
-			font-size: .95em; 
+			float: left; 
 		}
 			nav ul li a {
 				display: block;
-				padding: 0px 5px;
+				padding: 6px 10px;
 				color: #fff;
 				text-decoration: none; 
 			}
 		nav ul ul {
-			background: #5f6975;
+			background: #6699CC;
 			border-radius: 0px 0px 5px 5px;
 			padding: 0;
-			position: absolute;
+			position: relative;
 			top: 88%;
-			left:0%;
-			right:0%;
-
+			width:110px;
 		}
 			nav ul ul li {
 				float: none;
 				border-radius: 0px 0px 5px 5px;
-				border-top: 1px solid #6b727c;
-				border-bottom: 1px solid #575f6a;
+/*				border-top: 1px solid #6b727c;
+				border-bottom: 1px solid #575f6a;*/
 				position: relative;
 				font-size: 0.8em;
 			}
 				nav ul ul li a {
-					padding: 0px 5px;
+					padding: relative;
 					color: #fff;
 					border-radius: 5px;
 				}	
 					nav ul ul li a:hover {
 						background: #4b545f;
-						border-radius: 0px;
+						border-radius: 5px;
 					}
 
 	#credits {
@@ -370,21 +336,10 @@
 	     display: none;
 	     font-weight:bold;
 	     color: #4C4C4C;
-	}
-	.esriLegendMsg{
+	 }
+	 .esriLegendMsg{
 	 	display: none;
-	}
-	.esriSimpleSlider{
-	 	top:60px;
-	 	left:20px;
-	 	z-index:30;
-	}
-	.esriPopupWrapper .title {
-    	cursor: move;
-	}
-	.esriPopup .hidden {
-    	display: none !important;
-	}
+	 }
 
   </style>
   <script src="http://js.arcgis.com/3.18"></script>
@@ -464,15 +419,11 @@
 	    "esri/layers/LayerInfo",
 		"esri/dijit/Scalebar",
 		"dojo/on",
-		"dojo/dom-class",
-		"dojo/query",
-		"dojo/dnd/Moveable",
 
 		"esri/tasks/query", 
 		"esri/tasks/QueryTask",
 		"esri/arcgis/utils",
 		"esri/dijit/Legend",
-		"esri/dijit/Search",
 		"esri/geometry/webMercatorUtils",
 		"dojo/dom",
 		"esri/layers/KMLLayer",
@@ -512,8 +463,8 @@
         "esri/layers/WMTSLayer",
         "esri/layers/WMTSLayerInfo",
 
-		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable,
-			Query, QueryTask, arcgisUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw,
+		"dojo/domReady!"], function (Map, Renderer, domConstruct, LayerInfo, Scalebar, on,
+			Query, QueryTask, arcgisUtils, Legend, webMercatorUtils, dom, KMLLayer, parser, Draw,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
 			SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,
@@ -548,27 +499,12 @@
 		mapDeferred.addCallback(function(response) 
 		{	
 			map = response.map;
-			var handle = query(".title", map.infoWindow.domNode)[0];
-        	var dnd = new Moveable(map.infoWindow.domNode, {
-            handle: handle
-        	});
-        
-	        // when the infoWindow is moved, hide the arrow:
-	        on(dnd, 'FirstMove', function() {
-	            // hide pointer and outerpointer (used depending on where the pointer is shown)
-	            var arrowNode =  query(".outerPointer", map.infoWindow.domNode)[0];
-	            domClass.add(arrowNode, "hidden");
-	            
-	            var arrowNode =  query(".pointer", map.infoWindow.domNode)[0];
-	            domClass.add(arrowNode, "hidden");
-	        }.bind(this));
-
 			var theExtent = new Extent(-107,25.27,-93,37.27, new SpatialReference({ wkid: 4269 }));
 			map.setExtent(webMercatorUtils.geographicToWebMercator(theExtent));			
 		
 			//Add Roadway Inventory data to map but don't show until needed during Query.  Same for search layers.
 			addInventoryData();
-			//addSearchLayers();
+			addSearchLayers();
 
 			map.on("mouse-move", showCoordinates);
 			map.on("mouse-drag", showCoordinates);
@@ -591,147 +527,6 @@
 			//Set up the legend and create an array of the layers that will show in the legend.
 			theLegend = new Legend({map:map},"legendDiv");
 			theLegend.layerInfos=layerInfo; 
-
-	        var search = new Search({
-            
-            enableButtonMode: true, //this enables the search widget to display as a single button
-            enableLabel: false,
-            enableSuggestions:true,
-            enableInfoWindow: false,
-            showInfoWindowOnSelect: false,
-            allPlaceholder:"City, County, District, Hwy, CSJ...",
-            map: map,
-         }, "search");
-
-
-         var sources = search.get("sources");
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_City_Boundaries/FeatureServer/0"),          
-            searchFields: ["CITY_NM"],
-            displayField: "CITY_NM",
-            exactMatch: false,
-            name: "City",
-            outFields: ["*"],
-            placeholder: "City",
-            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
-            maxResults: 6,
-            maxSuggestions: 6,             
-            enableSuggestions: true,
-            minCharacters: 0
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0"),
-            searchFields: ["CTRL_SECT_LN_NBR"],
-            displayField: "CTRL_SECT_LN_NBR",
-            exactMatch: false,
-            outFields: ["CTRL_SECT_LN_NBR","RTE_RB_NM","BEGIN_MPT","END_MPT"],
-            name: "Control Section",
-            placeholder: "001001",
-            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
-            maxResults: 6,
-            maxSuggestions: 6,
-            enableSuggestions: true,
-            minCharacters: 0
-
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0"),
-            searchFields: ["CONTROL_SECT_JOB"],
-            displayField: "CONTROL_SECT_JOB",
-            exactMatch: false,
-            outFields: ["CONTROL_SECT_JOB ","DISTRICT_NUMBER ","LAYMAN_DESCRIPTION1","HIGHWAY_NUMBER"],
-            name: "Control Section Job (CSJ)",
-            placeholder: "001001001",
-            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
-            maxResults: 6,
-            maxSuggestions: 6,
-            enableSuggestions: true,
-            minCharacters: 0
-
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_County_Boundaries/FeatureServer/0"),
-            searchFields: ["CNTY_NM"],
-            displayField: "CNTY_NM",
-            exactMatch: false,
-            outFields: ["*"],
-            name: "County",
-            placeholder: "County",
-            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
-            maxResults: 6,
-            maxSuggestions: 6,
-            enableSuggestions: true,
-            minCharacters: 0
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Districts/FeatureServer/0"),
-            searchFields: ["DIST_NM"],
-            displayField: "DIST_NM",
-            exactMatch: false,
-            name: "District",
-            outFields: ["*"],
-            placeholder: "District",
-            highlightSymbol: new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),new esri.Color([255,255,255,0.0])),
-            maxResults: 6,
-            maxSuggestions: 6,         
-            enableSuggestions: true,
-            minCharacters: 0
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Highways_test/FeatureServer/0"),
-            searchFields: ["RTE_NM"],
-            displayField: "RTE_CNTY",
-            exactMatch: false,
-            name: "On System Highway",
-            outFields: ["*"],
-            placeholder: "Ex: IH0035, US0083, SH0079",
-            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
-            maxResults: 6,
-            maxSuggestions: 6,            
-            enableSuggestions: true,
-            minCharacters: 0
-         });
-
-         sources.push({
-            featureLayer: new FeatureLayer("http://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0"),
-            searchFields: ["RANK"],
-            displayField: "RANK",
-            exactMatch: false,
-            name: "Top 100 Rank",
-            outFields: ["*"],
-            placeholder: "Enter a Rank (1-100)",
-            highlightSymbol: new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new esri.Color([255,255,0,0.5]), 7),
-            maxResults: 6,
-            maxSuggestions: 6,           
-            enableSuggestions: true,
-            minCharacters: 0
-         });
-
-         sources[0].categories = ["Coordinate System"];
-         sources[0].placeholder= "-97.745520, 30.257332";
-         sources[0].name = "Latitude/Longitude";
-
-
-         //Set the sources above to the search widget
-         search.set("sources", sources);
-         search.sources[0].searchExtent = theExtent;
-
-         search.on("blur",expandSearch);
-         
-         function expandSearch(){
-         	var x=document.getElementById("search_input");
-         	if ((x.value).length > 0){
-         		search.expand();
-         	}
-         }
-
-   	     search.startup();
 
 	        // Name server with CORS enabled for Google Imagery
 			esriConfig.defaults.io.corsEnabledServers = ["https://txgi.tnris.org"];
@@ -825,8 +620,6 @@
         
 
 		//END HERE...
-
-
 
 		function getBasemapLayers(){
 				layer0 = (map.getLayer(map.layerIds[0])); //"https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer"
@@ -1072,7 +865,6 @@
 			}
 		 	toolbar.activate(tool);
 		  	map.hideZoomSlider();
-		  	//search.hide();
 		}
 
 		function deActivateTool(theTool) {
@@ -1082,7 +874,6 @@
 			}
 		  	toolbar.deactivate(tool);
 		  	map.showZoomSlider();
-		  	//search.show();
 		}	
 		  
 		function addToMap(evt) {
@@ -1146,9 +937,9 @@
 			if (ID == 'tcMap') {
 				activeTab = 'mapTab';
 			}
-			// else if (ID == 'tcSearch') {
-			// 	activeTab = 'searchTab';
-			// }
+			else if (ID == 'tcSearch') {
+				activeTab = 'searchTab';
+			}
 			else if (ID == 'tcMeasure') {
 				activeTab = 'measureTab';
 			}
@@ -1180,7 +971,7 @@
 		
 			clearStyle("tcTabs");
 			document.getElementById("mapTab").style.display="none";		
-			// document.getElementById("searchTab").style.display="none";
+			document.getElementById("searchTab").style.display="none";
 			document.getElementById("measureTab").style.display="none";
 			document.getElementById("queryTab").style.display="none";				
 			document.getElementById("sketchTab").style.display="none";
@@ -2200,7 +1991,7 @@
 						tableText = "";
 						tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 						tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
-						tableText += "<tr><td>Senator</td><td><a href='http://www.senate.state.tx.us/75r/Senate/members/dist${DIST_NBR}/dist${DIST_NBR}.htm' target='_blank'>${REP_NM}</a></td></tr>";			
+						tableText += "<tr><td>Senator</td><td><a href='http://www.senate.state.tx.us/member.php?d=${DIST_NBR}' target='_blank'>${REP_NM}</a></td></tr>";			
 						tableText += "</table>";		
 						
 						var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
@@ -2678,232 +2469,232 @@
 		dojo.query(".Searcher").forEach(function (result){
 				on(result, "click", check);
 		});
-		// var theSearchLayer;
-		// function check(searchLayer) {
-		// 	theSearchLayer = searchLayer.target.id;
-		// 	document.getElementById("txtSearch").focus();
-		// 	document.getElementById("searchResults").innerHTML = "";
-		// }
+		var theSearchLayer;
+		function check(searchLayer) {
+			theSearchLayer = searchLayer.target.id;
+			document.getElementById("txtSearch").focus();
+			document.getElementById("searchResults").innerHTML = "";
+		}
 			
-		// on(dom.byId("txtSearch"), "keyup", checkInput);
-		// function checkInput(event) {
-		// 	var userInput = event.target.value;
+		on(dom.byId("txtSearch"), "keyup", checkInput);
+		function checkInput(event) {
+			var userInput = event.target.value;
 
-		// 	var inputLenTest=3;
-		// 	if (theSearchLayer=="OnSystem_Highway") {
-		// 		inputLenTest=4;
-		// 	}
+			var inputLenTest=3;
+			if (theSearchLayer=="OnSystem_Highway") {
+				inputLenTest=4;
+			}
 	
-		// 	else if (theSearchLayer=="Top_100_Congested"){
-		// 		inputLenTest=0;		
-		// 	}
+			else if (theSearchLayer=="Top_100_Congested"){
+				inputLenTest=0;		
+			}
 
-		// 	else {
-		// 		inputLenTest=3;		
-		// 	}
+			else {
+				inputLenTest=3;		
+			}
 
 
 		
-		// 	if (userInput.length>inputLenTest) {		
-		// 		if (theSearchLayer=="Texas_City") {			
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[CITY_NM] LIKE '" + userInput + "%'";				
-		// 			citySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});					
-		// 		}
+			if (userInput.length>inputLenTest) {		
+				if (theSearchLayer=="Texas_City") {			
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[CITY_NM] LIKE '" + userInput + "%'";				
+					citySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});					
+				}
 				
-		// 		if (theSearchLayer=="TxDOT_Control_Section") {	
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[CTRL_SECT_NBR] LIKE '" + userInput + "%'";				
-		// 			csSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
-		// 		}
+				if (theSearchLayer=="TxDOT_Control_Section") {	
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[CTRL_SECT_NBR] LIKE '" + userInput + "%'";				
+					csSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
+				}
 				
-		// 		if (theSearchLayer=="Texas_County") {		
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[CNTY_NM] LIKE '" + userInput + "%'";				
-		// 			countySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
-		// 		}
+				if (theSearchLayer=="Texas_County") {		
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[CNTY_NM] LIKE '" + userInput + "%'";				
+					countySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
+				}
 				
-		// 		if (theSearchLayer=="TxDOT_District") {	
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[DIST_NM] LIKE '" + userInput + "%'";				
-		// 			districtSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
-		// 		}			
+				if (theSearchLayer=="TxDOT_District") {	
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[DIST_NM] LIKE '" + userInput + "%'";				
+					districtSearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});			
+				}			
 
-		// 		if (theSearchLayer=="OnSystem_Highway") {
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[RTE_NM] LIKE '" + userInput + "%'";				
-		// 			highwaySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
-		// 		}
+				if (theSearchLayer=="OnSystem_Highway") {
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[RTE_NM] LIKE '" + userInput + "%'";				
+					highwaySearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
+				}
 
-		// 		if (theSearchLayer=="Top_100_Congested") {
-		// 			var query = new Query();
-		// 			query.returnGeometry = false;
-		// 			query.where = "[Rank] LIKE '" + userInput + "%'";				
-		// 			top100SearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
-		// 		}
+				if (theSearchLayer=="Top_100_Congested") {
+					var query = new Query();
+					query.returnGeometry = false;
+					query.where = "[Rank] LIKE '" + userInput + "%'";				
+					top100SearchLyr.queryIds(query, function (objectIds) {getAttributeData(objectIds);});							
+				}
 
-		// 	}	
-		// }
+			}	
+		}
 		
-		// function getAttributeData(theIDs) {		
-		// 	var querySuccessful = false;	
-	 //        var query = new Query();
-	 //        query.objectIds = theIDs.slice();
-	 //        query.outFields = ["*"];
+		function getAttributeData(theIDs) {		
+			var querySuccessful = false;	
+	        var query = new Query();
+	        query.objectIds = theIDs.slice();
+	        query.outFields = ["*"];
 
-		// 	if (theSearchLayer=="Texas_City") {
-		// 		citySearchLyr.queryFeatures(query, function (featureSet) {
-		// 			showSearchResults(featureSet,12);
-		// 			querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="Texas_City") {
+				citySearchLyr.queryFeatures(query, function (featureSet) {
+					showSearchResults(featureSet,12);
+					querySuccessful = true;	
+				});	
+			}
 			
-		// 	if (theSearchLayer=="TxDOT_Control_Section") {
-		// 		csSearchLyr.queryFeatures(query, function (featureSet) {
-		// 		  showSearchResults(featureSet,13);
-		// 		  querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="TxDOT_Control_Section") {
+				csSearchLyr.queryFeatures(query, function (featureSet) {
+				  showSearchResults(featureSet,13);
+				  querySuccessful = true;	
+				});	
+			}
 
-		// 	if (theSearchLayer=="Texas_County") {
-		// 		countySearchLyr.queryFeatures(query, function (featureSet) {
-		// 		  showSearchResults(featureSet,10);
-		// 		  querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="Texas_County") {
+				countySearchLyr.queryFeatures(query, function (featureSet) {
+				  showSearchResults(featureSet,10);
+				  querySuccessful = true;	
+				});	
+			}
 
-		// 	if (theSearchLayer=="TxDOT_District") {
-		// 		districtSearchLyr.queryFeatures(query, function (featureSet) {
-		// 		  showSearchResults(featureSet,8);
-		// 		  querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="TxDOT_District") {
+				districtSearchLyr.queryFeatures(query, function (featureSet) {
+				  showSearchResults(featureSet,8);
+				  querySuccessful = true;	
+				});	
+			}
 
-		// 	if (theSearchLayer=="OnSystem_Highway") {
-		// 		highwaySearchLyr.queryFeatures(query, function (featureSet) {
-		// 		  showSearchResults(featureSet,12);
-		// 		  querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="OnSystem_Highway") {
+				highwaySearchLyr.queryFeatures(query, function (featureSet) {
+				  showSearchResults(featureSet,12);
+				  querySuccessful = true;	
+				});	
+			}
 
-		// 	if (theSearchLayer=="Top_100_Congested") {
-		// 		top100SearchLyr.queryFeatures(query, function (featureSet) {
-		// 		  showSearchResults(featureSet,13);
-		// 		  querySuccessful = true;	
-		// 		});	
-		// 	}
+			if (theSearchLayer=="Top_100_Congested") {
+				top100SearchLyr.queryFeatures(query, function (featureSet) {
+				  showSearchResults(featureSet,13);
+				  querySuccessful = true;	
+				});	
+			}
 
 			
-		// 	if (querySuccessful) {
-		// 	  //Nothing
-		// 	}
-		// 	else {
-		// 	  noResults("searchResults","Searching...");
-		// 	}
-		// }	
+			if (querySuccessful) {
+			  //Nothing
+			}
+			else {
+			  noResults("searchResults","Searching...");
+			}
+		}	
 		
 		function noResults(theDiv,theText) {
 			document.getElementById(theDiv).innerHTML = theText;
 		}
 		
-		// function showSearchResults(results,theZoom) {
-		// 	var resultItems = [];
-		// 	var finalSet = [];
-		// 	var resultText = "";
-	 //        var resultCount = results.features.length;
-	 //        for (var i = 0; i < resultCount; i++) {
-	 //          var featureAttributes = results.features[i].attributes;
-	 //          for (var attr in featureAttributes) {
-		// 		finalSet.push(featureAttributes[attr]);
-	 //          }
+		function showSearchResults(results,theZoom) {
+			var resultItems = [];
+			var finalSet = [];
+			var resultText = "";
+	        var resultCount = results.features.length;
+	        for (var i = 0; i < resultCount; i++) {
+	          var featureAttributes = results.features[i].attributes;
+	          for (var attr in featureAttributes) {
+				finalSet.push(featureAttributes[attr]);
+	          }
 
-		// 	  if (theSearchLayer=="OnSystem_Highway") {
-		// 		resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "-" + finalSet[2] + " CO.</span>";			
-		// 	  }
+			  if (theSearchLayer=="OnSystem_Highway") {
+				resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "-" + finalSet[2] + " CO.</span>";			
+			  }
 
-		// 	  else if (theSearchLayer=="Top_100_Congested"){
-		// 	  	resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
-		// 	  }
+			  else if (theSearchLayer=="Top_100_Congested"){
+			  	resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
+			  }
 
-		// 	  else if (theSearchLayer=="TxDOT_Control_Section"){
-		// 	  	resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
-		// 	  }
+			  else if (theSearchLayer=="TxDOT_Control_Section"){
+			  	resultText += "<span class='SearchResult' id='" + finalSet[3] + "," + finalSet[4] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
+			  }
 
-		// 	  else {
-		// 		resultText += "<span class='SearchResult' id='" + finalSet[4] + "," + finalSet[5] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
-		// 	  }
-		// 	  finalSet = [];
-	 //        }
+			  else {
+				resultText += "<span class='SearchResult' id='" + finalSet[4] + "," + finalSet[5] + "," + theZoom + "," + finalSet[0] + "'>" + finalSet[1] + "</span>";
+			  }
+			  finalSet = [];
+	        }
 			
-		// 	document.getElementById("searchResults").innerHTML = resultText;
+			document.getElementById("searchResults").innerHTML = resultText;
 
-		// 	dojo.query(".SearchResult").forEach(function (result){
-		// 		on(result, "click", zoomTo);
-		// 		on(result, "click", clearHighlighter);
-		// 		on(result, "click", highlighter);
-		// 	});
+			dojo.query(".SearchResult").forEach(function (result){
+				on(result, "click", zoomTo);
+				on(result, "click", clearHighlighter);
+				on(result, "click", highlighter);
+			});
 			
-		// }
+		}
 
-		// function highlighter (result) {
-		// 	var params = result.target.id;
-		// 	var paramsList = params.split(',');
-		// 	var theOID = paramsList[3];
-		// 	var whereClause = "OBJECTID =" + theOID;
-		// 	if (theSearchLayer=="Texas_City") {
-		// 		citySearchLyr.setDefinitionExpression(whereClause);
-		// 			citySearchLyr.show();
-		// 	}
-		// 	if (theSearchLayer=="TxDOT_Control_Section") {
-		// 		csSearchLyr.setDefinitionExpression(whereClause);
-		// 			csSearchLyr.show();
-		// 	}
-		// 	if (theSearchLayer=="Texas_County") {
-		// 		countySearchLyr.setDefinitionExpression(whereClause);
-		// 			countySearchLyr.show();
-		// 	}
-		// 	if (theSearchLayer=="TxDOT_District") {
-		// 		districtSearchLyr.setDefinitionExpression(whereClause);
-		// 			districtSearchLyr.show();
-		// 	}
-		// 	if (theSearchLayer=="OnSystem_Highway") {
-		// 		highwaySearchLyr.setDefinitionExpression(whereClause);
-		// 			highwaySearchLyr.show();
-		// 	}
-		// 	if (theSearchLayer=="Top_100_Congested") {
-		// 		top100SearchLyr.setDefinitionExpression(whereClause);
-		// 			top100SearchLyr.show();
-		// 	}
+		function highlighter (result) {
+			var params = result.target.id;
+			var paramsList = params.split(',');
+			var theOID = paramsList[3];
+			var whereClause = "OBJECTID =" + theOID;
+			if (theSearchLayer=="Texas_City") {
+				citySearchLyr.setDefinitionExpression(whereClause);
+					citySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_Control_Section") {
+				csSearchLyr.setDefinitionExpression(whereClause);
+					csSearchLyr.show();
+			}
+			if (theSearchLayer=="Texas_County") {
+				countySearchLyr.setDefinitionExpression(whereClause);
+					countySearchLyr.show();
+			}
+			if (theSearchLayer=="TxDOT_District") {
+				districtSearchLyr.setDefinitionExpression(whereClause);
+					districtSearchLyr.show();
+			}
+			if (theSearchLayer=="OnSystem_Highway") {
+				highwaySearchLyr.setDefinitionExpression(whereClause);
+					highwaySearchLyr.show();
+			}
+			if (theSearchLayer=="Top_100_Congested") {
+				top100SearchLyr.setDefinitionExpression(whereClause);
+					top100SearchLyr.show();
+			}
 
-		// }
+		}
 
-		// on(dom.byId("txtSearch"), "click", clearHighlighter);
-		// on(dom.byId("btnClearHighlighter"), "click", clearHighlighter);
-		// function clearHighlighter () {
-		// 	citySearchLyr.setDefinitionExpression("");
-		// 	csSearchLyr.setDefinitionExpression("");
-		// 	countySearchLyr.setDefinitionExpression("");
-		// 	districtSearchLyr.setDefinitionExpression("");
-		// 	highwaySearchLyr.setDefinitionExpression("");
-		// 	top100SearchLyr.setDefinitionExpression("");
-		// 	citySearchLyr.hide();
-		// 	csSearchLyr.hide();
-		// 	countySearchLyr.hide();
-		// 	districtSearchLyr.hide();
-		// 	highwaySearchLyr.hide();
-		// 	top100SearchLyr.hide();
-		// 	document.getElementById("btnClearHighlighter").style.display="none";
-		// }
+		on(dom.byId("txtSearch"), "click", clearHighlighter);
+		on(dom.byId("btnClearHighlighter"), "click", clearHighlighter);
+		function clearHighlighter () {
+			citySearchLyr.setDefinitionExpression("");
+			csSearchLyr.setDefinitionExpression("");
+			countySearchLyr.setDefinitionExpression("");
+			districtSearchLyr.setDefinitionExpression("");
+			highwaySearchLyr.setDefinitionExpression("");
+			top100SearchLyr.setDefinitionExpression("");
+			citySearchLyr.hide();
+			csSearchLyr.hide();
+			countySearchLyr.hide();
+			districtSearchLyr.hide();
+			highwaySearchLyr.hide();
+			top100SearchLyr.hide();
+			document.getElementById("btnClearHighlighter").style.display="none";
+		}
 
-		// on(dom.byId("searchResults"), "click", showClearButton);
-		// function showClearButton (){
-		// 	document.getElementById("btnClearHighlighter").style.display="block";
-		// }		
+		on(dom.byId("searchResults"), "click", showClearButton);
+		function showClearButton (){
+			document.getElementById("btnClearHighlighter").style.display="block";
+		}		
 		
 		on(dom.byId("btnCalcCost"), "click", deCalculateCost);
 		function deCalculateCost() {
@@ -3079,15 +2870,11 @@
 	<ul>	  
 	  <li>Switched to New Basemap</li>
 	  <li>Improved Search Function</li>
-	  		<ul>
-      			<li>Including Lat/Long</li>
-      		</ul>
 	  <li>Added Roadway Inventory Overlay</li>
 	  <li>Added Cemetery Overlay</li>
-	  <li>Added Length Field to Control Section Popup</li>
-	  <li>Added Ability to Turn On 2 Layers at a Time</li>
+	  <li>Added Length Field to Control Section popup</li>
+	  <li>Added Ability to Turn on 2 Layers at a Time</li>
 	  <li>Added District Name to Maintenance Office Popup</li>
-	  <li>Added Ability to Move Popup Windows</li>
 	  <li>Updated Legend</li>
 	  <li>Upgraded API to 3.18</li>
 	  <li>Various User Interface Improvements and Bug Fixes</li>
@@ -3098,15 +2885,15 @@
       <div id="tabControl">
 		  <table id="tcTabs">
 			  <tr align="center">
-				  <td class="Tabs" id="tcMap" bgcolor='#6699CC' style="color:white;">&nbsp&nbspMaps&nbsp&nbsp</td>
-				  <!-- <td class="Tabs" id="tcSearch">Search</td> -->
-				  <td class="Tabs" id="tcMeasure">&nbsp&nbspMeasure&nbsp&nbsp</td>
-				  <td class="Tabs" id="tcQuery">&nbsp&nbspQuery&nbsp&nbsp</td>
+				  <td class="Tabs" id="tcMap" bgcolor='#6699CC' style="color:white;">Maps</td>
+				  <td class="Tabs" id="tcSearch">Search</td>
+				  <td class="Tabs" id="tcMeasure">Measure</td>
+				  <td class="Tabs" id="tcQuery">Query</td>
 			  </tr>
 			  <tr>
-				  <td class="Tabs" id="tcSketch">&nbsp&nbspSketch&nbsp&nbsp</td>
-				  <td class="Tabs" id="tcLegend">&nbsp&nbspLegend&nbsp&nbsp</td>				  
-				  <td class="Tabs" id="tcAbout">&nbsp&nbspAbout&nbsp&nbsp</td>				  
+				  <td class="Tabs" id="tcSketch" colspan=2>Sketch Tool</td>
+				  <td class="Tabs" id="tcLegend">Legend</td>				  
+				  <td class="Tabs" id="tcAbout">About</td>				  
 			  </tr>			  
 		  </table>
 	  </div>
@@ -3158,7 +2945,7 @@
 		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
 		</table>
 	  </div>
-	  <!-- <div id="searchTab">
+	  <div id="searchTab">
 		<table class="tocTables">
 		 <tr><th>Select layer to search</th></tr>
 		 <tr><td>
@@ -3175,7 +2962,7 @@
 		 <tr><td><input id="txtSearch" type="text" onfocus="this.value=''" value="Search here..."/></td></tr>
 		 <tr><td><div id="searchResults"></div></td></tr>
         </table>
-	  </div> -->
+	  </div>
 	  <div id="measureTab">
 		<table class="tocTables">
          <tr><th>Units</th></tr>		
@@ -3293,7 +3080,6 @@
 			</table>
 		</div>	
   </div>
- <div id="search"></div>
  <div id="mapDiv">
      <span id="info"></span>
 	 <button id="btnClearHighlighter" title="Clear Highlight" style="display:none">
