@@ -2200,7 +2200,7 @@
 						tableText = "";
 						tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 						tableText += "<tr><td>District</td><td>${DIST_NBR}</td></tr>";
-						tableText += "<tr><td>Senator</td><td><a href='http://www.senate.state.tx.us/75r/Senate/members/dist${DIST_NBR}/dist${DIST_NBR}.htm' target='_blank'>${REP_NM}</a></td></tr>";			
+						tableText += "<tr><td>Senator</td><td><a href='http://www.senate.state.tx.us/member.php?d=${DIST_NBR}' target='_blank'>${REP_NM}</a></td></tr>";			
 						tableText += "</table>";		
 						
 						var infoTemplate = new InfoTemplate("State Senate District:",tableText);	
